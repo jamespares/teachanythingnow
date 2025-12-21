@@ -3,6 +3,9 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
 
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
