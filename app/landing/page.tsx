@@ -27,15 +27,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
       <header className="bg-[var(--surface)] border-b border-[var(--border)]">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[var(--primary)] rounded-lg flex items-center justify-center" style={{ border: '1px solid var(--background)', boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.15)' }}>
-              <svg className="w-5 h-5 text-[var(--surface)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything</span>
-          </div>
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-end">
           <button
             onClick={() => router.push("/auth/signin")}
             className="text-[var(--primary)] font-medium hover:underline"
@@ -81,11 +73,11 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">PowerPoint Slides</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>PowerPoint Slides</h3>
               <p className="text-[var(--text-secondary)]">
                 Professional presentation with clear structure and key points
               </p>
@@ -93,11 +85,11 @@ export default function LandingPage() {
 
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Podcast Audio</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>Podcast Audio</h3>
               <p className="text-[var(--text-secondary)]">
                 Natural-sounding audio explanation for auditory learners
               </p>
@@ -105,11 +97,11 @@ export default function LandingPage() {
 
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Student Worksheet</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>Student Worksheet</h3>
               <p className="text-[var(--text-secondary)]">
                 Exercises and questions to reinforce understanding
               </p>
@@ -117,11 +109,11 @@ export default function LandingPage() {
 
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">Answer Key</h3>
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>Answer Key</h3>
               <p className="text-[var(--text-secondary)]">
                 Complete answers for quick and easy grading
               </p>
@@ -161,7 +153,7 @@ export default function LandingPage() {
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
           <div className="card p-8 md:p-12 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)] mb-4" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>
               Ready to save hours of preparation?
             </h2>
             <p className="text-[var(--text-secondary)] mb-8 max-w-lg mx-auto">
