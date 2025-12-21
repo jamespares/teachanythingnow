@@ -102,7 +102,7 @@ export default function SignIn() {
               </div>
 
               <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
-                We'll send you a sign-in link
+                We&apos;ll send you a sign-in link
               </p>
             </>
           ) : (
