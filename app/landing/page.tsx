@@ -73,7 +73,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: '#ffffff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                 </svg>
               </div>
@@ -85,7 +85,7 @@ export default function LandingPage() {
 
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: '#ffffff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                 </svg>
               </div>
@@ -97,7 +97,7 @@ export default function LandingPage() {
 
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: '#ffffff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
@@ -109,7 +109,7 @@ export default function LandingPage() {
 
             <div className="card p-6">
               <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-5 h-5" style={{ color: 'rgba(0, 0, 0, 1)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: '#ffffff' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -140,8 +140,7 @@ export default function LandingPage() {
               style={{ 
                 maxWidth: '800px',
                 backgroundColor: 'var(--background)',
-                boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.15)',
-                border: '1px solid var(--text-primary)'
+                boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.15)'
               }}
               priority
             />
