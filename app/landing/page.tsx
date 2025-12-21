@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import Image from "next/image";
 
 export default function LandingPage() {
   const router = useRouter();
@@ -28,8 +29,8 @@ export default function LandingPage() {
       <header className="bg-[var(--surface)] border-b border-[var(--border)]">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-[var(--primary)] rounded-lg flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-8 h-8 bg-[var(--primary)] rounded-lg flex items-center justify-center" style={{ border: '1px solid var(--background)', boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.15)' }}>
+              <svg className="w-5 h-5 text-[var(--surface)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
@@ -48,7 +49,7 @@ export default function LandingPage() {
       <section className="bg-[var(--surface)]">
         <div className="max-w-6xl mx-auto px-6 py-20 md:py-28">
           <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-6 leading-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-6 leading-tight" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>
               Create complete lesson materials in seconds
             </h1>
             <p className="text-lg text-[var(--text-secondary)] mb-8">
@@ -73,7 +74,7 @@ export default function LandingPage() {
       {/* Features */}
       <section className="py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-12 text-center">
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-12 text-center" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>
             Everything you need to teach any topic
           </h2>
           
@@ -130,42 +131,28 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="bg-[var(--surface)] py-16 md:py-24">
+      <section className="flex flex-wrap bg-[var(--background)] py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-12 text-center">
-            Three simple steps
+          <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-8 text-center" style={{ fontFamily: 'SFMono-Regular, Consolas, "Liberation Mono", monospace' }}>
+            How it works
           </h2>
           
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                1
-              </div>
-              <h3 className="font-semibold text-[var(--text-primary)] mb-2">Enter your topic</h3>
-              <p className="text-[var(--text-secondary)] text-sm">
-                Type any subject you want to teach
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                2
-              </div>
-              <h3 className="font-semibold text-[var(--text-primary)] mb-2">Pay £1</h3>
-              <p className="text-[var(--text-secondary)] text-sm">
-                Secure payment via Stripe
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-12 h-12 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
-                3
-              </div>
-              <h3 className="font-semibold text-[var(--text-primary)] mb-2">Download files</h3>
-              <p className="text-[var(--text-secondary)] text-sm">
-                Get all four materials instantly
-              </p>
-            </div>
+          {/* Diagram */}
+          <div className="flex justify-center bg-[var(--background)]">
+            <Image 
+              src="/how-it-works-diagram.png" 
+              alt="How it works: Describe your topic, AI generates PowerPoint, Podcast Audio, and Worksheet with Answers"
+              width={2030}
+              height={808}
+              className="max-w-full h-auto"
+              style={{ 
+                maxWidth: '800px',
+                backgroundColor: 'var(--background)',
+                boxShadow: '0px 4px 12px 0px rgba(0, 0, 0, 0.15)',
+                border: '1px solid var(--text-primary)'
+              }}
+              priority
+            />
           </div>
         </div>
       </section>
@@ -193,7 +180,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="border-t border-[var(--border)] py-8">
         <div className="max-w-6xl mx-auto px-6 text-center text-[var(--text-muted)] text-sm">
-          <p>Teach Anything Now</p>
+          <p style={{ backgroundColor: 'var(--background)', borderColor: 'transparent', boxSizing: 'content-box' }}>Teach Anything Now</p>
         </div>
       </footer>
     </div>
