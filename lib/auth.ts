@@ -21,23 +21,73 @@ export const authOptions: NextAuthOptions = {
     EmailProvider({
       // Use custom sendVerificationRequest for Resend
       sendVerificationRequest: async ({ identifier: email, url }) => {
+        // Validate environment variables first
+        if (!process.env.RESEND_API_KEY) {
+          const errorMsg = "RESEND_API_KEY is not set in environment variables";
+          console.error("[Email Auth] Configuration error:", errorMsg);
+          throw new Error(errorMsg);
+        }
+
+        const emailFrom = process.env.EMAIL_FROM || "onboarding@resend.dev";
+        
+        console.log("[Email Auth] Attempting to send magic link:", {
+          to: email,
+          from: emailFrom,
+          hasApiKey: !!process.env.RESEND_API_KEY,
+        });
+
         try {
           const resend = getResend();
           const result = await resend.emails.send({
-            from: process.env.EMAIL_FROM || "Teach Anything <noreply@teachanything.app>",
+            from: emailFrom,
             to: email,
-            subject: "Sign in to Teach Anything",
+            subject: "Your sign in link for Teach Anything",
             html: generateMagicLinkEmail(url),
-            text: `Sign in to Teach Anything\n\nClick the link below to sign in:\n${url}\n\nThis link expires in 24 hours.\n\nIf you didn't request this email, you can safely ignore it.`,
+            text: `Your Sign In Link\n\nYou requested to sign in to Teach Anything. Click the link below to access your account:\n\n${url}\n\nThis link will expire in 24 hours for security.\n\nIf you didn't request this, you can safely ignore this email.\n\n---\nTeach Anything - AI-Powered Educational Content`,
+            // Add reply-to to improve deliverability
+            reply_to: process.env.EMAIL_REPLY_TO,
+            // Add headers to improve spam score
+            headers: {
+              'X-Entity-Ref-ID': Date.now().toString(),
+            },
           });
 
+          console.log("[Email Auth] Resend API response:", JSON.stringify(result, null, 2));
+
+          // Check for errors in the response
           if (result.error) {
-            console.error("Resend error:", result.error);
-            throw new Error(`Failed to send email: ${result.error.message}`);
+            const errorDetails = {
+              message: result.error.message,
+              name: result.error.name,
+              statusCode: (result.error as any).statusCode,
+            };
+            console.error("[Email Auth] Resend API error:", errorDetails);
+            throw new Error(`Failed to send email: ${result.error.message || "Unknown error"}`);
           }
-        } catch (error) {
-          console.error("Error sending magic link email:", error);
-          throw new Error("Failed to send verification email");
+
+          // Verify we got a successful response
+          if (!result.data || !result.data.id) {
+            console.error("[Email Auth] Unexpected response format:", result);
+            throw new Error("Failed to send email: Invalid response from email service");
+          }
+
+          console.log("[Email Auth] Email sent successfully:", {
+            emailId: result.data.id,
+            to: email,
+          });
+        } catch (error: any) {
+          // Log the full error details
+          console.error("[Email Auth] Error sending magic link email:", {
+            message: error?.message,
+            name: error?.name,
+            stack: error?.stack,
+            response: error?.response,
+            statusCode: error?.statusCode,
+          });
+
+          // Re-throw with more context
+          const errorMessage = error?.message || "Failed to send verification email";
+          throw new Error(errorMessage);
         }
       },
     }),
@@ -77,77 +127,82 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-// Generate a clean, professional magic link email
+// Generate a clean, professional magic link email (optimized for spam filters)
 function generateMagicLinkEmail(url: string): string {
   return `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign in to Teach Anything</title>
+  <title>Your Sign In Link</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #ffffff; color: #333333;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto;">
     <tr>
       <td style="padding: 40px 20px;">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 480px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+        
+        <!-- Header -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 32px;">
           <tr>
-            <td style="padding: 40px 32px;">
-              <!-- Logo / Header -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td style="text-align: center; padding-bottom: 32px;">
-                    <div style="display: inline-block; width: 48px; height: 48px; background-color: #6366f1; border-radius: 12px; line-height: 48px; text-align: center;">
-                      <span style="font-size: 24px;">&#128218;</span>
-                    </div>
-                    <h1 style="margin: 16px 0 0 0; font-size: 24px; font-weight: 600; color: #111827;">Teach Anything</h1>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- Content -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td style="text-align: center;">
-                    <h2 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600; color: #111827;">Sign in to your account</h2>
-                    <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #6b7280;">
-                      Click the button below to sign in to Teach Anything. This link will expire in 24 hours.
-                    </p>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="text-align: center; padding: 8px 0 24px 0;">
-                    <a href="${url}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #6366f1; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; border-radius: 8px;">
-                      Sign in
-                    </a>
-                  </td>
-                </tr>
-                <tr>
-                  <td style="text-align: center;">
-                    <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9ca3af;">
-                      If you didn't request this email, you can safely ignore it.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- Footer -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td style="text-align: center; padding-top: 32px; border-top: 1px solid #e5e7eb; margin-top: 32px;">
-                    <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                      Trouble clicking the button? Copy and paste this URL into your browser:
-                    </p>
-                    <p style="margin: 8px 0 0 0; font-size: 12px; color: #6366f1; word-break: break-all;">
-                      ${url}
-                    </p>
-                  </td>
-                </tr>
-              </table>
+            <td style="text-align: left;">
+              <h1 style="margin: 0; font-size: 22px; font-weight: 600; color: #111827;">Teach Anything</h1>
             </td>
           </tr>
         </table>
+        
+        <!-- Main Content -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="padding: 0 0 24px 0;">
+              <p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.5; color: #111827;">
+                Hello,
+              </p>
+              <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.5; color: #333333;">
+                You requested to sign in to your Teach Anything account. Click the button below to continue:
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 0 24px 0;">
+              <a href="${url}" style="display: inline-block; padding: 12px 24px; background-color: #4f46e5; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 500; border-radius: 6px; text-align: center;">
+                Sign in to Teach Anything
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 0 0 24px 0;">
+              <p style="margin: 0 0 8px 0; font-size: 14px; line-height: 1.5; color: #666666;">
+                Or copy and paste this link into your browser:
+              </p>
+              <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #4f46e5; word-break: break-all;">
+                ${url}
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 0 0 0; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0 0 8px 0; font-size: 14px; line-height: 1.5; color: #666666;">
+                This link will expire in 24 hours for security reasons.
+              </p>
+              <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #999999;">
+                If you didn't request this email, you can safely ignore it.
+              </p>
+            </td>
+          </tr>
+        </table>
+        
+        <!-- Footer -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 40px;">
+          <tr>
+            <td style="text-align: center; padding-top: 24px; border-top: 1px solid #e5e7eb;">
+              <p style="margin: 0; font-size: 12px; color: #999999;">
+                Teach Anything - AI-Powered Educational Content
+              </p>
+            </td>
+          </tr>
+        </table>
+        
       </td>
     </tr>
   </table>

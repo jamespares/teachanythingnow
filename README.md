@@ -8,9 +8,11 @@ An AI-powered educational content generator that creates complete teaching packa
 - Podcast-style audio explanations
 - Custom worksheets with questions
 - Complete answer sheets
-- Subscription-based access (£5/month)
+- Pay-per-use pricing (£1 per package)
 - Secure authentication with NextAuth.js
 - Payment processing with Stripe
+- SEO optimized for teacher discoverability
+- Modern, professional UI with Inter font
 
 ## Prerequisites
 
@@ -37,9 +39,17 @@ cp .env.example .env.local
 # OpenAI API
 OPENAI_API_KEY=your_openai_api_key_here
 
+# Email (Resend)
+RESEND_API_KEY=re_your_resend_api_key  # Get from https://resend.com/api-keys
+EMAIL_FROM=onboarding@resend.dev  # Development (or use verified domain for production)
+
 # Authentication
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your_secret_here  # Generate with: openssl rand -base64 32
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 # Stripe
 STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
@@ -143,6 +153,13 @@ teachanythingnow/
 ```
 
 ## Troubleshooting
+
+### Magic Link Emails Going to Spam
+If sign-in emails are going to spam folder:
+1. Check your spam/junk folder and mark as "Not Spam"
+2. Add sender to your contacts
+3. For production: Set up a verified domain in Resend (see [EMAIL-DELIVERABILITY.md](./EMAIL-DELIVERABILITY.md))
+4. Use `EMAIL_FROM=onboarding@resend.dev` for development (better deliverability)
 
 ### Environment Variables Not Loading
 Restart the development server after changing `.env.local`:

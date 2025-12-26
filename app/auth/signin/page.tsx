@@ -28,16 +28,28 @@ function SignInContent() {
       });
 
       if (result?.error) {
-        setError("Failed to send magic link. Please try again.");
+        // Log the error for debugging
+        console.error("Sign in error from NextAuth:", result.error);
+        
+        // Show more specific error message
+        let errorMessage = "Failed to send magic link. Please try again.";
+        if (result.error === "EmailSignin") {
+          errorMessage = "Failed to send the magic link email. Please check your email address and try again.";
+        } else if (result.error === "Configuration") {
+          errorMessage = "Email service is not properly configured. Please contact support.";
+        }
+        
+        setError(errorMessage);
         setLoading(false);
         return;
       }
 
       // Redirect to verify-request page on success
       router.push(`/auth/verify-request?email=${encodeURIComponent(email)}`);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Sign in error:", err);
-      setError("An unexpected error occurred. Please try again.");
+      const errorMessage = err?.message || "An unexpected error occurred. Please try again.";
+      setError(errorMessage);
       setLoading(false);
     }
   };
