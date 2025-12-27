@@ -1,5 +1,7 @@
-// Image generation utility using OpenAI GPT Image 1 Mini API
+// Image generation utility using OpenAI GPT-Image-1.5 API
 // Generates high-quality educational images for presentations and materials
+// GPT-Image-1.5 offers enhanced instruction following, faster generation (4x faster),
+// improved text rendering, and precise editing capabilities
 
 import OpenAI from "openai";
 
@@ -10,7 +12,7 @@ function getOpenAIClient(): OpenAI | null {
   }
   return new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
-    timeout: 120000, // 120 seconds for image generation (can be slow)
+    timeout: 60000, // 60 seconds - GPT-Image-1.5 is up to 4x faster than previous models
     maxRetries: 2,
   });
 }
@@ -25,7 +27,7 @@ export interface ImageGenerationResult {
 
 /**
  * Generates high-quality educational images related to the topic
- * Uses GPT Image 1 Mini for cost-efficient, high-quality output
+ * Uses GPT-Image-1.5 for enhanced instruction following and faster generation
  * Images are generated to be consistent with the slide content and topic
  */
 export async function generateImages(
@@ -53,13 +55,31 @@ export async function generateImages(
         const prompt = imagePrompts[i];
         console.log(`Generating image ${i + 1} with prompt: ${prompt.prompt.substring(0, 100)}...`);
         
-        const response = await openai.images.generate({
-          model: "dall-e-3", // Using DALL-E 3 for reliable image generation
-          prompt: prompt.prompt,
-          n: 1,
-          size: "1024x1024", // High resolution
-          quality: "standard",
-        });
+        // Try GPT-Image-1.5 first (latest model), fallback to DALL-E 3 if not available
+        let response;
+        try {
+          response = await openai.images.generate({
+            model: "gpt-image-1.5", // Using GPT-Image-1.5 - latest model with enhanced instruction following and faster generation
+            prompt: prompt.prompt,
+            n: 1,
+            size: "1024x1024", // High resolution
+            quality: "standard",
+          });
+        } catch (modelError: any) {
+          // Fallback to DALL-E 3 if GPT-Image-1.5 is not available or model name is incorrect
+          if (modelError?.code === "invalid_model" || modelError?.message?.includes("model")) {
+            console.warn("GPT-Image-1.5 not available, falling back to DALL-E 3");
+            response = await openai.images.generate({
+              model: "dall-e-3",
+              prompt: prompt.prompt,
+              n: 1,
+              size: "1024x1024",
+              quality: "standard",
+            });
+          } else {
+            throw modelError; // Re-throw if it's a different error
+          }
+        }
 
         console.log(`Image generation response:`, JSON.stringify(response, null, 2));
         
@@ -117,7 +137,7 @@ export async function downloadImages(
 }
 
 /**
- * Generates appropriate image prompts using GPT-5
+ * Generates appropriate image prompts using GPT-4o
  * Creates prompts that will generate educational, relevant images consistent with the topic and slides
  */
 async function generateImagePrompts(
