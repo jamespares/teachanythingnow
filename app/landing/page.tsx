@@ -215,7 +215,7 @@ export default function LandingPage() {
                 AI Generates Materials
               </h3>
               <p className="text-[var(--text-secondary)]">
-                Our AI creates a complete teaching package in 30-60 seconds
+                Our AI creates presentations, worksheets, audio, and images in 30-60 seconds
               </p>
             </div>
             

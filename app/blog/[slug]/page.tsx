@@ -163,7 +163,7 @@ export default function BlogPostPage() {
             Ready to create your own lesson materials?
           </h2>
           <p className="text-white/90 mb-6">
-            Generate professional presentations, worksheets, and audio content in minutes
+            Generate professional presentations, worksheets, audio, and images in minutes
           </p>
           <Link
             href="/auth/signin"
