@@ -59,7 +59,7 @@ export async function generateImages(
           size: "1024x1024", // High resolution
         });
 
-        const imageUrl = response.data[0]?.url;
+        const imageUrl = response.data?.[0]?.url;
         if (imageUrl) {
           images.push({
             url: imageUrl,
