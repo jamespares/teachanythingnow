@@ -124,6 +124,7 @@ function HomeContent() {
     audio?: string;
     worksheet?: string;
     answerSheet?: string;
+    images?: string[];
   }>({});
 
   useEffect(() => {
@@ -228,7 +229,7 @@ function HomeContent() {
     );
   }
 
-  const hasFiles = generatedFiles.presentation || generatedFiles.audio || generatedFiles.worksheet || generatedFiles.answerSheet;
+  const hasFiles = generatedFiles.presentation || generatedFiles.audio || generatedFiles.worksheet || generatedFiles.answerSheet || (generatedFiles.images && generatedFiles.images.length > 0);
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
@@ -395,7 +396,7 @@ function HomeContent() {
                 <DownloadItem
                   href={`/api/download?file=${generatedFiles.worksheet}`}
                   title="Student Worksheet"
-                  subtitle="Practice exercises"
+                  subtitle="Editable document (DOCX)"
                   icon={
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -416,6 +417,24 @@ function HomeContent() {
                   }
                 />
               )}
+
+              {generatedFiles.images && generatedFiles.images.length > 0 && (
+                <>
+                  {generatedFiles.images.map((imageFile, index) => (
+                    <DownloadItem
+                      key={index}
+                      href={`/api/download?file=${imageFile}`}
+                      title={`Image ${index + 1}`}
+                      subtitle="High-quality educational image"
+                      icon={
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      }
+                    />
+                  ))}
+                </>
+              )}
             </div>
 
             <div className="mt-6 pt-4 border-t border-[var(--border)]">
@@ -435,7 +454,7 @@ function HomeContent() {
         {/* Info */}
         <div className="mt-8 text-center">
           <p className="text-sm text-[var(--text-muted)]">
-            Each package includes slides, audio, worksheet, and answers
+            Each package includes slides, audio, editable worksheets with answer keys, and high-quality images
           </p>
         </div>
       </main>

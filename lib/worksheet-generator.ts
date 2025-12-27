@@ -1,4 +1,14 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+// Worksheet generation utility
+// Generates editable DOCX format worksheets for easy user editing
+import {
+  Document,
+  Packer,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  Spacing,
+  UnderlineType,
+} from "docx";
 
 export async function generateWorksheet(
   topic: string,
@@ -8,105 +18,179 @@ export async function generateWorksheet(
     options?: string[];
   }>
 ): Promise<Buffer> {
-  const pdfDoc = await PDFDocument.create();
-  let currentPage = pdfDoc.addPage([612, 792]); // US Letter size
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-  
-  const margin = 50;
-  let yPosition = currentPage.getHeight() - margin;
-  const lineHeight = 20;
-  const fontSize = 12;
-  const titleSize = 24;
+  const children: Paragraph[] = [];
 
-  // Header
-  currentPage.drawText(`Worksheet: ${topic}`, {
-    x: margin,
-    y: yPosition,
-    size: titleSize,
-    font: boldFont,
-    color: rgb(0, 0, 0),
-  });
-  yPosition -= lineHeight * 2;
+  // Title
+  children.push(
+    new Paragraph({
+      text: `Worksheet: ${topic}`,
+      heading: HeadingLevel.TITLE,
+      spacing: {
+        after: 400,
+      },
+    })
+  );
 
-  currentPage.drawText(`Name: ___________________ Date: ___________`, {
-    x: margin,
-    y: yPosition,
-    size: fontSize,
-    font: font,
-    color: rgb(0, 0, 0),
-  });
-  yPosition -= lineHeight * 2;
+  // Name and Date fields (editable)
+  children.push(
+    new Paragraph({
+      children: [
+        new TextRun({
+          text: "Name: ",
+          bold: true,
+        }),
+        new TextRun({
+          text: "___________________",
+          underline: {
+            type: UnderlineType.SINGLE,
+          },
+        }),
+        new TextRun({
+          text: "    Date: ",
+          bold: true,
+        }),
+        new TextRun({
+          text: "___________",
+          underline: {
+            type: UnderlineType.SINGLE,
+          },
+        }),
+      ],
+      spacing: {
+        after: 300,
+      },
+    })
+  );
 
   // Questions
   questions.forEach((q, index) => {
-    // Check if we need a new page
-    if (yPosition < margin + 100) {
-      currentPage = pdfDoc.addPage([612, 792]);
-      yPosition = currentPage.getHeight() - margin;
-    }
-
     // Question number and text
-    const questionText = `${index + 1}. ${q.question}`;
-    currentPage.drawText(questionText, {
-      x: margin,
-      y: yPosition,
-      size: 14,
-      font: boldFont,
-      color: rgb(0, 0, 0),
-      maxWidth: currentPage.getWidth() - margin * 2,
-    });
-    yPosition -= lineHeight * 1.5;
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `${index + 1}. `,
+            bold: true,
+          }),
+          new TextRun({
+            text: q.question,
+            bold: true,
+          }),
+        ],
+        spacing: {
+          before: 200,
+          after: 200,
+        },
+      })
+    );
 
     if (q.type === "multiple-choice" && q.options) {
+      // Multiple choice options
       q.options.forEach((option, optIndex) => {
-        const optionText = `   ${String.fromCharCode(65 + optIndex)}. ${option}`;
-        currentPage.drawText(optionText, {
-          x: margin,
-          y: yPosition,
-          size: fontSize,
-          font: font,
-          color: rgb(0, 0, 0),
-          maxWidth: currentPage.getWidth() - margin * 2,
-        });
-        yPosition -= lineHeight;
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: `   ${String.fromCharCode(65 + optIndex)}. `,
+              }),
+              new TextRun({
+                text: option,
+              }),
+            ],
+            indent: {
+              left: 360, // 0.25 inch indent
+            },
+            spacing: {
+              after: 100,
+            },
+          })
+        );
       });
     } else if (q.type === "short-answer") {
-      currentPage.drawText("Answer: _________________________________________________", {
-        x: margin,
-        y: yPosition,
-        size: fontSize,
-        font: font,
-        color: rgb(0, 0, 0),
-      });
-      yPosition -= lineHeight;
+      // Short answer with underline for writing space
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "Answer: ",
+              bold: true,
+            }),
+            new TextRun({
+              text: "________________________________________________________________",
+              underline: {
+                type: UnderlineType.SINGLE,
+              },
+            }),
+          ],
+          spacing: {
+            after: 200,
+          },
+        })
+      );
     } else if (q.type === "essay") {
-      currentPage.drawText("Answer:", {
-        x: margin,
-        y: yPosition,
-        size: fontSize,
-        font: font,
-        color: rgb(0, 0, 0),
-      });
-      yPosition -= lineHeight;
-      // Add lines for essay
+      // Essay question with multiple lines
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: "Answer:",
+              bold: true,
+            }),
+          ],
+          spacing: {
+            after: 100,
+          },
+        })
+      );
+
+      // Add multiple blank lines for essay writing
       for (let i = 0; i < 8; i++) {
-        currentPage.drawLine({
-          start: { x: margin, y: yPosition },
-          end: { x: currentPage.getWidth() - margin, y: yPosition },
-          thickness: 1,
-          color: rgb(0, 0, 0),
-        });
-        yPosition -= lineHeight;
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({
+                text: "________________________________________________________________",
+                underline: {
+                  type: UnderlineType.SINGLE,
+                },
+              }),
+            ],
+            spacing: {
+              after: 200,
+            },
+          })
+        );
       }
     }
 
-    yPosition -= lineHeight;
+    // Add spacing after each question
+    children.push(
+      new Paragraph({
+        text: "",
+        spacing: {
+          after: 200,
+        },
+      })
+    );
   });
 
-  const pdfBytes = await pdfDoc.save();
-  return Buffer.from(pdfBytes);
+  // Create the document
+  const doc = new Document({
+    sections: [
+      {
+        properties: {},
+        children: children,
+      },
+    ],
+  });
+
+  // Generate the buffer
+  const buffer = await Packer.toBuffer(doc);
+  return Buffer.from(buffer);
 }
+
+// Answer sheet remains as PDF since it's for reference, not editing
+import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 export async function generateAnswerSheet(
   topic: string,

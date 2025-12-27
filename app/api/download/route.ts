@@ -32,10 +32,14 @@ export async function GET(request: NextRequest) {
     const ext = filename.split(".").pop()?.toLowerCase();
     const contentTypeMap: Record<string, string> = {
       pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
       pdf: "application/pdf",
       mp3: "audio/mpeg",
       wav: "audio/wav",
       txt: "text/plain",
+      png: "image/png",
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
     };
 
     const contentType = contentTypeMap[ext || ""] || "application/octet-stream";

@@ -5,6 +5,7 @@ import { generatePPT } from "@/lib/ppt-generator";
 import { generateAudio } from "@/lib/audio-generator";
 import { generateContent } from "@/lib/content-generator";
 import { generateWorksheet, generateAnswerSheet } from "@/lib/worksheet-generator";
+import { generateImages, downloadImages } from "@/lib/image-generator";
 import { promises as fs } from "fs";
 import path from "path";
 import { stripe } from "@/lib/stripe";
@@ -106,20 +107,37 @@ export async function POST(request: NextRequest) {
     const audioPath = path.join(tempDir, `${fileId}.${audioExtension}`);
     await fs.writeFile(audioPath, audioResult.buffer);
 
-    // Generate worksheet and answer sheet
+    // Generate worksheet (DOCX format for easy editing) and answer sheet (PDF for reference)
     const worksheetBuffer = await generateWorksheet(topic, worksheet.questions);
     const answerSheetBuffer = await generateAnswerSheet(topic, worksheet.questions);
-    const worksheetPath = path.join(tempDir, `${fileId}_worksheet.pdf`);
+    const worksheetPath = path.join(tempDir, `${fileId}_worksheet.docx`);
     const answerSheetPath = path.join(tempDir, `${fileId}_answers.pdf`);
     await fs.writeFile(worksheetPath, worksheetBuffer);
     await fs.writeFile(answerSheetPath, answerSheetBuffer);
+
+    // Generate high-quality images
+    const imageResult = await generateImages(topic, slides);
+    const imageFiles: string[] = [];
+    
+    if (imageResult.images.length > 0) {
+      // Download images and save them
+      const imageBuffers = await downloadImages(imageResult.images);
+      
+      for (let i = 0; i < imageBuffers.length; i++) {
+        const imageFileName = `${fileId}_image_${i + 1}.png`;
+        const imagePath = path.join(tempDir, imageFileName);
+        await fs.writeFile(imagePath, imageBuffers[i]);
+        imageFiles.push(imageFileName);
+      }
+    }
 
     return NextResponse.json({
       files: {
         presentation: `${fileId}.pptx`,
         audio: `${fileId}.${audioExtension}`,
-        worksheet: `${fileId}_worksheet.pdf`,
+        worksheet: `${fileId}_worksheet.docx`,
         answerSheet: `${fileId}_answers.pdf`,
+        images: imageFiles,
       },
     });
   } catch (error) {
