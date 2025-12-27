@@ -193,10 +193,9 @@ export async function POST(request: NextRequest) {
     const pptPath = path.join(tempDir, `${fileId}.pptx`);
     await fs.writeFile(pptPath, pptBuffer);
 
-    // Generate audio (use sanitized topic)
+    // Generate audio (use sanitized topic) - always returns MP3
     const audioResult = await generateAudio(podcastScript, sanitizedTopic);
-    const audioExtension = audioResult.isAudio ? "mp3" : "txt";
-    const audioPath = path.join(tempDir, `${fileId}.${audioExtension}`);
+    const audioPath = path.join(tempDir, `${fileId}.mp3`);
     await fs.writeFile(audioPath, audioResult.buffer);
 
     // Generate worksheet (DOCX format for easy editing) and answer sheet (PDF for reference)
@@ -238,7 +237,7 @@ export async function POST(request: NextRequest) {
     // Prepare files object for response and database
     const filesData = {
       presentation: `${fileId}.pptx`,
-      audio: `${fileId}.${audioExtension}`,
+      audio: `${fileId}.mp3`,
       worksheet: `${fileId}_worksheet.docx`,
       answerSheet: `${fileId}_answers.pdf`,
       images: imageFiles,
