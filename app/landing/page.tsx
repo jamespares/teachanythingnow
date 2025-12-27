@@ -2,17 +2,52 @@
 
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  author: string;
+  tags: string[];
+  created_at: string;
+}
 
 export default function LandingPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const [featuredPosts, setFeaturedPosts] = useState<BlogPost[]>([]);
 
   useEffect(() => {
     if (status === "authenticated") {
       router.push("/");
     }
+    // Fetch featured blog posts for SEO
+    fetchFeaturedPosts();
   }, [status, router]);
+
+  const fetchFeaturedPosts = async () => {
+    try {
+      const response = await fetch("/api/blog?featured=true&limit=3");
+      if (response.ok) {
+        const data = await response.json();
+        setFeaturedPosts(data.posts || []);
+      }
+    } catch (error) {
+      console.error("Error fetching featured posts:", error);
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-GB", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   if (status === "loading") {
     return (
@@ -37,13 +72,21 @@ export default function LandingPage() {
             <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything Now</span>
           </div>
 
-          {/* Auth Button */}
-          <button
-            onClick={() => router.push("/auth/signin")}
-            className="btn btn-primary"
-          >
-            Get started
-          </button>
+          {/* Navigation */}
+          <div className="flex items-center gap-6">
+            <Link
+              href="/blog"
+              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hidden sm:block"
+            >
+              Blog
+            </Link>
+            <button
+              onClick={() => router.push("/auth/signin")}
+              className="btn btn-primary"
+            >
+              Get started
+            </button>
+          </div>
         </div>
       </header>
 
@@ -213,8 +256,18 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="border-t border-[var(--border)] py-8 bg-[var(--surface)]">
-        <div className="max-w-7xl mx-auto px-6 text-center text-[var(--text-muted)] text-sm">
-          <p>© 2025 Teach Anything Now. All rights reserved.</p>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-[var(--text-muted)] text-sm">
+              © 2025 Teach Anything Now. All rights reserved.
+            </p>
+            <Link
+              href="/blog"
+              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            >
+              Blog
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
