@@ -235,14 +235,41 @@ export async function POST(request: NextRequest) {
       // Continue without images - don't fail the entire request
     }
 
+    // Prepare files object for response and database
+    const filesData = {
+      presentation: `${fileId}.pptx`,
+      audio: `${fileId}.${audioExtension}`,
+      worksheet: `${fileId}_worksheet.docx`,
+      answerSheet: `${fileId}_answers.pdf`,
+      images: imageFiles,
+    };
+
+    // Save package to database for user to view and redownload later
+    try {
+      const { data: payment } = await supabaseAdmin
+        .from("payments")
+        .select("id")
+        .eq("stripe_payment_intent_id", paymentIntentId)
+        .eq("user_id", user.id)
+        .single();
+
+      await supabaseAdmin
+        .from("packages")
+        .insert({
+          user_id: user.id,
+          payment_id: payment?.id || null,
+          topic: sanitizedTopic,
+          file_id: fileId,
+          files: filesData,
+        });
+    } catch (dbError) {
+      // Log error but don't fail the request - package generation succeeded
+      console.error("Error saving package to database:", dbError);
+    }
+
     return NextResponse.json({
-      files: {
-        presentation: `${fileId}.pptx`,
-        audio: `${fileId}.${audioExtension}`,
-        worksheet: `${fileId}_worksheet.docx`,
-        answerSheet: `${fileId}_answers.pdf`,
-        images: imageFiles,
-      },
+      files: filesData,
+      packageId: fileId, // Return package ID for reference
     });
   } catch (error) {
     console.error("Error generating content:", error);

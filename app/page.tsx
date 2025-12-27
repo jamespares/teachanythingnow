@@ -253,7 +253,7 @@ function HomeContent() {
               onClick={() => router.push("/account")}
               className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
             >
-              Account
+              My Packages
             </button>
             <button
               onClick={() => signOut()}
