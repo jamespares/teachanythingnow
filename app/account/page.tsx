@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Package {
   id: string;
@@ -81,10 +82,11 @@ export default function AccountPage() {
             onClick={() => router.push("/")}
             className="flex items-center gap-2"
           >
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Teach Anything Logo" 
-              className="w-8 h-8"
+              width={32}
+              height={32}
             />
             <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything Now</span>
           </button>

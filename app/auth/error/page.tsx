@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import Image from "next/image";
 
 function ErrorContent() {
   const router = useRouter();
@@ -69,10 +70,11 @@ function ErrorContent() {
             onClick={() => router.push("/landing")}
             className="flex items-center gap-2"
           >
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Teach Anything Now Logo" 
-              className="w-8 h-8"
+              width={32}
+              height={32}
             />
             <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything Now</span>
           </button>

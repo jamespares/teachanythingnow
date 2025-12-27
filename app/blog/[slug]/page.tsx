@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface BlogPost {
   id: string;
@@ -82,10 +83,11 @@ export default function BlogPostPage() {
       <header className="bg-[var(--surface)] border-b border-[var(--border)]">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/landing" className="flex items-center gap-2">
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Teach Anything Logo" 
-              className="w-8 h-8"
+              width={32}
+              height={32}
             />
             <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything Now</span>
           </Link>

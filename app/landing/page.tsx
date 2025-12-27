@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface BlogPost {
   id: string;
@@ -64,10 +65,12 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-2">
-            <img 
+            <Image 
               src="/logo.png" 
               alt="Teach Anything Logo" 
-              className="w-8 h-8"
+              width={32}
+              height={32}
+              priority
             />
             <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything Now</span>
           </div>
