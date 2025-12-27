@@ -115,20 +115,32 @@ export async function POST(request: NextRequest) {
     await fs.writeFile(worksheetPath, worksheetBuffer);
     await fs.writeFile(answerSheetPath, answerSheetBuffer);
 
-    // Generate high-quality images
-    const imageResult = await generateImages(topic, slides);
+    // Generate high-quality images (don't fail if images fail)
     const imageFiles: string[] = [];
-    
-    if (imageResult.images.length > 0) {
-      // Download images and save them
-      const imageBuffers = await downloadImages(imageResult.images);
+    try {
+      console.log(`Starting image generation for topic: ${topic}`);
+      const imageResult = await generateImages(topic, slides);
+      console.log(`Image generation result: ${imageResult.images.length} images`);
       
-      for (let i = 0; i < imageBuffers.length; i++) {
-        const imageFileName = `${fileId}_image_${i + 1}.png`;
-        const imagePath = path.join(tempDir, imageFileName);
-        await fs.writeFile(imagePath, imageBuffers[i]);
-        imageFiles.push(imageFileName);
+      if (imageResult.images.length > 0) {
+        // Download images and save them
+        console.log(`Downloading ${imageResult.images.length} images...`);
+        const imageBuffers = await downloadImages(imageResult.images);
+        console.log(`Downloaded ${imageBuffers.length} image buffers`);
+        
+        for (let i = 0; i < imageBuffers.length; i++) {
+          const imageFileName = `${fileId}_image_${i + 1}.png`;
+          const imagePath = path.join(tempDir, imageFileName);
+          await fs.writeFile(imagePath, imageBuffers[i]);
+          imageFiles.push(imageFileName);
+          console.log(`Saved image: ${imageFileName}`);
+        }
+      } else {
+        console.warn("No images were generated");
       }
+    } catch (imageError) {
+      console.error("Error generating images (non-fatal):", imageError);
+      // Continue without images - don't fail the entire request
     }
 
     return NextResponse.json({

@@ -51,26 +51,36 @@ export async function generateImages(
     for (let i = 0; i < Math.min(imagePrompts.length, 3); i++) {
       try {
         const prompt = imagePrompts[i];
+        console.log(`Generating image ${i + 1} with prompt: ${prompt.prompt.substring(0, 100)}...`);
         
         const response = await openai.images.generate({
-          model: "gpt-image-1-mini", // Using GPT Image 1 Mini for cost-efficient, high-quality images
-          prompt: prompt.prompt, // Prompt already includes topic and slide context for consistency
+          model: "dall-e-3", // Using DALL-E 3 for reliable image generation
+          prompt: prompt.prompt,
           n: 1,
           size: "1024x1024", // High resolution
+          quality: "standard",
         });
 
+        console.log(`Image generation response:`, JSON.stringify(response, null, 2));
+        
         const imageUrl = response.data?.[0]?.url;
         if (imageUrl) {
+          console.log(`Successfully generated image ${i + 1}: ${imageUrl}`);
           images.push({
             url: imageUrl,
             description: prompt.description,
           });
+        } else {
+          console.warn(`No URL in response for image ${i + 1}:`, response);
         }
-      } catch (error) {
-        console.error(`Error generating image ${i + 1}:`, error);
+      } catch (error: any) {
+        console.error(`Error generating image ${i + 1}:`, error?.message || error);
+        console.error(`Full error:`, error);
         // Continue with other images even if one fails
       }
     }
+    
+    console.log(`Total images generated: ${images.length}`);
 
     return {
       images,
@@ -139,59 +149,32 @@ async function generateImagePrompts(
       .join(", ");
 
     const response = await openai.chat.completions.create({
-      model: "gpt-5", // Using GPT-5 for high-quality prompt generation
+      model: "gpt-4o", // Using GPT-4o for high-quality prompt generation
       messages: [
         {
           role: "system",
-          content: `You are an expert educational visual designer specializing in creating compelling imagery for learning materials. You understand how visuals enhance comprehension and retention.
-
-Your image design principles:
-- Visual clarity: Simple, focused compositions that communicate one key concept
-- Educational relevance: Images must directly support and illustrate the learning content
-- Professional quality: Clean, modern aesthetic suitable for presentations
-- Universal appeal: Appropriate for diverse audiences and learning contexts
-
-Generate 2-3 specific, detailed image prompts that will create high-quality educational visuals. Return ONLY valid JSON in this exact format: {"prompts": [{"prompt": "...", "description": "..."}]}. 
-
-Each prompt must:
-- Be 80-150 words with specific visual details
-- Focus on one key concept from the slides
-- Include style guidance for professional educational aesthetics
-- Avoid text/labels (image models render text poorly)
-- Describe composition, colors, perspective, and style`,
+          content: "You create image generation prompts for educational content. Return ONLY valid JSON: {\"prompts\": [{\"prompt\": \"...\", \"description\": \"...\"}]}. Create 2-3 detailed prompts (60-100 words each) for educational images. Avoid text in images.",
         },
         {
           role: "user",
-          content: `Create 2-3 image generation prompts for educational content about "${topic}".
+          content: `Create 2-3 image prompts for educational content about "${topic}".
 
-CRITICAL: The images must visually represent and be consistent with the slide content below. Each image should illustrate a key concept that helps learners understand "${topic}".
-
-Complete slide content for context:
+Slide content:
 ${fullSlideContent}
 
-Key concepts to visualize: ${keyConcepts}
+Key concepts: ${keyConcepts}
 
-For each image prompt, include:
+For each prompt (60-100 words):
+- Describe what to visualize (no text/labels)
+- Include style: "professional educational illustration, clean design"
+- Focus on different key aspects of "${topic}"
+- Make it suitable for presentations
 
-1. SUBJECT: What is the main visual focus? (specific object, diagram, scene, or concept visualization)
-2. COMPOSITION: How is it arranged? (centered, rule of thirds, close-up, wide shot)
-3. STYLE: "Professional educational illustration, clean modern design, suitable for presentations"
-4. COLORS: Suggest a professional color palette (blues, greens, or topic-appropriate colors)
-5. DETAILS: Specific visual elements that reinforce the educational concept
-6. MOOD: Professional, approachable, and educational
-
-Requirements:
-- Each prompt: 80-150 words with specific visual details
-- NO text, labels, or words in the images
-- Each image covers a DIFFERENT key aspect of "${topic}"
-- Focus on concepts that benefit from visual explanation
-- Professional quality suitable for classroom/business presentations
-
-Return JSON with prompts and brief descriptions explaining how each image supports learning about "${topic}".`,
+Return JSON with prompts and descriptions.`,
         },
       ],
-      temperature: 0.7, // Lower temperature for more consistent, focused prompts
-      max_tokens: 1200, // Increased for more detailed prompts
+      temperature: 0.8, // Creative prompts
+      max_tokens: 1000,
     });
 
     const content = response.choices[0]?.message?.content;
