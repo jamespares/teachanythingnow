@@ -55,12 +55,15 @@ export async function generateImages(
         const prompt = imagePrompts[i];
         console.log(`Generating image ${i + 1} with prompt: ${prompt.prompt.substring(0, 100)}...`);
         
+        // Ensure prompt explicitly excludes text
+        const noTextPrompt = `${prompt.prompt}. CRITICAL: This image must contain NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, and NO written content of any kind. Pure visual illustration only.`;
+        
         // Try GPT-Image-1.5 first (latest model), fallback to DALL-E 3 if not available
         let response;
         try {
           response = await openai.images.generate({
             model: "gpt-image-1.5", // Using GPT-Image-1.5 - latest model with enhanced instruction following and faster generation
-            prompt: prompt.prompt,
+            prompt: noTextPrompt,
             n: 1,
             size: "1024x1024", // High resolution
             quality: "standard",
@@ -71,7 +74,7 @@ export async function generateImages(
             console.warn("GPT-Image-1.5 not available, falling back to DALL-E 3");
             response = await openai.images.generate({
               model: "dall-e-3",
-              prompt: prompt.prompt,
+              prompt: noTextPrompt,
               n: 1,
               size: "1024x1024",
               quality: "standard",
@@ -147,10 +150,10 @@ async function generateImagePrompts(
   const openai = getOpenAIClient();
   
   if (!openai) {
-    // Fallback prompts if OpenAI is not available
+    // Fallback prompts if OpenAI is not available - explicitly no text
     return [
       {
-        prompt: `Professional educational illustration about ${topic}, clear and informative, suitable for teaching materials, high quality, visually engaging`,
+        prompt: `Professional educational illustration about ${topic}, clear and informative, suitable for teaching materials, high quality, visually engaging. NO text, NO words, NO labels, NO captions, NO written content. Pure visual illustration only.`,
         description: `Main illustration for ${topic}`,
       },
     ];
@@ -173,7 +176,7 @@ async function generateImagePrompts(
       messages: [
         {
           role: "system",
-          content: "You create image generation prompts for educational content. Return ONLY valid JSON: {\"prompts\": [{\"prompt\": \"...\", \"description\": \"...\"}]}. Create 2-3 detailed prompts (60-100 words each) for educational images. Avoid text in images.",
+          content: "You create image generation prompts for educational content. Return ONLY valid JSON: {\"prompts\": [{\"prompt\": \"...\", \"description\": \"...\"}]}. Create 2-3 detailed prompts (60-100 words each) for educational images. CRITICAL: Images must NEVER contain any text, words, letters, numbers, labels, captions, or written content of any kind. Only visual illustrations, diagrams, and graphics.",
         },
         {
           role: "user",
@@ -184,9 +187,11 @@ ${fullSlideContent}
 
 Key concepts: ${keyConcepts}
 
-For each prompt (60-100 words):
-- Describe what to visualize (no text/labels)
-- Include style: "professional educational illustration, clean design"
+CRITICAL REQUIREMENTS for each prompt (60-100 words):
+- NO TEXT: The image must contain ZERO text, words, letters, numbers, labels, captions, signs, or written content
+- Visual only: Pure illustration, diagram, or graphic representation
+- Include explicit instruction: "no text, no words, no labels, no captions, no written content"
+- Include style: "professional educational illustration, clean design, visual only"
 - Focus on different key aspects of "${topic}"
 - Make it suitable for presentations
 
@@ -211,15 +216,15 @@ Return JSON with prompts and descriptions.`,
     console.error("Error generating image prompts:", error);
   }
 
-  // Enhanced fallback prompts that are more specific
+  // Enhanced fallback prompts that are more specific - explicitly no text
   const mainConcept = slides[0]?.title || topic;
   return [
     {
-      prompt: `Professional educational illustration about ${topic}, specifically showing ${mainConcept}, clear and informative, suitable for teaching materials, high quality, visually engaging, educational style`,
+      prompt: `Professional educational illustration about ${topic}, specifically showing ${mainConcept}, clear and informative, suitable for teaching materials, high quality, visually engaging, educational style. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual illustration only.`,
       description: `Main illustration for ${topic}: ${mainConcept}`,
     },
     {
-      prompt: `Educational diagram or visual representation of key concepts in ${topic}, showing practical applications or examples mentioned in the lesson, professional style, suitable for presentations, clear and informative`,
+      prompt: `Educational diagram or visual representation of key concepts in ${topic}, showing practical applications or examples mentioned in the lesson, professional style, suitable for presentations, clear and informative. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual diagram only.`,
       description: `Conceptual diagram for ${topic}`,
     },
   ];
