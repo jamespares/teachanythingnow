@@ -145,11 +145,10 @@ function generateMagicLinkEmail(url: string): string {
           <tr>
             <td style="padding: 48px 40px;">
               
-              <!-- Header with Logo -->
+              <!-- Header -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-bottom: 32px;">
                 <tr>
                   <td style="text-align: center;">
-                    <img src="https://teachanything.com/logo.png" alt="Teach Anything Now" width="48" height="48" style="display: block; margin: 0 auto 12px auto;" />
                     <h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #111827;">Teach Anything Now</h1>
                   </td>
                 </tr>
