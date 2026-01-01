@@ -131,7 +131,7 @@ async function generatePodcastScriptWithAI(topic: string, slides: Array<{ title:
         },
         {
           role: "user",
-          content: `Create a podcast script (800-1200 words) about "${topic}".
+          content: `Create a podcast script about "${topic}". The script MUST be under 3800 characters (approximately 600-800 words) to ensure it fits within technical limits.
 
 Structure:
 - Engaging introduction with a hook
@@ -139,19 +139,26 @@ Structure:
 - Real-world examples and analogies
 - Conclusion with key takeaways
 
-Use natural, conversational language. Write in full paragraphs, not bullet points. Make it engaging and educational.
+Use natural, conversational language. Write in full paragraphs, not bullet points. Make it engaging and educational. Keep it concise and focused - prioritize clarity over length.
+
+CRITICAL: The total script length must be under 3800 characters. Count your characters and ensure you stay under this limit.
 
 Reference these slides for content:
 ${slideContent}`,
         },
       ],
       temperature: 0.8, // Creative and engaging
-      max_tokens: 2500,
+      max_tokens: 2000, // Limit tokens to ensure script stays under 3800 characters
     });
 
     const script = response.choices[0]?.message?.content;
     if (script && script.trim().length > 200) {
-      return script;
+      const trimmedScript = script.trim();
+      // Validate script length - warn if it exceeds TTS limit (truncation will happen in audio generator)
+      if (trimmedScript.length > 4000) {
+        console.warn(`Generated script (${trimmedScript.length} chars) exceeds TTS limit of 4000. Script will be truncated during audio generation.`);
+      }
+      return trimmedScript;
     }
   } catch (error) {
     console.error("Error generating podcast script with AI:", error);
