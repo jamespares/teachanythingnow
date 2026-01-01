@@ -1,6 +1,7 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
+import Script from "next/script";
 import "./globals.css";
 
 export default function RootLayout({
@@ -75,6 +76,13 @@ export default function RootLayout({
       </head>
       <body>
         <SessionProvider>{children}</SessionProvider>
+        {/* Umami Analytics - Track page views, location, and referral data */}
+        <Script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="8a62bfd9-fe25-464e-a960-5ca951e57747"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
