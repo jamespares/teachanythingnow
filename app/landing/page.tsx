@@ -122,7 +122,7 @@ export default function LandingPage() {
             {/* Right Column - Features Grid */}
             <div>
               <h2 className="text-3xl font-bold text-[var(--text-primary)] mb-8">
-                Complete AI-powered teaching package
+                Complete teaching package
               </h2>
               
               {/* Features Grid */}
@@ -303,14 +303,11 @@ export default function LandingPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4">
               Ready to save hours of preparation time?
             </h2>
-            <p className="text-lg text-[var(--text-secondary)] mb-8 max-w-2xl mx-auto">
-              Join teachers worldwide who use AI to create professional lesson materials in seconds, not hours.
-            </p>
             <button
               onClick={() => router.push("/auth/signin")}
               className="btn btn-primary text-lg"
             >
-              Start creating for £1
+              Start creating
             </button>
             <p className="text-sm text-[var(--text-muted)] mt-4">
               No subscription. Pay only when you generate content.
@@ -324,7 +321,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-[var(--text-muted)] text-sm">
-              © 2025 Teach Anything Now. All rights reserved.
+              © 2025 EduConnect Asia Ltd. All rights reserved.
             </p>
             <Link
               href="/blog"
