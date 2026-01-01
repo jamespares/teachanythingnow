@@ -7,5 +7,5 @@ Disallow: /api/
 Disallow: /account
 
 # Sitemap location
-Sitemap: https://teachanything.com/sitemap.xml
+Sitemap: https://teachanythingnow.com/sitemap.xml
 
