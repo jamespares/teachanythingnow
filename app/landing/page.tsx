@@ -294,14 +294,8 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section 
         className="py-16 md:py-24"
-        style={{
-          backgroundImage: "url('/chalk-board-bg.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-          backgroundRepeat: "no-repeat"
-        }}
-      >
+        >
+
         <div className="max-w-4xl mx-auto px-6">
           <div className="card border border-[var(--border)] rounded-3xl p-8 md:p-12 text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4">
@@ -323,14 +317,8 @@ export default function LandingPage() {
       {/* Footer */}
       <footer 
         className="border-t border-white/20 py-8 bg-transparent"
-        style={{
-          backgroundImage: "url('/chalk-board-bg.png')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed",
-          backgroundRepeat: "no-repeat"
-        }}
-      >
+        >
+
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-white/90 text-sm">

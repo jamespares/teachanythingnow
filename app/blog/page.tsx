@@ -113,16 +113,16 @@ export default function BlogPage() {
                 onClick={() => router.push(`/blog/${post.slug}`)}
               >
                 {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 text-xs bg-[var(--surface)] text-[var(--text-secondary)] rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {post.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 text-xs bg-[var(--surface)] text-[var(--text-secondary)] rounded"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
                 )}
                 
                 <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-3 hover:text-[var(--primary)] transition-colors">

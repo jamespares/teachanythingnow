@@ -39,11 +39,6 @@
 
 body {
   color: var(--text-primary);
-  background-image: url('/chalk-board-bg.png');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

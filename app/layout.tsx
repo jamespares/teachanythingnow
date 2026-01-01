@@ -3,6 +3,7 @@
 import { SessionProvider } from "next-auth/react";
 import Script from "next/script";
 import "./globals.css";
+import BackgroundImage from "@/components/BackgroundImage";
 
 export default function RootLayout({
   children,
@@ -42,9 +43,6 @@ export default function RootLayout({
         <meta name="twitter:description" content="Generate complete teaching resources and lesson materials in seconds with AI. PowerPoint presentations, podcast audio, worksheets, answer sheets, and educational images for any topic." />
         <meta name="twitter:image" content="https://teachanythingnow.com/logo.png" />
         <meta name="twitter:image:alt" content="Teach Anything Now Logo" />
-        
-        {/* Preload critical background image for faster rendering */}
-        <link rel="preload" as="image" href="/chalk-board-bg.png" fetchPriority="high" />
         
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -102,6 +100,7 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="512x512" href="/logo.png" />
       </head>
       <body>
+        <BackgroundImage />
         <SessionProvider>{children}</SessionProvider>
         {/* Umami Analytics - Track page views, location, and referral data */}
         <Script
