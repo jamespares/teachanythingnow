@@ -3,7 +3,6 @@
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 interface Package {
   id: string;
@@ -76,27 +75,34 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-[var(--surface)]">
-        <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
+      <header className="bg-transparent">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Logo Text */}
           <button 
             onClick={() => router.push("/")}
-            className="flex items-center"
+            className="flex items-center gap-2"
           >
-            <Image 
-              src="/logo.png" 
-              alt="Teach Anything Now" 
-              width={250}
-              height={83}
-              className="logo-image"
-            />
+            <h1 className="text-2xl font-bold text-white underline">Teach Anything Now</h1>
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
           </button>
-          
-          <button
-            onClick={() => signOut()}
-            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
-          >
-            Sign out
-          </button>
+
+          {/* Navigation */}
+          <div className="flex items-center gap-6">
+            <button
+              onClick={() => router.push("/")}
+              className="text-sm text-white hover:text-gray-200 transition-colors"
+            >
+              Create Materials
+            </button>
+            <button
+              onClick={() => signOut()}
+              className="text-sm text-white hover:text-gray-200 transition-colors"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -121,52 +127,6 @@ export default function AccountPage() {
               </div>
             )}
           </div>
-        </div>
-
-        {/* Pricing card */}
-        <div className="card p-6 mb-4">
-          <h2 className="text-sm font-medium text-[var(--text-muted)] uppercase tracking-wide mb-4">
-            Pricing
-          </h2>
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-3xl font-bold text-[var(--text-primary)]">£1</span>
-            <span className="text-[var(--text-secondary)]">per lesson package</span>
-          </div>
-          <p className="text-sm text-[var(--text-muted)] mb-4">
-            Pay only when you generate content. No subscription.
-          </p>
-          <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[var(--primary)]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              PowerPoint presentation
-            </li>
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[var(--primary)]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Podcast audio
-            </li>
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[var(--primary)]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Student worksheet
-            </li>
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[var(--primary)]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Answer key
-            </li>
-            <li className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-[var(--primary)]" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-              Educational images
-            </li>
-          </ul>
         </div>
 
         {/* My Packages */}

@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 
 interface BlogPost {
   id: string;
@@ -72,7 +71,7 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
         <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -83,30 +82,29 @@ export default function BlogPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-[var(--surface)]">
-        <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/landing" className="flex items-center">
-            <Image 
-              src="/logo.png" 
-              alt="Teach Anything Now" 
-              width={250}
-              height={83}
-              className="logo-image"
-            />
+      <header className="bg-transparent">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          {/* Logo Text */}
+          <Link href="/landing" className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-white underline">Teach Anything Now</h1>
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
           </Link>
-          
-          <div className="flex items-center gap-4">
+
+          {/* Navigation */}
+          <div className="flex items-center gap-6">
             <Link
               href="/blog"
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              className="text-sm text-white hover:text-gray-200 transition-colors"
             >
               Blog
             </Link>
             <Link
               href="/auth/signin"
-              className="btn btn-primary text-sm"
+              className="px-6 py-2 bg-white text-[var(--primary)] font-medium rounded-full hover:bg-gray-100 transition-colors"
             >
               Get Started
             </Link>
@@ -118,7 +116,7 @@ export default function BlogPostPage() {
       <main className="max-w-3xl mx-auto px-6 py-12">
         <Link
           href="/blog"
-          className="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] mb-8"
+          className="inline-flex items-center gap-2 text-gray-200 hover:text-white mb-8 transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
