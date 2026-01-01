@@ -38,6 +38,9 @@ export default function RootLayout({
         <meta property="twitter:description" content="Create complete lesson materials in seconds with AI. PowerPoint presentations, podcast audio, worksheets, answer sheets, and educational images for any topic." />
         <meta property="twitter:image" content="https://teachanything.com/logo.png" />
         
+        {/* Preload critical background image for faster rendering */}
+        <link rel="preload" as="image" href="/chalk-board-bg.jpg" fetchPriority="high" />
+        
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 interface BlogPost {
   id: string;
@@ -61,31 +60,27 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-[var(--surface)]">
+      <header className="bg-transparent">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Image 
-              src="/logo.png" 
-              alt="Teach Anything Now" 
-              width={250}
-              height={83}
-              priority
-              className="logo-image"
-            />
+          {/* Logo Text */}
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-bold text-white underline">Teach Anything Now</h1>
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
 
           {/* Navigation */}
           <div className="flex items-center gap-6">
             <Link
               href="/blog"
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hidden sm:block"
+              className="text-sm text-white hover:text-gray-200 hidden sm:block transition-colors"
             >
               Blog
             </Link>
             <button
               onClick={() => router.push("/auth/signin")}
-              className="btn btn-primary"
+              className="px-6 py-2 bg-white text-[var(--primary)] font-medium rounded-full hover:bg-gray-100 transition-colors"
             >
               Get started
             </button>
@@ -108,7 +103,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <button
                   onClick={() => router.push("/auth/signin")}
-                  className="btn btn-primary"
+                  className="px-6 py-3 bg-white text-[var(--primary)] font-medium rounded-full hover:bg-gray-100 transition-colors"
                 >
                   Get started
                 </button>
@@ -134,7 +129,7 @@ export default function LandingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">PowerPoint</h3>
+                  <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">PowerPoint</h3>
                   <p className="text-sm text-[var(--text-secondary)]">
                     Professional presentation slides with clear structure and key teaching points
                   </p>
@@ -147,7 +142,7 @@ export default function LandingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Worksheets & Answer Key</h3>
+                  <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Worksheets & Answer Key</h3>
                   <p className="text-sm text-[var(--text-secondary)]">
                     Editable DOCX worksheets with complete answer keys for quick grading
                   </p>
@@ -160,7 +155,7 @@ export default function LandingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">High-Quality Images</h3>
+                  <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">High-Quality Images</h3>
                   <p className="text-sm text-[var(--text-secondary)]">
                     High-quality educational images and illustrations for your presentations
                   </p>
@@ -173,7 +168,7 @@ export default function LandingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Podcast-Style Audio</h3>
+                  <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Podcast-Style Audio</h3>
                   <p className="text-sm text-[var(--text-secondary)]">
                     Audio explanations for independent study and accessibility. Perfect for podcast-style learning.
                   </p>
@@ -300,10 +295,11 @@ export default function LandingPage() {
       <section 
         className="py-16 md:py-24"
         style={{
-          backgroundImage: "url('/chalk-board-bg.png')",
+          backgroundImage: "url('/chalk-board-bg.jpg')",
           backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundAttachment: "fixed"
+          backgroundPosition: "center top",
+          backgroundAttachment: "fixed",
+          backgroundRepeat: "no-repeat"
         }}
       >
         <div className="max-w-4xl mx-auto px-6">
@@ -313,7 +309,7 @@ export default function LandingPage() {
             </h2>
             <button
               onClick={() => router.push("/auth/signin")}
-              className="btn btn-primary text-lg"
+              className="px-8 py-3 bg-white text-[var(--primary)] font-medium rounded-full hover:bg-gray-100 transition-colors text-lg"
             >
               Start creating
             </button>
@@ -325,15 +321,24 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-[var(--border)] py-8 bg-[var(--surface)]">
+      <footer 
+        className="border-t border-white/20 py-8 bg-transparent"
+        style={{
+          backgroundImage: "url('/chalk-board-bg.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center top",
+          backgroundAttachment: "fixed",
+          backgroundRepeat: "no-repeat"
+        }}
+      >
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[var(--text-muted)] text-sm">
+            <p className="text-white/90 text-sm">
               © 2025 EduConnect Asia Ltd. All rights reserved.
             </p>
             <Link
               href="/blog"
-              className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+              className="text-sm text-white hover:text-gray-200 transition-colors"
             >
               Blog
             </Link>
