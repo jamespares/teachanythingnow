@@ -197,12 +197,19 @@ export default function LandingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                 </svg>
               </div>
+              <div className="mb-4 rounded-lg overflow-hidden border border-[var(--border)]">
+                <img 
+                  src="/samples/ppt-screenshot.png" 
+                  alt="PowerPoint presentation preview" 
+                  className="w-full h-auto"
+                />
+              </div>
               <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">PowerPoint Presentation</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-4">
                 Professional slides with clear structure and engaging visuals
               </p>
               <a
-                href="/samples/sample-presentation.pptx"
+                href="/samples/ppt.pptx"
                 download
                 className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
               >
@@ -224,8 +231,14 @@ export default function LandingPage() {
               <p className="text-sm text-[var(--text-secondary)] mb-4">
                 Clear, engaging audio explanations perfect for independent learning
               </p>
+              <div className="mb-4">
+                <audio controls className="w-full" style={{ maxHeight: '40px' }}>
+                  <source src="/samples/audio.mp3" type="audio/mpeg" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
               <a
-                href="/samples/sample-audio.mp3"
+                href="/samples/audio.mp3"
                 download
                 className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
               >
@@ -243,12 +256,19 @@ export default function LandingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
+              <div className="mb-4 rounded-lg overflow-hidden border border-[var(--border)]">
+                <img 
+                  src="/samples/worksheet-screenshot.png" 
+                  alt="Student worksheet preview" 
+                  className="w-full h-auto"
+                />
+              </div>
               <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Student Worksheet</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-4">
                 Editable DOCX worksheets with varied question types
               </p>
               <a
-                href="/samples/sample-worksheet.docx"
+                href="/samples/worksheet.docx"
                 download
                 className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
               >
@@ -266,12 +286,19 @@ export default function LandingPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
+              <div className="mb-4 rounded-lg overflow-hidden border border-[var(--border)]">
+                <img 
+                  src="/samples/answer-key-screenshot.png" 
+                  alt="Answer key preview" 
+                  className="w-full h-auto"
+                />
+              </div>
               <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Answer Key</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-4">
                 Complete answer sheet for quick and easy grading
               </p>
               <a
-                href="/samples/sample-answers.pdf"
+                href="/samples/answers.pdf"
                 download
                 className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
               >
