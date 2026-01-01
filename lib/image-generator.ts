@@ -1,20 +1,14 @@
-// Image generation utility using OpenAI GPT-Image-1.5 API
+// Image generation utility using Google Gemini Nano Banana
 // Generates high-quality educational images for presentations and materials
-// GPT-Image-1.5 offers enhanced instruction following, faster generation (4x faster),
-// improved text rendering, and precise editing capabilities
+// Gemini Nano Banana offers fast, efficient image generation
 
-import OpenAI from "openai";
-
-// Lazy initialization of OpenAI client to avoid errors when API key is missing
-function getOpenAIClient(): OpenAI | null {
-  if (!process.env.OPENAI_API_KEY) {
-    return null;
-  }
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-    timeout: 60000, // 60 seconds - GPT-Image-1.5 is up to 4x faster than previous models
-    maxRetries: 2,
-  });
+// Lazy initialization to check if API key is available
+function getGeminiApiKey(): string | null {
+  // Check for common environment variable names
+  return process.env.GOOGLE_GEMINI_API_KEY || 
+         process.env.GEMINI_API_KEY || 
+         process.env.BANANA_API_KEY ||
+         null;
 }
 
 export interface ImageGenerationResult {
@@ -34,10 +28,10 @@ export async function generateImages(
   topic: string,
   slides: Array<{ title: string; content: string[] }>
 ): Promise<ImageGenerationResult> {
-  const openai = getOpenAIClient();
+  const apiKey = getGeminiApiKey();
   
-  if (!openai) {
-    console.warn("OPENAI_API_KEY not set, skipping image generation");
+  if (!apiKey) {
+    console.warn("Google Gemini API key not set, skipping image generation");
     return {
       images: [],
     };
@@ -53,48 +47,94 @@ export async function generateImages(
     for (let i = 0; i < Math.min(imagePrompts.length, 3); i++) {
       try {
         const prompt = imagePrompts[i];
-        console.log(`Generating image ${i + 1} with prompt: ${prompt.prompt.substring(0, 100)}...`);
+        console.log(`Generating image ${i + 1} with Gemini Nano Banana: ${prompt.prompt.substring(0, 100)}...`);
         
         // Ensure prompt explicitly excludes text
         const noTextPrompt = `${prompt.prompt}. CRITICAL: This image must contain NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, and NO written content of any kind. Pure visual illustration only.`;
         
-        // Try GPT-Image-1.5 first (latest model), fallback to DALL-E 3 if not available
+        // Use Google Gemini Nano Banana for image generation
+        // Try Banana.dev API first (if using Banana.dev hosting)
         let response;
+        let imageUrl: string | null = null;
+        
         try {
-          response = await openai.images.generate({
-            model: "gpt-image-1.5", // Using GPT-Image-1.5 - latest model with enhanced instruction following and faster generation
-            prompt: noTextPrompt,
-            n: 1,
-            size: "1024x1024", // High resolution
-            quality: "standard",
-          });
-        } catch (modelError: any) {
-          // Fallback to DALL-E 3 if GPT-Image-1.5 is not available or model name is incorrect
-          if (modelError?.code === "invalid_model" || modelError?.message?.includes("model")) {
-            console.warn("GPT-Image-1.5 not available, falling back to DALL-E 3");
-            response = await openai.images.generate({
-              model: "dall-e-3",
-              prompt: noTextPrompt,
-              n: 1,
-              size: "1024x1024",
-              quality: "standard",
-            });
-          } else {
-            throw modelError; // Re-throw if it's a different error
+          // Try Banana.dev endpoint first
+          response = await fetch(
+            `https://api.banana.dev/v1/models/gemini-2.5-flash-image-preview/generate`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${apiKey}`,
+              },
+              body: JSON.stringify({
+                prompt: noTextPrompt,
+                num_outputs: 1,
+                width: 1024,
+                height: 1024,
+              }),
+            }
+          );
+
+          if (response.ok) {
+            const data = await response.json();
+            imageUrl = data.images?.[0]?.url || data.image_url || data.url;
+            console.log(`Generated via Banana.dev API`);
+          }
+        } catch (bananaError) {
+          console.log(`Banana.dev API failed, trying Google Gemini API directly...`);
+        }
+
+        // If Banana.dev didn't work, try Google Gemini API directly
+        if (!imageUrl) {
+          try {
+            response = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  contents: [{
+                    parts: [{
+                      text: noTextPrompt
+                    }]
+                  }],
+                  generationConfig: {
+                    temperature: 0.7,
+                    responseModalities: ["IMAGE"],
+                  }
+                }),
+              }
+            );
+
+            if (response.ok) {
+              const data = await response.json();
+              const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+              
+              if (imageData) {
+                // Convert base64 to data URL
+                imageUrl = `data:image/png;base64,${imageData}`;
+                console.log(`Generated via Google Gemini API`);
+              }
+            } else {
+              const errorText = await response.text();
+              console.error(`Gemini API error: ${response.status} - ${errorText}`);
+            }
+          } catch (geminiError: any) {
+            console.error(`Error calling Gemini API:`, geminiError?.message || geminiError);
           }
         }
 
-        console.log(`Image generation response:`, JSON.stringify(response, null, 2));
-        
-        const imageUrl = response.data?.[0]?.url;
         if (imageUrl) {
-          console.log(`Successfully generated image ${i + 1}: ${imageUrl}`);
           images.push({
             url: imageUrl,
             description: prompt.description,
           });
+          console.log(`Successfully generated image ${i + 1} using Gemini Nano Banana`);
         } else {
-          console.warn(`No URL in response for image ${i + 1}:`, response);
+          console.warn(`Failed to generate image ${i + 1} - no URL returned`);
         }
       } catch (error: any) {
         console.error(`Error generating image ${i + 1}:`, error?.message || error);
@@ -117,7 +157,7 @@ export async function generateImages(
 }
 
 /**
- * Downloads images from URLs and returns them as buffers
+ * Downloads images from URLs or converts base64 data URLs to buffers
  */
 export async function downloadImages(
   images: Array<{ url: string; description: string }>
@@ -126,6 +166,16 @@ export async function downloadImages(
   
   for (const image of images) {
     try {
+      // Check if it's a data URL (base64)
+      if (image.url.startsWith('data:image')) {
+        const base64Data = image.url.split(',')[1];
+        if (base64Data) {
+          buffers.push(Buffer.from(base64Data, 'base64'));
+          continue;
+        }
+      }
+      
+      // Otherwise, fetch from URL
       const response = await fetch(image.url);
       if (response.ok) {
         const arrayBuffer = await response.arrayBuffer();
@@ -147,85 +197,28 @@ async function generateImagePrompts(
   topic: string,
   slides: Array<{ title: string; content: string[] }>
 ): Promise<Array<{ prompt: string; description: string }>> {
-  const openai = getOpenAIClient();
-  
-  if (!openai) {
-    // Fallback prompts if OpenAI is not available - explicitly no text
-    return [
-      {
-        prompt: `Professional educational illustration about ${topic}, clear and informative, suitable for teaching materials, high quality, visually engaging. NO text, NO words, NO labels, NO captions, NO written content. Pure visual illustration only.`,
-        description: `Main illustration for ${topic}`,
-      },
-    ];
-  }
-
-  try {
-    // Use ALL slides for comprehensive context to ensure consistency
-    const fullSlideContent = slides
-      .map((s, index) => `Slide ${index + 1} - ${s.title}: ${s.content.join(". ")}`)
-      .join("\n\n");
-
-    // Extract key visual concepts from all slides
-    const keyConcepts = slides
-      .flatMap(s => s.content)
-      .filter((_, i) => i < 10) // Limit to avoid token overflow
-      .join(", ");
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Using GPT-4o for high-quality prompt generation
-      messages: [
-        {
-          role: "system",
-          content: "You create image generation prompts for educational content. Return ONLY valid JSON: {\"prompts\": [{\"prompt\": \"...\", \"description\": \"...\"}]}. Create 2-3 detailed prompts (60-100 words each) for educational images. CRITICAL: Images must NEVER contain any text, words, letters, numbers, labels, captions, or written content of any kind. Only visual illustrations, diagrams, and graphics.",
-        },
-        {
-          role: "user",
-          content: `Create 2-3 image prompts for educational content about "${topic}".
-
-Slide content:
-${fullSlideContent}
-
-Key concepts: ${keyConcepts}
-
-CRITICAL REQUIREMENTS for each prompt (60-100 words):
-- NO TEXT: The image must contain ZERO text, words, letters, numbers, labels, captions, signs, or written content
-- Visual only: Pure illustration, diagram, or graphic representation
-- Include explicit instruction: "no text, no words, no labels, no captions, no written content"
-- Include style: "professional educational illustration, clean design, visual only"
-- Focus on different key aspects of "${topic}"
-- Make it suitable for presentations
-
-Return JSON with prompts and descriptions.`,
-        },
-      ],
-      temperature: 0.8, // Creative prompts
-      max_tokens: 1000,
-    });
-
-    const content = response.choices[0]?.message?.content;
-    if (content) {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.prompts && Array.isArray(parsed.prompts)) {
-          return parsed.prompts;
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Error generating image prompts:", error);
-  }
-
-  // Enhanced fallback prompts that are more specific - explicitly no text
+  // Generate prompts directly without needing OpenAI
+  // Extract key visual concepts from slides
   const mainConcept = slides[0]?.title || topic;
+  const keyConcepts = slides
+    .flatMap(s => s.content)
+    .filter((_, i) => i < 10) // Limit to avoid overflow
+    .slice(0, 5)
+    .join(", ");
+
+  // Create 2-3 detailed prompts for educational images
   return [
     {
       prompt: `Professional educational illustration about ${topic}, specifically showing ${mainConcept}, clear and informative, suitable for teaching materials, high quality, visually engaging, educational style. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual illustration only.`,
       description: `Main illustration for ${topic}: ${mainConcept}`,
     },
     {
-      prompt: `Educational diagram or visual representation of key concepts in ${topic}, showing practical applications or examples mentioned in the lesson, professional style, suitable for presentations, clear and informative. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual diagram only.`,
+      prompt: `Educational diagram or visual representation of key concepts in ${topic}, showing ${keyConcepts}, professional style, suitable for presentations, clear and informative. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual diagram only.`,
       description: `Conceptual diagram for ${topic}`,
+    },
+    {
+      prompt: `Visual example or practical application illustration related to ${topic}, showing real-world context, educational and engaging, professional quality. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual example only.`,
+      description: `Practical example for ${topic}`,
     },
   ];
 }

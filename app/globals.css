@@ -172,3 +172,18 @@ body {
 .StripeElement--invalid {
   border-color: var(--error);
 }
+
+/* Logo styling - make white background transparent using blend mode */
+.logo-image,
+header img[alt="Teach Anything Now"],
+header img[src="/logo.png"] {
+  background-color: transparent !important;
+  border-radius: 0;
+  display: block;
+  object-fit: contain;
+  /* Use multiply blend mode to make white backgrounds transparent */
+  mix-blend-mode: multiply;
+}
+
+/* For white backgrounds, multiply makes white transparent while preserving colors */
+/* If the logo has a white background, it will blend seamlessly with white headers */

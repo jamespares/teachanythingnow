@@ -61,18 +61,18 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--background)]">
       {/* Header */}
-      <header className="bg-[var(--surface)] border-b border-[var(--border)]">
+      <header className="bg-[var(--surface)]">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <Image 
               src="/logo.png" 
-              alt="Teach Anything Logo" 
-              width={32}
-              height={32}
+              alt="Teach Anything Now" 
+              width={250}
+              height={83}
               priority
+              className="logo-image"
             />
-            <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything Now</span>
           </div>
 
           {/* Navigation */}
@@ -134,7 +134,7 @@ export default function LandingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">AI PowerPoint Generator</h3>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">PowerPoint</h3>
                   <p className="text-sm text-[var(--text-secondary)]">
                     Professional presentation slides with clear structure and key teaching points
                   </p>
@@ -160,7 +160,7 @@ export default function LandingPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Relevant Images</h3>
+                  <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">High-Quality Images</h3>
                   <p className="text-sm text-[var(--text-secondary)]">
                     High-quality educational images and illustrations for your presentations
                   </p>
@@ -184,52 +184,114 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
+      {/* Samples Section */}
       <section className="py-16 md:py-20 bg-[var(--background)]">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4 text-center">
-            How It Works
+            Sample Resources
           </h2>
           <p className="text-lg text-[var(--text-secondary)] mb-12 text-center max-w-2xl mx-auto">
-            AI-powered lesson planning made simple for busy teachers
+            Preview the quality of our AI-generated teaching materials. Download samples to see what you'll get.
           </p>
           
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[var(--primary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-white">1</span>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Sample PowerPoint */}
+            <article className="card p-6 border border-[var(--border)] hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-[var(--primary)] rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
               </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">
-                Enter Your Topic
-              </h3>
-              <p className="text-[var(--text-secondary)]">
-                Type any subject or lesson topic you want to teach
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">PowerPoint Presentation</h3>
+              <p className="text-sm text-[var(--text-secondary)] mb-4">
+                Professional slides with clear structure and engaging visuals
               </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[var(--primary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-white">2</span>
+              <a
+                href="/samples/sample-presentation.pptx"
+                download
+                className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
+              >
+                Download Sample
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </a>
+            </article>
+
+            {/* Sample Audio */}
+            <article className="card p-6 border border-[var(--border)] hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-[var(--primary)] rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                </svg>
               </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">
-                AI Generates Materials
-              </h3>
-              <p className="text-[var(--text-secondary)]">
-                Our AI creates presentations, worksheets, audio, and images in 30-60 seconds
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Podcast Audio</h3>
+              <p className="text-sm text-[var(--text-secondary)] mb-4">
+                Clear, engaging audio explanations perfect for independent learning
               </p>
-            </div>
-            
-            <div className="text-center">
-              <div className="w-16 h-16 bg-[var(--primary)] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-white">3</span>
+              <a
+                href="/samples/sample-audio.mp3"
+                download
+                className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
+              >
+                Download Sample
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </a>
+            </article>
+
+            {/* Sample Worksheet */}
+            <article className="card p-6 border border-[var(--border)] hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-[var(--primary)] rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
               </div>
-              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">
-                Download & Teach
-              </h3>
-              <p className="text-[var(--text-secondary)]">
-                Get all files instantly and start teaching right away
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Student Worksheet</h3>
+              <p className="text-sm text-[var(--text-secondary)] mb-4">
+                Editable DOCX worksheets with varied question types
               </p>
-            </div>
+              <a
+                href="/samples/sample-worksheet.docx"
+                download
+                className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
+              >
+                Download Sample
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </a>
+            </article>
+
+            {/* Sample Answer Key */}
+            <article className="card p-6 border border-[var(--border)] hover:shadow-lg transition-shadow">
+              <div className="w-12 h-12 bg-[var(--primary)] rounded-xl flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-[var(--text-primary)] mb-2">Answer Key</h3>
+              <p className="text-sm text-[var(--text-secondary)] mb-4">
+                Complete answer sheet for quick and easy grading
+              </p>
+              <a
+                href="/samples/sample-answers.pdf"
+                download
+                className="text-sm text-[var(--primary)] font-medium hover:underline inline-flex items-center gap-1"
+              >
+                Download Sample
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+              </a>
+            </article>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-[var(--text-muted)]">
+              All samples are generated using our AI. Create your own custom resources for any topic.
+            </p>
           </div>
         </div>
       </section>

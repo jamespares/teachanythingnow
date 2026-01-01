@@ -64,19 +64,19 @@ function ErrorContent() {
   return (
     <div className="min-h-screen bg-[var(--background)] flex flex-col">
       {/* Header */}
-      <header className="bg-[var(--surface)] border-b border-[var(--border)]">
+      <header className="bg-[var(--surface)]">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center">
           <button 
             onClick={() => router.push("/landing")}
-            className="flex items-center gap-2"
+            className="flex items-center"
           >
             <Image 
               src="/logo.png" 
-              alt="Teach Anything Now Logo" 
-              width={32}
-              height={32}
+              alt="Teach Anything Now" 
+              width={250}
+              height={83}
+              className="logo-image"
             />
-            <span className="text-lg font-semibold text-[var(--text-primary)]">Teach Anything Now</span>
           </button>
         </div>
       </header>
