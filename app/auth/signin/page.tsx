@@ -60,10 +60,10 @@ function SignInContent() {
       <div className="flex-1 flex items-center justify-center p-6">
         <div className="w-full max-w-sm">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+            <h1 className="text-2xl font-bold text-white mb-2">
               Sign in
             </h1>
-            <p className="text-[var(--text-secondary)]">
+            <p className="text-gray-200">
               Enter your email to receive a magic link
             </p>
           </div>
@@ -116,7 +116,7 @@ function SignInContent() {
             </form>
           </div>
 
-          <p className="mt-6 text-center text-sm text-[var(--text-muted)]">
+          <p className="mt-6 text-center text-sm text-gray-300">
             We&apos;ll email you a secure sign-in link
           </p>
         </div>

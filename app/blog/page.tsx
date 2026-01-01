@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,23 +20,29 @@ export default function BlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
       const response = await fetch("/api/blog");
       if (response.ok) {
         const data = await response.json();
+        console.log("Blog posts fetched:", data);
         setPosts(data.posts || []);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Failed to fetch blog posts:", response.status, errorData);
+        setPosts([]);
       }
     } catch (error) {
       console.error("Error fetching blog posts:", error);
+      setPosts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -48,7 +54,7 @@ export default function BlogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-[var(--surface)]">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -106,16 +112,18 @@ export default function BlogPage() {
                 className="card p-6 hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => router.push(`/blog/${post.slug}`)}
               >
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2 py-1 text-xs bg-[var(--surface)] text-[var(--text-secondary)] rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {post.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-1 text-xs bg-[var(--surface)] text-[var(--text-secondary)] rounded"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 
                 <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-3 hover:text-[var(--primary)] transition-colors">
                   {post.title}

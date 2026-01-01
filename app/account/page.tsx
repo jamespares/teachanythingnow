@@ -102,7 +102,7 @@ export default function AccountPage() {
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-6 py-8">
-        <h1 className="text-xl font-semibold text-[var(--text-primary)] mb-6">Account</h1>
+        <h1 className="text-xl font-semibold text-white mb-6">Account</h1>
 
         {/* Profile card */}
         <div className="card p-6 mb-4">

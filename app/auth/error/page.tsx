@@ -91,11 +91,11 @@ function ErrorContent() {
             </svg>
           </div>
 
-          <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
+          <h1 className="text-2xl font-bold text-white mb-3">
             {title}
           </h1>
           
-          <p className="text-[var(--text-secondary)] mb-8">
+          <p className="text-gray-200 mb-8">
             {message}
           </p>
 
@@ -116,7 +116,7 @@ function ErrorContent() {
           </div>
 
           {error && (
-            <p className="mt-6 text-xs text-[var(--text-muted)]">
+            <p className="mt-6 text-xs text-gray-300">
               Error code: {error}
             </p>
           )}

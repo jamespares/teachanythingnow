@@ -456,7 +456,7 @@ function HomeContent() {
 
         {/* Info */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-[var(--text-muted)]">
+          <p className="text-sm text-gray-300">
             Each package includes slides, audio, editable worksheets with answer keys, and high-quality images
           </p>
         </div>

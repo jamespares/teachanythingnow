@@ -18,16 +18,16 @@ function VerifyRequestContent() {
           </svg>
         </div>
 
-        <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-3">
+        <h1 className="text-3xl font-bold text-white mb-3">
           Check your email
         </h1>
         
-        <p className="text-[var(--text-secondary)] mb-2">
+        <p className="text-gray-200 mb-2">
           We sent a magic link to
         </p>
         
         {email && (
-          <p className="font-semibold text-[var(--text-primary)] mb-8">
+          <p className="font-semibold text-white mb-8">
             {email}
           </p>
         )}
@@ -52,7 +52,7 @@ function VerifyRequestContent() {
           </ol>
         </div>
 
-        <p className="text-sm text-[var(--text-muted)]">
+        <p className="text-sm text-gray-300">
           The link expires in 24 hours. Check your spam folder if you don&apos;t see it.
         </p>
       </div>

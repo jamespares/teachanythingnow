@@ -10,7 +10,7 @@
   --primary-light: #25d366;
   
   /* Neutral palette - clean like PayPal */
-  --background: #f0f2f5;
+  --background: transparent;
   --surface: #ffffff;
   --text-primary: #111b21;
   --text-secondary: #667781;
@@ -27,6 +27,10 @@
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
+  
+  /* Font stacks - Consistent typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-handwritten: 'Excalifont', 'Caveat', 'Kalam', cursive, sans-serif;
 }
 
 * {
@@ -35,19 +39,94 @@
 
 body {
   color: var(--text-primary);
-  background: var(--background);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-image: url('/chalk-board-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
 }
 
-/* Hero typography */
-.hero-title {
-  font-family: 'Inter', sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+/* Excalifont - Handwritten whiteboard-style font */
+@font-face {
+  font-family: 'Excalifont';
+  src: url('/fonts/Excalifont.woff2') format('woff2'),
+       url('/fonts/Excalifont.woff') format('woff'),
+       url('/fonts/Excalifont.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Consistent typography - All headings use handwritten font */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-handwritten);
+  font-weight: normal;
+  line-height: 1.2;
+  color: var(--text-primary);
+  letter-spacing: 0.02em;
+}
+
+h1 {
+  font-size: 2.25rem; /* 36px */
+  font-weight: normal;
   line-height: 1.1;
+}
+
+h2 {
+  font-size: 1.875rem; /* 30px */
+  font-weight: normal;
+}
+
+h3 {
+  font-size: 1.5rem; /* 24px */
+  font-weight: normal;
+}
+
+h4 {
+  font-size: 1.25rem; /* 20px */
+  font-weight: normal;
+}
+
+h5 {
+  font-size: 1.125rem; /* 18px */
+  font-weight: normal;
+}
+
+h6 {
+  font-size: 1rem; /* 16px */
+  font-weight: normal;
+}
+
+/* Hero typography - Using Excalifont for handwritten whiteboard style */
+.hero-title {
+  font-family: var(--font-handwritten);
+  font-weight: normal;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+/* Body text and paragraphs */
+p {
+  font-family: var(--font-sans);
+  line-height: 1.6;
+}
+
+/* Links */
+a {
+  font-family: var(--font-sans);
+}
+
+/* Buttons - ensure consistent font */
+button, .btn {
+  font-family: var(--font-sans);
+}
+
+/* Inputs and form elements */
+input, textarea, select {
+  font-family: var(--font-sans);
 }
 
 /* Custom scrollbar */

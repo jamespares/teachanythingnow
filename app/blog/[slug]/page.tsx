@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -24,13 +24,7 @@ export default function BlogPostPage() {
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (params.slug) {
-      fetchPost(params.slug as string);
-    }
-  }, [params.slug]);
-
-  const fetchPost = async (slug: string) => {
+  const fetchPost = useCallback(async (slug: string) => {
     try {
       const response = await fetch(`/api/blog/${slug}`);
       if (response.ok) {
@@ -54,7 +48,18 @@ export default function BlogPostPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    // Handle slug parameter - could be string or array
+    const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+    if (slug) {
+      fetchPost(slug);
+    } else {
+      setLoading(false);
+      router.push("/blog");
+    }
+  }, [params.slug, fetchPost, router]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -67,7 +72,7 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -78,7 +83,7 @@ export default function BlogPostPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-[var(--surface)]">
         <div className="max-w-3xl mx-auto px-6 h-16 flex items-center justify-between">

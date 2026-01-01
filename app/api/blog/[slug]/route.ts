@@ -15,6 +15,14 @@ export async function GET(
   try {
     const { slug } = params;
 
+    // Validate slug parameter
+    if (!slug || typeof slug !== 'string') {
+      return NextResponse.json(
+        { error: "Invalid slug parameter" },
+        { status: 400 }
+      );
+    }
+
     const { data: post, error } = await supabaseAdmin
       .from("blog_posts")
       .select("*")
@@ -22,7 +30,22 @@ export async function GET(
       .eq("published", true)
       .single();
 
-    if (error || !post) {
+    // Check if post was not found (Supabase returns error code 'PGRST116' for no rows)
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: "Blog post not found" },
+          { status: 404 }
+        );
+      }
+      console.error("Error fetching blog post:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch blog post" },
+        { status: 500 }
+      );
+    }
+
+    if (!post) {
       return NextResponse.json(
         { error: "Blog post not found" },
         { status: 404 }

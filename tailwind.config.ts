@@ -12,6 +12,10 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+        handwritten: ['Excalifont', 'Caveat', 'Kalam', 'cursive', 'sans-serif'],
+      },
     },
   },
   plugins: [],
