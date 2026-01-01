@@ -86,10 +86,12 @@ export async function generateImages(
         }
 
         // If Banana.dev didn't work, try Google Gemini API directly
+        // Use gemini-2.5-flash-image which supports image generation
         if (!imageUrl) {
           try {
+            // Try gemini-2.5-flash-image first (supports image generation)
             response = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`,
               {
                 method: "POST",
                 headers: {
@@ -111,16 +113,63 @@ export async function generateImages(
 
             if (response.ok) {
               const data = await response.json();
+              // Check for inline image data
               const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
               
               if (imageData) {
                 // Convert base64 to data URL
                 imageUrl = `data:image/png;base64,${imageData}`;
-                console.log(`Generated via Google Gemini API`);
+                console.log(`Generated via Google Gemini 2.5 Flash Image API`);
+              } else {
+                // Try alternative response structure
+                const alternativeImageData = data.candidates?.[0]?.content?.parts?.find((part: any) => part.inlineData?.data)?.inlineData?.data;
+                if (alternativeImageData) {
+                  imageUrl = `data:image/png;base64,${alternativeImageData}`;
+                  console.log(`Generated via Google Gemini 2.5 Flash Image API (alternative structure)`);
+                } else {
+                  console.warn(`No image data found in Gemini response:`, JSON.stringify(data).substring(0, 500));
+                }
               }
             } else {
               const errorText = await response.text();
               console.error(`Gemini API error: ${response.status} - ${errorText}`);
+              
+              // Try imagen-4.0 as fallback
+              if (response.status === 400) {
+                console.log(`Trying imagen-4.0 as fallback...`);
+                try {
+                  const imagenResponse = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0:generateContent?key=${apiKey}`,
+                    {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify({
+                        contents: [{
+                          parts: [{
+                            text: noTextPrompt
+                          }]
+                        }],
+                        generationConfig: {
+                          temperature: 0.7,
+                        }
+                      }),
+                    }
+                  );
+                  
+                  if (imagenResponse.ok) {
+                    const imagenData = await imagenResponse.json();
+                    const imagenImageData = imagenData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                    if (imagenImageData) {
+                      imageUrl = `data:image/png;base64,${imagenImageData}`;
+                      console.log(`Generated via Imagen 4.0 API`);
+                    }
+                  }
+                } catch (imagenError: any) {
+                  console.error(`Error calling Imagen API:`, imagenError?.message || imagenError);
+                }
+              }
             }
           } catch (geminiError: any) {
             console.error(`Error calling Gemini API:`, geminiError?.message || geminiError);
@@ -164,28 +213,48 @@ export async function downloadImages(
 ): Promise<Buffer[]> {
   const buffers: Buffer[] = [];
   
-  for (const image of images) {
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
     try {
       // Check if it's a data URL (base64)
       if (image.url.startsWith('data:image')) {
         const base64Data = image.url.split(',')[1];
         if (base64Data) {
-          buffers.push(Buffer.from(base64Data, 'base64'));
-          continue;
+          const buffer = Buffer.from(base64Data, 'base64');
+          if (buffer.length > 0) {
+            buffers.push(buffer);
+            console.log(`Successfully converted base64 image ${i + 1} to buffer (${buffer.length} bytes)`);
+            continue;
+          } else {
+            console.warn(`Base64 image ${i + 1} resulted in empty buffer`);
+          }
+        } else {
+          console.warn(`Base64 image ${i + 1} has no data after comma`);
+        }
+      } else {
+        // Otherwise, fetch from URL
+        console.log(`Fetching image ${i + 1} from URL: ${image.url.substring(0, 100)}...`);
+        const response = await fetch(image.url);
+        if (response.ok) {
+          const arrayBuffer = await response.arrayBuffer();
+          const buffer = Buffer.from(arrayBuffer);
+          if (buffer.length > 0) {
+            buffers.push(buffer);
+            console.log(`Successfully downloaded image ${i + 1} (${buffer.length} bytes)`);
+          } else {
+            console.warn(`Downloaded image ${i + 1} is empty`);
+          }
+        } else {
+          console.error(`Failed to download image ${i + 1}: HTTP ${response.status} ${response.statusText}`);
         }
       }
-      
-      // Otherwise, fetch from URL
-      const response = await fetch(image.url);
-      if (response.ok) {
-        const arrayBuffer = await response.arrayBuffer();
-        buffers.push(Buffer.from(arrayBuffer));
-      }
     } catch (error) {
-      console.error(`Error downloading image:`, error);
+      console.error(`Error downloading image ${i + 1}:`, error instanceof Error ? error.message : String(error));
+      // Continue with other images
     }
   }
   
+  console.log(`Downloaded ${buffers.length} out of ${images.length} images`);
   return buffers;
 }
 

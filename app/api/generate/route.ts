@@ -217,20 +217,33 @@ export async function POST(request: NextRequest) {
         // Download images and save them
         console.log(`Downloading ${imageResult.images.length} images...`);
         const imageBuffers = await downloadImages(imageResult.images);
-        console.log(`Downloaded ${imageBuffers.length} image buffers`);
+        console.log(`Downloaded ${imageBuffers.length} image buffers (expected ${imageResult.images.length})`);
         
+        // Save each successfully downloaded image
         for (let i = 0; i < imageBuffers.length; i++) {
-          const imageFileName = `${fileId}_image_${i + 1}.png`;
-          const imagePath = path.join(tempDir, imageFileName);
-          await fs.writeFile(imagePath, imageBuffers[i]);
-          imageFiles.push(imageFileName);
-          console.log(`Saved image: ${imageFileName}`);
+          try {
+            const imageFileName = `${fileId}_image_${i + 1}.png`;
+            const imagePath = path.join(tempDir, imageFileName);
+            await fs.writeFile(imagePath, imageBuffers[i]);
+            imageFiles.push(imageFileName);
+            console.log(`Successfully saved image: ${imageFileName}`);
+          } catch (saveError) {
+            console.error(`Error saving image ${i + 1}:`, saveError);
+            // Continue with other images
+          }
+        }
+        
+        if (imageFiles.length === 0 && imageBuffers.length > 0) {
+          console.warn("Images were downloaded but failed to save");
+        } else if (imageFiles.length > 0) {
+          console.log(`Successfully saved ${imageFiles.length} images`);
         }
       } else {
-        console.warn("No images were generated");
+        console.warn("No images were generated - this may be due to missing API key or API errors");
       }
     } catch (imageError) {
       console.error("Error generating images (non-fatal):", imageError);
+      console.error("Image error details:", imageError instanceof Error ? imageError.message : String(imageError));
       // Continue without images - don't fail the entire request
     }
 
@@ -266,6 +279,8 @@ export async function POST(request: NextRequest) {
       console.error("Error saving package to database:", dbError);
     }
 
+    console.log(`Returning files: presentation=${!!filesData.presentation}, audio=${!!filesData.audio}, worksheet=${!!filesData.worksheet}, answerSheet=${!!filesData.answerSheet}, images=${filesData.images.length}`);
+    
     return NextResponse.json({
       files: filesData,
       packageId: fileId, // Return package ID for reference
