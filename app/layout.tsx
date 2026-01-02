@@ -4,6 +4,8 @@ import { SessionProvider } from "next-auth/react";
 import Script from "next/script";
 import "./globals.css";
 import BackgroundImage from "@/components/BackgroundImage";
+import FeedbackWidget from "@/components/FeedbackWidget";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -101,7 +103,15 @@ export default function RootLayout({
       </head>
       <body>
         <BackgroundImage />
-        <SessionProvider>{children}</SessionProvider>
+        <SessionProvider>
+          <div className="flex flex-col min-h-screen">
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+            <FeedbackWidget />
+          </div>
+        </SessionProvider>
         {/* Umami Analytics - Track page views, location, and referral data */}
         <Script
           defer
