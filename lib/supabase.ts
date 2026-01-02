@@ -40,3 +40,48 @@ export interface Subscription {
   updated_at: string;
 }
 
+export const STORAGE_BUCKET = "generations";
+
+export async function uploadToStorage(
+  buffer: Buffer,
+  fileName: string,
+  contentType: string
+): Promise<{ path: string; error: any }> {
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .upload(fileName, buffer, {
+        contentType,
+        upsert: true,
+      });
+
+    if (error) {
+      console.error(`Error uploading ${fileName} to storage:`, error);
+      return { path: "", error };
+    }
+
+    return { path: data?.path || fileName, error: null };
+  } catch (error) {
+    console.error(`Unexpected error uploading ${fileName}:`, error);
+    return { path: "", error };
+  }
+}
+
+export async function downloadFromStorage(path: string): Promise<{ data: Blob | null; error: any }> {
+  try {
+    const { data, error } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .download(path);
+
+    if (error) {
+      console.error(`Error downloading ${path} from storage:`, error);
+      return { data: null, error };
+    }
+
+    return { data, error: null };
+  } catch (error) {
+    console.error(`Unexpected error downloading ${path}:`, error);
+    return { data: null, error };
+  }
+}
+

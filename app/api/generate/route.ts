@@ -6,10 +6,8 @@ import { generateAudio } from "@/lib/audio-generator";
 import { generateContent } from "@/lib/content-generator";
 import { generateWorksheet, generateAnswerSheet } from "@/lib/worksheet-generator";
 import { generateImages, downloadImages } from "@/lib/image-generator";
-import { promises as fs } from "fs";
-import path from "path";
 import { stripe } from "@/lib/stripe";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin, uploadToStorage } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -180,80 +178,93 @@ export async function POST(request: NextRequest) {
     const content = await generateContent(sanitizedTopic);
     const { slides, podcastScript, worksheet } = content;
 
-    // Create temp directory if it doesn't exist
-    const tempDir = path.join(process.cwd(), "temp");
-    await fs.mkdir(tempDir, { recursive: true });
-
     // Generate unique ID for this generation (use sanitized topic)
     const timestamp = Date.now();
     const fileId = `${sanitizedTopic.toLowerCase().replace(/[^a-z0-9_]/g, "_").substring(0, 50)}_${timestamp}`;
 
-    // Generate PowerPoint file (use sanitized topic)
-    const pptBuffer = await generatePPT(slides, sanitizedTopic);
-    const pptPath = path.join(tempDir, `${fileId}.pptx`);
-    await fs.writeFile(pptPath, pptBuffer);
+    // Define parallel tasks
+    const pptTask = async () => {
+      const pptBuffer = await generatePPT(slides, sanitizedTopic);
+      await uploadToStorage(Buffer.from(pptBuffer), `${fileId}.pptx`, "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+      return { presentation: `${fileId}.pptx` };
+    };
 
-    // Generate audio (use sanitized topic) - always returns MP3
-    const audioResult = await generateAudio(podcastScript, sanitizedTopic);
-    const audioPath = path.join(tempDir, `${fileId}.mp3`);
-    await fs.writeFile(audioPath, audioResult.buffer);
+    const audioTask = async () => {
+      const audioResult = await generateAudio(podcastScript, sanitizedTopic);
+      await uploadToStorage(audioResult.buffer, `${fileId}.mp3`, "audio/mpeg");
+      return { audio: `${fileId}.mp3` };
+    };
 
-    // Generate worksheet (DOCX format for easy editing) and answer sheet (PDF for reference)
-    const worksheetBuffer = await generateWorksheet(sanitizedTopic, worksheet.questions);
-    const answerSheetBuffer = await generateAnswerSheet(sanitizedTopic, worksheet.questions);
-    const worksheetPath = path.join(tempDir, `${fileId}_worksheet.docx`);
-    const answerSheetPath = path.join(tempDir, `${fileId}_answers.pdf`);
-    await fs.writeFile(worksheetPath, worksheetBuffer);
-    await fs.writeFile(answerSheetPath, answerSheetBuffer);
+    const worksheetTask = async () => {
+      const worksheetBuffer = await generateWorksheet(sanitizedTopic, worksheet.questions);
+      await uploadToStorage(Buffer.from(worksheetBuffer), `${fileId}_worksheet.docx`, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+      return { worksheet: `${fileId}_worksheet.docx` };
+    };
 
-    // Generate high-quality images (don't fail if images fail)
-    const imageFiles: string[] = [];
-    try {
-      console.log(`Starting image generation for topic: ${sanitizedTopic}`);
-      const imageResult = await generateImages(sanitizedTopic, slides);
-      console.log(`Image generation result: ${imageResult.images.length} images`);
-      
-      if (imageResult.images.length > 0) {
-        // Download images and save them
-        console.log(`Downloading ${imageResult.images.length} images...`);
-        const imageBuffers = await downloadImages(imageResult.images);
-        console.log(`Downloaded ${imageBuffers.length} image buffers (expected ${imageResult.images.length})`);
+    const answerSheetTask = async () => {
+      const answerSheetBuffer = await generateAnswerSheet(sanitizedTopic, worksheet.questions);
+      await uploadToStorage(Buffer.from(answerSheetBuffer), `${fileId}_answers.pdf`, "application/pdf");
+      return { answerSheet: `${fileId}_answers.pdf` };
+    };
+
+    const imagesTask = async () => {
+      const imageFiles: string[] = [];
+      try {
+        console.log(`Starting image generation for topic: ${sanitizedTopic}`);
+        const imageResult = await generateImages(sanitizedTopic, slides);
+        console.log(`Image generation result: ${imageResult.images.length} images`);
         
-        // Save each successfully downloaded image
-        for (let i = 0; i < imageBuffers.length; i++) {
-          try {
-            const imageFileName = `${fileId}_image_${i + 1}.png`;
-            const imagePath = path.join(tempDir, imageFileName);
-            await fs.writeFile(imagePath, imageBuffers[i]);
-            imageFiles.push(imageFileName);
-            console.log(`Successfully saved image: ${imageFileName}`);
-          } catch (saveError) {
-            console.error(`Error saving image ${i + 1}:`, saveError);
-            // Continue with other images
+        if (imageResult.images.length > 0) {
+          // Download images and save them
+          console.log(`Downloading ${imageResult.images.length} images...`);
+          const imageBuffers = await downloadImages(imageResult.images);
+          console.log(`Downloaded ${imageBuffers.length} image buffers (expected ${imageResult.images.length})`);
+          
+          // Save each successfully downloaded image
+          for (let i = 0; i < imageBuffers.length; i++) {
+            try {
+              const imageFileName = `${fileId}_image_${i + 1}.png`;
+              await uploadToStorage(imageBuffers[i], imageFileName, "image/png");
+              imageFiles.push(imageFileName);
+              console.log(`Successfully saved image: ${imageFileName}`);
+            } catch (saveError) {
+              console.error(`Error saving image ${i + 1}:`, saveError);
+              // Continue with other images
+            }
           }
+          
+          if (imageFiles.length === 0 && imageBuffers.length > 0) {
+            console.warn("Images were downloaded but failed to save");
+          } else if (imageFiles.length > 0) {
+            console.log(`Successfully saved ${imageFiles.length} images`);
+          }
+        } else {
+          console.warn("No images were generated - this may be due to missing API key or API errors");
         }
-        
-        if (imageFiles.length === 0 && imageBuffers.length > 0) {
-          console.warn("Images were downloaded but failed to save");
-        } else if (imageFiles.length > 0) {
-          console.log(`Successfully saved ${imageFiles.length} images`);
-        }
-      } else {
-        console.warn("No images were generated - this may be due to missing API key or API errors");
+      } catch (imageError) {
+        console.error("Error generating images (non-fatal):", imageError);
+        console.error("Image error details:", imageError instanceof Error ? imageError.message : String(imageError));
+        // Continue without images - don't fail the entire request
       }
-    } catch (imageError) {
-      console.error("Error generating images (non-fatal):", imageError);
-      console.error("Image error details:", imageError instanceof Error ? imageError.message : String(imageError));
-      // Continue without images - don't fail the entire request
-    }
+      return { images: imageFiles };
+    };
+
+    // Execute all tasks in parallel
+    const [pptResult, audioResult, worksheetResult, answerSheetResult, imagesResult] = await Promise.all([
+      pptTask(),
+      audioTask(),
+      worksheetTask(),
+      answerSheetTask(),
+      imagesTask()
+    ]);
 
     // Prepare files object for response and database
     const filesData = {
-      presentation: `${fileId}.pptx`,
-      audio: `${fileId}.mp3`,
-      worksheet: `${fileId}_worksheet.docx`,
-      answerSheet: `${fileId}_answers.pdf`,
-      images: imageFiles,
+      ...pptResult,
+      ...audioResult,
+      ...worksheetResult,
+      ...answerSheetResult,
+      ...imagesResult,
     };
 
     // Save package to database for user to view and redownload later

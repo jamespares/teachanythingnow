@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readFile } from "fs/promises";
-import { join } from "path";
-import { existsSync } from "fs";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { supabaseAdmin } from "@/lib/supabase";
+import { supabaseAdmin, downloadFromStorage } from "@/lib/supabase";
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
@@ -36,46 +33,34 @@ export async function GET(request: NextRequest) {
       .eq("email", session.user.email)
       .single();
 
-    if (user) {
-      // Extract file_id from filename (format: fileId.ext or fileId_suffix.ext)
-      const fileIdMatch = filename.match(/^([^_]+(?:_[^_]+)*?)(?:_(?:worksheet|answers|image_\d+))?\./);
-      const fileId = fileIdMatch ? fileIdMatch[1] : filename.split('.')[0];
-
-      // Check if this file belongs to a package owned by the user
-      const { data: packageData } = await supabaseAdmin
-        .from("packages")
-        .select("id, files")
-        .eq("user_id", user.id)
-        .eq("file_id", fileId)
-        .single();
-
-      if (!packageData) {
-        // File doesn't belong to user's packages - check if it's a recent generation
-        // Allow access if file exists and was created recently (within last hour)
-        // This handles the case where package wasn't saved yet
-        const filePath = join(process.cwd(), "temp", filename);
-        if (existsSync(filePath)) {
-          const { stat } = await import("fs/promises");
-          const stats = await stat(filePath);
-          const oneHourAgo = Date.now() - 60 * 60 * 1000;
-          if (stats.mtimeMs > oneHourAgo) {
-            // Recent file, allow access
-          } else {
-            return NextResponse.json({ error: "File access denied" }, { status: 403 });
-          }
-        } else {
-          return NextResponse.json({ error: "File not found" }, { status: 404 });
-        }
-      }
+    if (!user) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const filePath = join(process.cwd(), "temp", filename);
+    // Extract file_id from filename (format: fileId.ext or fileId_suffix.ext)
+    const fileIdMatch = filename.match(/^([^_]+(?:_[^_]+)*?)(?:_(?:worksheet|answers|image_\d+))?\./);
+    const fileId = fileIdMatch ? fileIdMatch[1] : filename.split('.')[0];
 
-    if (!existsSync(filePath)) {
-      return NextResponse.json({ error: "File not found" }, { status: 404 });
+    // Check if this file belongs to a package owned by the user
+    const { data: packageData } = await supabaseAdmin
+    .from("packages")
+    .select("id, files")
+    .eq("user_id", user.id)
+    .eq("file_id", fileId)
+    .single();
+
+    if (!packageData) {
+        // Strict security: No fallback to "recent files"
+        return NextResponse.json({ error: "File access denied" }, { status: 403 });
     }
 
-    const fileBuffer = await readFile(filePath);
+    // Download from Supabase Storage
+    const { data, error } = await downloadFromStorage(filename);
+
+    if (error || !data) {
+        console.error("File not found in storage:", filename);
+        return NextResponse.json({ error: "File not found" }, { status: 404 });
+    }
 
     // Determine content type based on file extension
     const ext = filename.split(".").pop()?.toLowerCase();
@@ -93,10 +78,14 @@ export async function GET(request: NextRequest) {
 
     const contentType = contentTypeMap[ext || ""] || "application/octet-stream";
 
-    return new NextResponse(fileBuffer, {
+    // Convert Blob to ArrayBuffer then to Buffer
+    const arrayBuffer = await data.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    return new NextResponse(buffer, {
       headers: {
         "Content-Type": contentType,
-        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Disposition": `attachment; filename="${filename}"`, 
       },
     });
   } catch (error) {
@@ -107,4 +96,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

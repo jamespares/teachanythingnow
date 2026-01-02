@@ -1,14 +1,20 @@
 import PptxGenJS from "pptxgenjs";
 
-// Professional color scheme for educational presentations
+// Professional green color scheme to match branding
 const COLORS = {
-  primary: "1E3A5F",      // Deep blue - professional, trustworthy
-  secondary: "2E86AB",    // Bright blue - engaging
-  accent: "F18F01",       // Orange - highlights, energy
-  text: "2C3E50",         // Dark slate - readable
-  textLight: "5D6D7E",    // Medium gray - secondary text
-  background: "F8F9FA",   // Light gray - clean background
+  primary: "166534",      // Dark Green (Tailwind green-800) - professional, grounded
+  secondary: "15803d",    // Green (Tailwind green-700)
+  accent: "4ade80",       // Light Green (Tailwind green-400) - highlights, growth
+  text: "1f2937",         // Gray 800 - high contrast
+  textLight: "4b5563",    // Gray 600 - secondary text
+  background: "f0fdf4",   // Very Light Green (Tailwind green-50) - soft background
   white: "FFFFFF",
+};
+
+// Fonts configuration
+const FONTS = {
+  title: "Segoe Print",   // Handwritten style for titles
+  body: "Arial",          // Clean sans-serif for content
 };
 
 export async function generatePPT(
@@ -26,6 +32,7 @@ export async function generatePPT(
 
   // Add professional title slide
   const titleSlide = pptx.addSlide();
+  titleSlide.background = { color: COLORS.background };
   
   // Background accent bar
   titleSlide.addShape("rect", {
@@ -46,7 +53,7 @@ export async function generatePPT(
     bold: true,
     color: COLORS.primary,
     align: "center",
-    fontFace: "Arial",
+    fontFace: FONTS.title,
   });
   
   // Subtitle
@@ -58,7 +65,7 @@ export async function generatePPT(
     fontSize: 22,
     color: COLORS.textLight,
     align: "center",
-    fontFace: "Arial",
+    fontFace: FONTS.body,
   });
   
   // Decorative accent line
@@ -79,12 +86,13 @@ export async function generatePPT(
     fontSize: 12,
     color: COLORS.textLight,
     align: "center",
-    fontFace: "Arial",
+    fontFace: FONTS.body,
   });
 
   // Add content slides with professional styling
   slides.forEach((slide, slideIndex) => {
     const contentSlide = pptx.addSlide();
+    contentSlide.background = { color: COLORS.background };
     
     // Header bar
     contentSlide.addShape("rect", {
@@ -104,7 +112,7 @@ export async function generatePPT(
       fontSize: 28,
       bold: true,
       color: COLORS.white,
-      fontFace: "Arial",
+      fontFace: FONTS.title,
     });
     
     // Content area with bullet points
@@ -115,7 +123,7 @@ export async function generatePPT(
       h: 3.8,
       fontSize: 18,
       color: COLORS.text,
-      fontFace: "Arial",
+      fontFace: FONTS.body,
       bullet: { 
         type: "bullet" as const,
         style: "arabicPeriod" as const,
@@ -180,7 +188,7 @@ export async function generatePPT(
     bold: true,
     color: COLORS.white,
     align: "center",
-    fontFace: "Arial",
+    fontFace: FONTS.title,
   });
   
   endSlide.addText(`Questions about ${topic}?`, {
@@ -191,7 +199,7 @@ export async function generatePPT(
     fontSize: 22,
     color: COLORS.white,
     align: "center",
-    fontFace: "Arial",
+    fontFace: FONTS.body,
   });
 
   // Generate buffer
