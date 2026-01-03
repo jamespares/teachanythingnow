@@ -140,13 +140,6 @@ export default function BlogPage() {
           </div>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-[var(--border)] mt-16">
-        <div className="max-w-4xl mx-auto px-6 py-8 text-center text-sm text-[var(--text-muted)]">
-          <p>© 2025 Teach Anything Now. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -370,26 +370,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer 
-        className="border-t border-white/20 py-8 bg-transparent"
-        >
-
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-white/90 text-sm">
-              © 2025 EduConnect Asia Ltd. All rights reserved.
-            </p>
-            <Link
-              href="/blog"
-              className="text-sm text-white hover:text-gray-200 transition-colors"
-            >
-              Blog
-            </Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
