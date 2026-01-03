@@ -2,6 +2,8 @@
 // Generates high-quality educational images for presentations and materials
 // Gemini Nano Banana offers fast, efficient image generation
 
+import OpenAI from "openai";
+
 // Lazy initialization to check if API key is available
 function getGeminiApiKey(): string | null {
   // Check for common environment variable names
@@ -49,8 +51,9 @@ export async function generateImages(
         const prompt = imagePrompts[i];
         console.log(`Generating image ${i + 1} with Gemini Nano Banana: ${prompt.prompt.substring(0, 100)}...`);
         
-        // Ensure prompt explicitly excludes text
-        const noTextPrompt = `${prompt.prompt}. CRITICAL: This image must contain NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, and NO written content of any kind. Pure visual illustration only.`;
+        // The prompt already includes text exclusion, but reinforce it for the API call
+        // Also ensure hyper-realistic, photorealistic style (not animated/cartoon)
+        const enhancedPrompt = `${prompt.prompt} ABSOLUTELY NO animated style, NO cartoon style, NO illustration style, NO artistic filters. Must be photorealistic and hyper-realistic only.`;
         
         // Use Google Gemini Nano Banana for image generation
         // Try Banana.dev API first (if using Banana.dev hosting)
@@ -68,7 +71,7 @@ export async function generateImages(
                 "Authorization": `Bearer ${apiKey}`,
               },
               body: JSON.stringify({
-                prompt: noTextPrompt,
+                prompt: enhancedPrompt,
                 num_outputs: 1,
                 width: 1024,
                 height: 1024,
@@ -100,7 +103,7 @@ export async function generateImages(
                 body: JSON.stringify({
                   contents: [{
                     parts: [{
-                      text: noTextPrompt
+                      text: enhancedPrompt
                     }]
                   }],
                   generationConfig: {
@@ -148,7 +151,7 @@ export async function generateImages(
                       body: JSON.stringify({
                         contents: [{
                           parts: [{
-                            text: noTextPrompt
+                            text: enhancedPrompt
                           }]
                         }],
                         generationConfig: {
@@ -260,35 +263,109 @@ export async function downloadImages(
 
 /**
  * Generates appropriate image prompts using GPT-4o
- * Creates prompts that will generate educational, relevant images consistent with the topic and slides
+ * Identifies 3 specific key events, people, or places related to the topic
+ * Creates prompts for hyper-realistic, photorealistic images
  */
 async function generateImagePrompts(
   topic: string,
   slides: Array<{ title: string; content: string[] }>
 ): Promise<Array<{ prompt: string; description: string }>> {
-  // Generate prompts directly without needing OpenAI
-  // Extract key visual concepts from slides
-  const mainConcept = slides[0]?.title || topic;
-  const keyConcepts = slides
-    .flatMap(s => s.content)
-    .filter((_, i) => i < 10) // Limit to avoid overflow
-    .slice(0, 5)
-    .join(", ");
+  // Use OpenAI to identify 3 specific key subjects (events, people, or places)
+  const openai = getOpenAIClient();
+  
+  if (openai) {
+    try {
+      // First, identify 3 specific key events, people, or places
+      const identificationResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert educator who identifies the most important and visually interesting subjects for educational images. Identify exactly 3 specific key events, historical figures, or important places related to the topic. Each should be a single, specific subject (not combinations). Return ONLY valid JSON in this exact format: {\"subjects\": [{\"type\": \"event\" | \"person\" | \"place\", \"name\": \"specific name\", \"description\": \"brief description\"}]}.",
+          },
+          {
+            role: "user",
+            content: `For the topic "${topic}", identify exactly 3 specific key subjects that would make excellent educational images. Focus on:
+- Important historical events (be specific: e.g., "The signing of the Declaration of Independence" not just "American Revolution")
+- Key historical figures (be specific: e.g., "Albert Einstein in his laboratory" not just "scientists")
+- Significant places or locations (be specific: e.g., "The Great Wall of China" not just "China")
 
-  // Create 2-3 detailed prompts for educational images
+Each subject should be ONE specific thing, not a combination. Prioritize subjects that are visually interesting and historically/educationally significant.
+
+Topic: "${topic}"
+Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 500,
+      });
+
+      const identificationContent = identificationResponse.choices[0]?.message?.content;
+      if (identificationContent) {
+        const jsonMatch = identificationContent.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.subjects && Array.isArray(parsed.subjects) && parsed.subjects.length > 0) {
+            // Generate hyper-realistic image prompts for each subject
+            return parsed.subjects.slice(0, 3).map((subject: { type: string; name: string; description: string }) => {
+              const subjectName = subject.name;
+              const subjectType = subject.type;
+              
+              // Create hyper-realistic, photorealistic prompts
+              let prompt = `Hyper-realistic, photorealistic photograph of ${subjectName}`;
+              
+              if (subjectType === "event") {
+                prompt = `Hyper-realistic, photorealistic photograph capturing the historical moment of ${subjectName}, documentary photography style, high detail, sharp focus, natural lighting, professional photojournalism quality`;
+              } else if (subjectType === "person") {
+                prompt = `Hyper-realistic, photorealistic portrait photograph of ${subjectName}, professional portrait photography, high detail, sharp focus, natural lighting, authentic and realistic`;
+              } else if (subjectType === "place") {
+                prompt = `Hyper-realistic, photorealistic landscape photograph of ${subjectName}, professional landscape photography, high detail, sharp focus, natural lighting, wide angle view, authentic and realistic`;
+              }
+              
+              // Add style requirements and text exclusion
+              prompt += `. Style: photorealistic, documentary photography, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only with perfect, realistic detail.`;
+              
+              return {
+                prompt,
+                description: `${subjectType === "event" ? "Historical event" : subjectType === "person" ? "Historical figure" : "Historical place"}: ${subjectName}`,
+              };
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error identifying key subjects with AI:", error);
+      // Fall through to fallback
+    }
+  }
+  
+  // Fallback: Create prompts based on topic if AI fails
+  // Still focus on hyper-realistic, single subjects
   return [
     {
-      prompt: `Professional educational illustration about ${topic}, specifically showing ${mainConcept}, clear and informative, suitable for teaching materials, high quality, visually engaging, educational style. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual illustration only.`,
-      description: `Main illustration for ${topic}: ${mainConcept}`,
+      prompt: `Hyper-realistic, photorealistic photograph related to ${topic}, professional documentary photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
+      description: `Key subject for ${topic}`,
     },
     {
-      prompt: `Educational diagram or visual representation of key concepts in ${topic}, showing ${keyConcepts}, professional style, suitable for presentations, clear and informative. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual diagram only.`,
-      description: `Conceptual diagram for ${topic}`,
+      prompt: `Hyper-realistic, photorealistic photograph of an important historical figure or event related to ${topic}, professional portrait or documentary photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
+      description: `Historical subject for ${topic}`,
     },
     {
-      prompt: `Visual example or practical application illustration related to ${topic}, showing real-world context, educational and engaging, professional quality. CRITICAL: NO text, NO words, NO labels, NO captions, NO written content. Pure visual example only.`,
-      description: `Practical example for ${topic}`,
+      prompt: `Hyper-realistic, photorealistic photograph of a significant place or location related to ${topic}, professional landscape or architectural photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
+      description: `Significant location for ${topic}`,
     },
   ];
+}
+
+// Helper function to get OpenAI client (same pattern as content-generator.ts)
+function getOpenAIClient(): OpenAI | null {
+  if (!process.env.OPENAI_API_KEY) {
+    return null;
+  }
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+    timeout: 60000,
+    maxRetries: 2,
+  });
 }
 

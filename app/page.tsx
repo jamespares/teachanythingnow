@@ -479,7 +479,7 @@ function DownloadItem({
       download
       className="flex items-center gap-4 p-4 rounded-lg border border-[var(--border)] hover:border-[var(--primary)] hover:bg-[var(--background)] transition-all group"
     >
-      <div className="w-10 h-10 bg-[var(--primary)] bg-opacity-10 rounded-lg flex items-center justify-center text-[var(--primary)] group-hover:bg-opacity-20 transition-colors">
+      <div className="w-10 h-10 bg-[var(--primary)] rounded-lg flex items-center justify-center text-white group-hover:bg-[var(--primary-dark)] transition-colors flex-shrink-0">
         {icon}
       </div>
       <div className="flex-1 min-w-0">
