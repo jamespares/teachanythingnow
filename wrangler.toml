@@ -1,0 +1,23 @@
+name = "teachanythingnow"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+compatibility_flags = [ "nodejs_compat" ]
+
+[vars]
+STRIPE_PUBLISHABLE_KEY = "pk_test_51Sgg3aBYRA6cNlBJSkhQXCHccP3W66f9BKldVTsJERSHoGEKYU3Fd5bWxGNCVBt2FwVRf8xjwmJN5gTlFylC5S1V00NYsRBs5L"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "teach-anything-db"
+database_id = "8628e8d5-92a7-43f5-96d9-f430f2b2dd2c" # Run: wrangler d1 create teach-anything-db
+
+[[r2_buckets]]
+binding = "BUCKET"
+bucket_name = "teach-anything-assets"
+# Run: wrangler r2 bucket create teach-anything-assets
+
+[site]
+bucket = "./public"
+
+[observability]
+enabled = true

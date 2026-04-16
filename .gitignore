@@ -100,3 +100,6 @@ next-env.d.ts
 todo.md
 notes.md
 scratch.*
+
+# Cloudflare Wrangler
+.wrangler/
