@@ -1,13 +1,14 @@
 import { Hono } from "hono";
-import { serveStatic } from "hono/cloudflare-workers";
 import { getAuth } from "./lib/auth";
 import { getDb } from "./lib/db";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
+import { Terms } from "./pages/Terms";
 import { payments, packages } from "./db/schema";
 import { eq, and, isNull, desc } from "drizzle-orm";
 import { stripe } from "./lib/stripe";
+import type Stripe from "stripe";
 import { generatePPT } from "./lib/ppt-generator";
 import { generateAudio } from "./lib/audio-generator";
 import { generateContent } from "./lib/content-generator";
@@ -24,13 +25,13 @@ type Bindings = {
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   STRIPE_PUBLISHABLE_KEY: string;
-  __STATIC_CONTENT: any;
+  STRIPE_WEBHOOK_SECRET: string;
+
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-// --- Static Assets ---
-app.use("/*", serveStatic({ root: "./" }));
+
 
 // --- UI Routes ---
 
@@ -42,6 +43,8 @@ app.get("/", async (c) => {
 });
 
 app.get("/login", (c) => c.html(Auth({})));
+
+app.get("/terms", (c) => c.html(Terms({})));
 
 app.get("/dashboard", async (c) => {
   const db = getDb(c.env.DB);
@@ -100,6 +103,46 @@ app.post("/api/payment/create", async (c) => {
   });
 });
 
+app.post("/api/webhooks/stripe", async (c) => {
+  const stripeInstance = stripe(c.env.STRIPE_SECRET_KEY);
+  const signature = c.req.header("stripe-signature");
+  const body = await c.req.text();
+
+  if (!signature) {
+    return c.text("Missing stripe-signature header", 400);
+  }
+
+  let event: Stripe.Event;
+  try {
+    event = stripeInstance.webhooks.constructEvent(
+      body,
+      signature,
+      c.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err: any) {
+    console.error("Webhook signature verification failed:", err.message);
+    return c.text(`Webhook Error: ${err.message}`, 400);
+  }
+
+  const db = getDb(c.env.DB);
+
+  if (event.type === "payment_intent.succeeded") {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    await db
+      .update(payments)
+      .set({ status: "succeeded" })
+      .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+  } else if (event.type === "payment_intent.payment_failed") {
+    const paymentIntent = event.data.object as Stripe.PaymentIntent;
+    await db
+      .update(payments)
+      .set({ status: "failed" })
+      .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+  }
+
+  return c.text("Received", 200);
+});
+
 app.post("/api/generate", async (c) => {
   const db = getDb(c.env.DB);
   const auth = getAuth(db, c.env);
@@ -122,6 +165,22 @@ app.post("/api/generate", async (c) => {
     .limit(1);
 
   if (!payment) return c.json({ error: "No unused payment found for this topic" }, 400);
+
+  // Verify payment succeeded (webhook or synchronous)
+  if (payment.status !== "succeeded") {
+    const stripeInstance = stripe(c.env.STRIPE_SECRET_KEY);
+    const pi = await stripeInstance.paymentIntents.retrieve(payment.stripePaymentIntentId);
+
+    if (pi.status !== "succeeded") {
+      return c.json({ error: "Payment not completed" }, 400);
+    }
+
+    // Sync our DB since webhook may not have arrived yet
+    await db
+      .update(payments)
+      .set({ status: "succeeded" })
+      .where(eq(payments.id, payment.id));
+  }
 
   // Mark as used
   await db.update(payments).set({ usedAt: new Date() }).where(eq(payments.id, payment.id));

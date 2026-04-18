@@ -1,36 +1,34 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* globals.css – plain CSS, no build step required */
 
-/* PayPal/WhatsApp inspired design system */
+/* Light, accessible design system */
 :root {
-  /* Primary brand - teal/green inspired by WhatsApp */
-  --primary: #00a884;
-  --primary-dark: #008069;
-  --primary-light: #25d366;
-  
-  /* Neutral palette - clean like PayPal */
-  --background: transparent;
+  /* Primary brand - deep teal */
+  --primary: #006b54;
+  --primary-dark: #005240;
+  --primary-light: #008f70;
+
+  /* Neutral palette - clean light theme */
+  --background: #f8f9fa;
   --surface: #ffffff;
-  --text-primary: #111b21;
-  --text-secondary: #667781;
-  --text-muted: #8696a0;
-  --border: #e9edef;
-  --border-strong: #d1d7db;
-  
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --border: #e2e8f0;
+  --border-strong: #d1d5db;
+
   /* Accent colors */
-  --success: #00a884;
-  --error: #ea0038;
-  --warning: #f7c600;
-  
-  /* Shadows */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.1);
-  
-  /* Font stacks - Consistent typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --font-handwritten: 'Excalifont', 'Caveat', 'Kalam', cursive, sans-serif;
+  --success: #006b54;
+  --error: #dc2626;
+  --warning: #d97706;
+
+  /* Shadows - subtle for light theme */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08);
+
+  /* Font stacks - Lexend + Inter for clarity, accessibility & professionalism */
+  --font-heading: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 * {
@@ -39,90 +37,84 @@
 
 body {
   color: var(--text-primary);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
+  background-color: var(--background);
 }
 
-/* Excalifont - Handwritten whiteboard-style font */
-@font-face {
-  font-family: 'Excalifont';
-  src: url('/fonts/Excalifont.woff2') format('woff2'),
-       url('/fonts/Excalifont.woff') format('woff'),
-       url('/fonts/Excalifont.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* Consistent typography - All headings use handwritten font */
+/* Consistent typography - All headings use Lexend for clarity & accessibility */
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-handwritten);
-  font-weight: normal;
+  font-family: var(--font-heading);
+  font-weight: 600;
   line-height: 1.2;
   color: var(--text-primary);
-  letter-spacing: 0.02em;
 }
 
 h1 {
   font-size: 2.25rem; /* 36px */
-  font-weight: normal;
+  font-weight: 700;
   line-height: 1.1;
 }
 
 h2 {
   font-size: 1.875rem; /* 30px */
-  font-weight: normal;
+  font-weight: 600;
 }
 
 h3 {
   font-size: 1.5rem; /* 24px */
-  font-weight: normal;
+  font-weight: 600;
 }
 
 h4 {
   font-size: 1.25rem; /* 20px */
-  font-weight: normal;
+  font-weight: 600;
 }
 
 h5 {
   font-size: 1.125rem; /* 18px */
-  font-weight: normal;
+  font-weight: 600;
 }
 
 h6 {
   font-size: 1rem; /* 16px */
-  font-weight: normal;
+  font-weight: 600;
 }
 
-/* Hero typography - Using Excalifont for handwritten whiteboard style */
+/* Hero typography - Lexend for bold, readable headings */
 .hero-title {
-  font-family: var(--font-handwritten);
-  font-weight: normal;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
 /* Body text and paragraphs */
 p {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   line-height: 1.6;
 }
 
 /* Links */
 a {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
+  color: var(--primary);
+}
+
+a:hover {
+  color: var(--primary-dark);
 }
 
 /* Buttons - ensure consistent font */
 button, .btn {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
 }
 
 /* Inputs and form elements */
 input, textarea, select {
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
 }
 
 /* Custom scrollbar */
@@ -198,7 +190,7 @@ input, textarea, select {
 .input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 107, 84, 0.1);
 }
 
 .input::placeholder {
@@ -210,6 +202,7 @@ input, textarea, select {
   background: var(--surface);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
 }
 
 /* Animation */
@@ -241,14 +234,14 @@ input, textarea, select {
 
 .StripeElement--focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 2px rgba(0, 168, 132, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 107, 84, 0.1);
 }
 
 .StripeElement--invalid {
   border-color: var(--error);
 }
 
-/* Logo styling - make white background transparent using blend mode */
+/* Logo styling - transparent blend for white-background logos */
 .logo-image,
 header img[alt="Teach Anything Now"],
 header img[src="/logo.png"] {
@@ -256,9 +249,4 @@ header img[src="/logo.png"] {
   border-radius: 0;
   display: block;
   object-fit: contain;
-  /* Use multiply blend mode to make white backgrounds transparent */
-  mix-blend-mode: multiply;
 }
-
-/* For white backgrounds, multiply makes white transparent while preserving colors */
-/* If the logo has a white background, it will blend seamlessly with white headers */

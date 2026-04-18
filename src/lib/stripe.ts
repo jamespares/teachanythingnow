@@ -2,7 +2,7 @@ import Stripe from "stripe";
 
 export function stripe(secretKey: string) {
   return new Stripe(secretKey, {
-    apiVersion: "2023-10-16" as any,
+    apiVersion: "2025-01-27.acacia" as any,
     typescript: true,
   });
 }

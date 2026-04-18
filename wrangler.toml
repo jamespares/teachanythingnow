@@ -4,7 +4,8 @@ compatibility_date = "2024-11-01"
 compatibility_flags = [ "nodejs_compat" ]
 
 [vars]
-STRIPE_PUBLISHABLE_KEY = "pk_test_51Sgg3aBYRA6cNlBJSkhQXCHccP3W66f9BKldVTsJERSHoGEKYU3Fd5bWxGNCVBt2FwVRf8xjwmJN5gTlFylC5S1V00NYsRBs5L"
+STRIPE_PUBLISHABLE_KEY = "pk_live_51Sgg3aBYRA6cNlBJ0It49XIgT9m3sfasq999J2K0aLIPW3SuBy7IJ6l70bY9MUovpg1HE2uPV4xBAZotqdS3NTWV003zYv1lJo"
+BETTER_AUTH_URL = "https://www.teachanythingnow.com"
 
 [[d1_databases]]
 binding = "DB"
@@ -16,8 +17,8 @@ binding = "BUCKET"
 bucket_name = "teach-anything-assets"
 # Run: wrangler r2 bucket create teach-anything-assets
 
-[site]
-bucket = "./public"
+[assets]
+directory = "./public"
 
 [observability]
 enabled = true

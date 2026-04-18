@@ -103,3 +103,4 @@ scratch.*
 
 # Cloudflare Wrangler
 .wrangler/
+.dev.vars

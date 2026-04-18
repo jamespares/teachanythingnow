@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Teach Anything Now — Demo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    #stage {
+      width: 1920px;
+      height: 1080px;
+      background: #0a0a0a;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Subtle grid background */
+    .bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Glow orb */
+    .glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,168,132,0.15) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+    }
+
+    /* Scene 1 — Hero */
+    .hero-title {
+      font-family: 'Lexend', sans-serif;
+      font-size: 96px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+    }
+
+    .hero-sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 36px;
+      font-weight: 400;
+      color: #a1a1aa;
+      margin-top: 24px;
+      line-height: 1.4;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      margin-top: 48px;
+      padding: 20px 48px;
+      background: #00a884;
+      color: white;
+      font-family: 'Lexend', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      border-radius: 12px;
+    }
+
+    /* Scene 2 — Input */
+    .input-box {
+      width: 800px;
+      height: 80px;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid #333;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      font-size: 28px;
+      color: #a1a1aa;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .input-text {
+      color: #ffffff;
+      margin-left: 4px;
+    }
+
+    .cursor {
+      display: inline-block;
+      width: 3px;
+      height: 32px;
+      background: #00a884;
+      margin-left: 4px;
+      animation: blink 0.8s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    /* Scene 3 — Output cards */
+    .output-grid {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+    }
+
+    .output-card {
+      width: 360px;
+      height: 480px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .output-icon {
+      font-size: 72px;
+      margin-bottom: 24px;
+    }
+
+    .output-label {
+      font-family: 'Lexend', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: center;
+    }
+
+    .output-ext {
+      font-size: 20px;
+      color: #00a884;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* Scene 4 — CTA */
+    .final-cta {
+      font-family: 'Lexend', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .final-price {
+      font-family: 'Lexend', sans-serif;
+      font-size: 48px;
+      font-weight: 600;
+      color: #00a884;
+      margin-top: 24px;
+    }
+
+    .final-url {
+      font-family: 'Inter', sans-serif;
+      font-size: 28px;
+      color: #71717a;
+      margin-top: 16px;
+    }
+
+    /* Shared positioning helpers */
+    .abs-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .section-label {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Lexend', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      color: #00a884;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+  </style>
+</head>
+<body>
+
+<div id="stage"
+     data-composition-id="tan-demo"
+     data-start="0"
+     data-width="1920"
+     data-height="1080">
+
+  <!-- Background layers -->
+  <div class="bg-grid clip" data-start="0" data-duration="15" data-track-index="0"></div>
+  <div class="glow clip"    data-start="0" data-duration="15" data-track-index="1"></div>
+
+  <!-- ════════════════════════════════════════
+       SCENE 1  —  Hero (0s → 4.5s)
+       ════════════════════════════════════════ -->
+  <div id="scene-hero" class="clip abs-center" data-start="0" data-duration="4.5" data-track-index="2">
+    <h1 class="hero-title">Teach Anything Now</h1>
+    <p class="hero-sub">Create complete lesson materials<br/>in seconds with AI.</p>
+    <div class="hero-cta">Get Started →</div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCENE 2  —  Topic Input (4.5s → 8.5s)
+       ════════════════════════════════════════ -->
+  <div id="scene-input" class="clip abs-center" data-start="4.5" data-duration="4" data-track-index="3" style="opacity:0;">
+    <div class="section-label">Type any topic</div>
+    <div class="input-box" style="margin-top:40px;">
+      <span>e.g.</span>
+      <span class="input-text" id="typed-topic"></span>
+      <span class="cursor"></span>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCENE 3  —  Output Cards (8.5s → 12.5s)
+       ════════════════════════════════════════ -->
+  <div id="scene-output" class="clip" data-start="8.5" data-duration="4" data-track-index="4" style="opacity:0; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
+    <div class="section-label" style="top:-200px;">Instantly receive</div>
+    <div class="output-grid">
+      <div class="output-card" id="card-ppt">
+        <div class="output-icon">📊</div>
+        <div class="output-label">Presentation</div>
+        <div class="output-ext">.pptx</div>
+      </div>
+      <div class="output-card" id="card-audio">
+        <div class="output-icon">🎙️</div>
+        <div class="output-label">Podcast</div>
+        <div class="output-ext">.mp3</div>
+      </div>
+      <div class="output-card" id="card-worksheet">
+        <div class="output-icon">📝</div>
+        <div class="output-label">Worksheet</div>
+        <div class="output-ext">.docx</div>
+      </div>
+      <div class="output-card" id="card-images">
+        <div class="output-icon">🎨</div>
+        <div class="output-label">AI Images</div>
+        <div class="output-ext">.png</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       SCENE 4  —  Final CTA (12.5s → 15s)
+       ════════════════════════════════════════ -->
+  <div id="scene-cta" class="clip abs-center" data-start="12.5" data-duration="2.5" data-track-index="5" style="opacity:0;">
+    <div class="final-cta">
+      £1 per lesson.<br/>Instant results.
+    </div>
+    <div class="final-price">teachanythingnow.com</div>
+    <div class="final-url">Sign up & generate in 60 seconds</div>
+  </div>
+
+</div>
+
+<script>
+  // ════════════════════════════════════════
+  // HyperFrames GSAP Timeline
+  // ════════════════════════════════════════
+
+  const tl = gsap.timeline({ paused: true });
+
+  // ── Scene 1: Hero ──
+  tl.fromTo("#scene-hero .hero-title",
+    { y: 60, opacity: 0 },
+    { y: 0, opacity: 1, duration: 1.0, ease: "power3.out" },
+    0.2
+  );
+  tl.fromTo("#scene-hero .hero-sub",
+    { y: 40, opacity: 0 },
+    { y: 0, opacity: 1, duration: 0.8, ease: "power3.out" },
+    0.6
+  );
+  tl.fromTo("#scene-hero .hero-cta",
+    { y: 30, opacity: 0, scale: 0.95 },
+    { y: 0, opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.4)" },
+    1.0
+  );
+  // Exit
+  tl.to("#scene-hero",
+    { y: -40, opacity: 0, duration: 0.5, ease: "power2.in" },
+    3.8
+  );
+
+  // ── Scene 2: Input typing ──
+  tl.to("#scene-input",
+    { opacity: 1, duration: 0.4, ease: "power2.out" },
+    4.5
+  );
+
+  // Typewriter effect for "The Solar System"
+  const topicText = "The Solar System";
+  const topicEl = document.getElementById("typed-topic");
+  topicText.split("").forEach((char, i) => {
+    tl.call(() => { topicEl.textContent += char; }, [], 4.9 + i * 0.08);
+  });
+
+  tl.to("#scene-input",
+    { y: -30, opacity: 0, duration: 0.4, ease: "power2.in" },
+    8.0
+  );
+
+  // ── Scene 3: Output cards ──
+  tl.to("#scene-output",
+    { opacity: 1, duration: 0.4, ease: "power2.out" },
+    8.5
+  );
+  tl.fromTo("#card-ppt",
+    { y: 80, opacity: 0, scale: 0.9 },
+    { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.2)" },
+    8.8
+  );
+  tl.fromTo("#card-audio",
+    { y: 80, opacity: 0, scale: 0.9 },
+    { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.2)" },
+    9.0
+  );
+  tl.fromTo("#card-worksheet",
+    { y: 80, opacity: 0, scale: 0.9 },
+    { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.2)" },
+    9.2
+  );
+  tl.fromTo("#card-images",
+    { y: 80, opacity: 0, scale: 0.9 },
+    { y: 0, opacity: 1, scale: 1, duration: 0.5, ease: "back.out(1.2)" },
+    9.4
+  );
+
+  tl.to("#scene-output",
+    { y: -30, opacity: 0, duration: 0.4, ease: "power2.in" },
+    12.0
+  );
+
+  // ── Scene 4: Final CTA ──
+  tl.to("#scene-cta",
+    { opacity: 1, duration: 0.4, ease: "power2.out" },
+    12.5
+  );
+  tl.fromTo("#scene-cta .final-cta",
+    { y: 50, opacity: 0 },
+    { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
+    12.6
+  );
+  tl.fromTo("#scene-cta .final-price",
+    { y: 30, opacity: 0 },
+    { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+    13.1
+  );
+  tl.fromTo("#scene-cta .final-url",
+    { y: 20, opacity: 0 },
+    { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" },
+    13.4
+  );
+
+  // Register on HyperFrames timeline
+  window.__timelines = window.__timelines || {};
+  window.__timelines["main"] = tl;
+</script>
+
+</body>
+</html>
