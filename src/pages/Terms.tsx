@@ -7,21 +7,22 @@ export const Terms: FC = () => {
     <Layout title="Terms of Service">
       <div class="page-wrapper">
         {/* Header */}
-        <header class="site-header site-header--border">
-          <a href="/" class="brand">Teach Anything Now</a>
+        <header class="site-header" style="border-bottom:1px solid rgba(255,255,255,0.15);">
+          <a href="/" class="brand" style="color:#ffffff; font-family:var(--font-heading); font-size:1.25rem; font-weight:600;">Teach Anything Now</a>
           <nav class="site-nav">
-            <a href="/" class="text-sm" style="transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color=''">Home</a>
+            <a href="/" class="text-sm" style="transition:color 0.2s; color:rgba(255,255,255,0.85);" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Home</a>
           </nav>
         </header>
 
         {/* Content */}
         <main class="site-main--narrow" style="padding-top:3rem; padding-bottom:4rem;">
-          <h1 style="font-size:2rem; margin-bottom:2rem;">Terms of Service</h1>
-          <p class="text-secondary" style="margin-bottom:2rem;">
-            Last updated: 18 April 2025
-          </p>
+          <div class="card" style="padding:2.5rem;">
+            <h1 style="font-size:2rem; margin-bottom:2rem; color:var(--text-primary);">Terms of Service</h1>
+            <p class="text-secondary" style="margin-bottom:2rem;">
+              Last updated: 18 April 2025
+            </p>
 
-          <div style="display:flex; flex-direction:column; gap:2rem;">
+            <div style="display:flex; flex-direction:column; gap:2rem;">
             <section>
               <h2 style="font-size:1.25rem; margin-bottom:0.75rem;">1. Introduction & Acceptance of Terms</h2>
               <p class="text-secondary" style="line-height:1.7;">
@@ -123,14 +124,15 @@ export const Terms: FC = () => {
               </p>
             </section>
           </div>
+          </div>
         </main>
 
         {/* Footer */}
-        <footer style="border-top:1px solid var(--border); padding:2rem 1.5rem; text-align:center;">
-          <p class="text-muted text-xs" style="margin:0 0 0.5rem;">
+        <footer style="border-top:1px solid rgba(255,255,255,0.15); padding:2rem 1.5rem; text-align:center;">
+          <p class="text-xs" style="margin:0 0 0.5rem; color:rgba(255,255,255,0.55);">
             © 2025 EduConnect Asia Ltd. All rights reserved.
           </p>
-          <p class="text-muted text-xs" style="margin:0;">
+          <p class="text-xs" style="margin:0; color:rgba(255,255,255,0.55);">
             71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ
           </p>
         </footer>

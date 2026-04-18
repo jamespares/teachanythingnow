@@ -16,8 +16,8 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           <nav class="site-nav">
             {user ? (
               <>
-                <a href="/dashboard" class="text-sm" style="transition:color 0.2s; color:var(--text-secondary);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'">My Packages</a>
-                <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem;">Sign out</button>
+                <a href="/dashboard" class="text-sm" style="transition:color 0.2s; color:rgba(255,255,255,0.85);" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">My Packages</a>
+                <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem; color:#ffffff; border-color:rgba(255,255,255,0.35);">Sign out</button>
                 <script type="module" dangerouslySetInnerHTML={{ __html: `
                   import { createAuthClient } from "https://esm.sh/better-auth/client";
                   const client = createAuthClient({ baseURL: window.location.origin });
@@ -28,7 +28,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                 `}} />
               </>
             ) : (
-              <a href="/login" class="text-sm" style="transition:color 0.2s; color:var(--text-muted);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">Sign in</a>
+              <a href="/login" class="text-sm" style="transition:color 0.2s; color:rgba(255,255,255,0.85);" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Sign in</a>
             )}
           </nav>
         </header>
@@ -37,10 +37,10 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
         <main style="flex:1;">
           <section class="site-main--narrow" style="padding-top:4rem; padding-bottom:2rem; text-align:center;">
             <div class="hero-text">
-              <h1 class="hero-title" style="font-size:clamp(2.5rem, 6vw, 4rem); margin-bottom:1.25rem;">
+              <h1 class="hero-title" style="font-size:clamp(2.5rem, 6vw, 4rem); margin-bottom:1.25rem; color:#ffffff;">
                 Lesson materials,<br/>generated instantly.
               </h1>
-              <p class="text-secondary" style="font-size:clamp(1.125rem, 2.5vw, 1.5rem); max-width:560px; margin:0 auto; line-height:1.6;">
+              <p style="font-size:clamp(1.125rem, 2.5vw, 1.5rem); max-width:560px; margin:0 auto; line-height:1.6; color:rgba(255,255,255,0.85);">
                 Type any topic. Pay £1. Get a complete teaching package — presentation, podcast, worksheet, and AI images — in under 60 seconds.
               </p>
             </div>
@@ -81,10 +81,10 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           </section>
 
           {/* ── How It Works ── */}
-          <section style="background:#f3f4f6; padding:5rem 1.5rem; text-align:center;">
+          <section style="background:rgba(0,0,0,0.35); padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:var(--max-width); margin:0 auto;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">How It Works</p>
-              <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:3.5rem;">Three steps to your lesson</h2>
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">How It Works</p>
+              <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:3.5rem; color:#ffffff;">Three steps to your lesson</h2>
 
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:2rem; max-width:900px; margin:0 auto;">
                 {[
@@ -93,9 +93,9 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                   { num: "03", title: "Download everything", desc: "Get your full package in under a minute. Ready to teach." },
                 ].map(step => (
                   <div key={step.num} style="text-align:center; padding:2rem;">
-                    <div style="font-family:var(--font-heading); font-size:3rem; font-weight:700; color:var(--primary); opacity:0.25; line-height:1; margin-bottom:1rem;">{step.num}</div>
-                    <h3 style="font-size:1.25rem; margin-bottom:0.5rem; color:var(--text-primary);">{step.title}</h3>
-                    <p class="text-secondary" style="font-size:0.9375rem; line-height:1.6; margin:0;">{step.desc}</p>
+                    <div style="font-family:var(--font-heading); font-size:3rem; font-weight:700; color:rgba(255,255,255,0.25); line-height:1; margin-bottom:1rem;">{step.num}</div>
+                    <h3 style="font-size:1.25rem; margin-bottom:0.5rem; color:#ffffff;">{step.title}</h3>
+                    <p style="font-size:0.9375rem; line-height:1.6; margin:0; color:rgba(255,255,255,0.8);">{step.desc}</p>
                   </div>
                 ))}
               </div>
@@ -103,11 +103,11 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           </section>
 
           {/* ── Proof / Sample Gallery ── */}
-          <section style="background:var(--background); padding:5rem 1.5rem; text-align:center;">
+          <section style="padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:var(--max-width); margin:0 auto;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">See What You Get</p>
-              <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:1rem; color:var(--text-primary);">Real output, real quality</h2>
-              <p class="text-secondary" style="font-size:1.0625rem; max-width:560px; margin:0 auto 3.5rem; line-height:1.6;">Every lesson package includes four professionally formatted resources. Here's a sample generated for "The Solar System."</p>
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">See What You Get</p>
+              <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:1rem; color:#ffffff;">Real output, real quality</h2>
+              <p style="font-size:1.0625rem; max-width:560px; margin:0 auto 3.5rem; line-height:1.6; color:rgba(255,255,255,0.8);">Every lesson package includes four professionally formatted resources. Here's a sample generated for "The Solar System."</p>
 
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.5rem; max-width:1200px; margin:0 auto;">
                 {[
@@ -147,10 +147,10 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           </section>
 
           {/* ── What's Included ── */}
-          <section style="background:#f3f4f6; padding:5rem 1.5rem; text-align:center;">
+          <section style="background:rgba(0,0,0,0.35); padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:var(--max-width); margin:0 auto;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">What's Included</p>
-              <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:3.5rem; color:var(--text-primary);">Everything you need to teach</h2>
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">What's Included</p>
+              <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:3.5rem; color:#ffffff;">Everything you need to teach</h2>
 
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:1.5rem; max-width:1000px; margin:0 auto;">
                 {[
@@ -170,11 +170,11 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           </section>
 
           {/* ── Pricing / Final CTA ── */}
-          <section style="background:var(--background); padding:5rem 1.5rem; text-align:center;">
+          <section style="padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:560px; margin:0 auto; text-align:center;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:var(--primary); text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">Pricing</p>
-              <h2 style="font-size:clamp(2rem, 5vw, 3rem); margin-bottom:1rem; color:var(--text-primary);">One pound. One lesson.</h2>
-              <p class="text-secondary" style="font-size:1.125rem; line-height:1.6; margin-bottom:2.5rem;">
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">Pricing</p>
+              <h2 style="font-size:clamp(2rem, 5vw, 3rem); margin-bottom:1rem; color:#ffffff;">One pound. One lesson.</h2>
+              <p style="font-size:1.125rem; line-height:1.6; margin-bottom:2.5rem; color:rgba(255,255,255,0.8);">
                 No subscriptions. No credits. Just pay £1 when you need a lesson, and get four professional teaching resources back.
               </p>
 
@@ -208,8 +208,8 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
         </main>
 
         {/* ── Footer ── */}
-        <footer style="border-top:1px solid var(--border); padding:2rem 1.5rem; text-align:center;">
-          <p class="text-muted text-xs" style="margin:0;">
+        <footer style="border-top:1px solid rgba(255,255,255,0.15); padding:2rem 1.5rem; text-align:center;">
+          <p class="text-xs" style="margin:0; color:rgba(255,255,255,0.55);">
             © {new Date().getFullYear()} Teach Anything Now. Built for educators.
           </p>
         </footer>

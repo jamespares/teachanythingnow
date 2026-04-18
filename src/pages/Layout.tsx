@@ -37,12 +37,17 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
 
           body {
             font-family: var(--font-body);
-            background-color: var(--background);
+            background-color: transparent;
             color: var(--text-primary);
             margin: 0;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
           }
+
+          /* Text directly on chalkboard background */
+          .text-on-dark { color: #ffffff; }
+          .text-on-dark-muted { color: rgba(255, 255, 255, 0.75); }
+          .text-on-dark-faint { color: rgba(255, 255, 255, 0.55); }
 
           h1, h2, h3, h4, h5, h6 {
             font-family: var(--font-heading);
@@ -165,6 +170,7 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             height: 52px;
             width: auto;
             display: block;
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
           }
           .brand--home { font-size: 1.5rem; }
 
@@ -196,8 +202,8 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             align-items: center;
             padding: 1rem;
             border-radius: 0.75rem;
-            border: 1px solid var(--border);
-            background: #f3f4f6;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
           }
           .feature-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
           .feature-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
@@ -221,6 +227,10 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             padding: 1rem;
             background: #f3f4f6;
             border-radius: 0.5rem;
+            border: 1px solid var(--border);
+          }
+          .card .status-box {
+            background: #f3f4f6;
             border: 1px solid var(--border);
           }
           .spinner {
@@ -284,7 +294,7 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             align-items: center;
             justify-content: center;
             padding: 1.5rem;
-            background: var(--background);
+            background: transparent;
           }
           .auth-card {
             width: 100%;
