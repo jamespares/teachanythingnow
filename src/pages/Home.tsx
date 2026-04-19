@@ -201,7 +201,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                 Generate your first lesson →
               </a>
               <p class="text-sm" style="margin-top:1.5rem; color:var(--text-muted);">
-                By using this service, you agree to our <a href="/terms" style="color:var(--primary); text-decoration:underline;">Terms of Service</a>.
+                By using this service, you agree to the <a href="/terms" style="color:var(--primary); text-decoration:underline;">Terms of Service</a>.
               </p>
             </div>
           </section>
@@ -226,7 +226,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             </div>
             <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">jamespares.me</a>
             <p class="text-sm" style="margin:0; color:var(--text-muted);">
-              All profits go to putting food on the table for me and my family x
+              All profits from this project go directly into my wife's bank account
             </p>
           </div>
         </footer>
