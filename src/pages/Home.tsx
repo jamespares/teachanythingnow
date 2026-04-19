@@ -225,9 +225,6 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               </a>
             </div>
             <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">jamespares.me</a>
-            <p class="text-sm" style="margin:0; color:var(--text-muted);">
-              All profits from this project go directly into my wife's bank account
-            </p>
           </div>
         </footer>
       </div>

@@ -161,6 +161,15 @@ button, .btn {
   background: #94a3b8;
 }
 
+.auth-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
 /* Button base styles */
 .btn {
   display: inline-flex;
