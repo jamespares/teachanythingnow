@@ -8,21 +8,21 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
       <div class="page-wrapper">
 
         {/* Header */}
-        <header class="site-header" style="border-bottom:1px solid rgba(255,255,255,0.15);">
+        <header class="site-header" style="border-bottom:1px solid var(--border-strong);">
           <a href="/" class="brand">
             <img src="/logo.png" alt="Teach Anything Now" />
           </a>
           <nav class="site-nav">
-            <span class="text-sm" style="color:#ffffff;">{user.email}</span>
-            <a href="/" class="text-sm" style="transition:color 0.2s; color:#ffffff;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#ffffff'">Create New</a>
-            <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem; color:#ffffff; border-color:rgba(255,255,255,0.35);">Sign out</button>
+            <span class="text-sm font-semibold" style="color:var(--text-primary);">{user.email}</span>
+            <a href="/" class="text-sm font-semibold" style="transition:color 0.2s; color:var(--text-primary);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">Create New</a>
+            <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem;">Sign out</button>
           </nav>
         </header>
 
         {/* Main */}
         <main class="site-main">
           <div class="dash-heading-row">
-            <h2 style="font-size:1.875rem; color:#ffffff;">My Lesson Packages</h2>
+            <h2 style="font-size:2rem; letter-spacing:-0.03em;">My Lesson Packages</h2>
           </div>
 
           {packages.length === 0 ? (

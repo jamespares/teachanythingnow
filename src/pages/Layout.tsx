@@ -13,74 +13,15 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
 
         <link rel="stylesheet" href="/globals.css" />
         <style>{`
-          @font-face {
-            font-family: 'Patrick Hand';
-            font-style: normal;
-            font-weight: 400;
-            font-display: swap;
-            src: url('/fonts/PatrickHand-Regular.ttf') format('truetype');
-          }
-          @font-face {
-            font-family: 'Quicksand';
-            font-style: normal;
-            font-weight: 400;
-            font-display: swap;
-            src: url('/fonts/Quicksand-Regular.ttf') format('truetype');
-          }
-          @font-face {
-            font-family: 'Quicksand';
-            font-style: normal;
-            font-weight: 500;
-            font-display: swap;
-            src: url('/fonts/Quicksand-Medium.ttf') format('truetype');
-          }
-          @font-face {
-            font-family: 'Quicksand';
-            font-style: normal;
-            font-weight: 600;
-            font-display: swap;
-            src: url('/fonts/Quicksand-SemiBold.ttf') format('truetype');
-          }
-          @font-face {
-            font-family: 'Quicksand';
-            font-style: normal;
-            font-weight: 700;
-            font-display: swap;
-            src: url('/fonts/Quicksand-Bold.ttf') format('truetype');
-          }
+          /* ── Layout specific styles (globals are in globals.css) ── */
 
-          :root {
-            --font-heading: 'Patrick Hand', cursive;
-            --font-body: 'Quicksand', sans-serif;
-            --primary: #006b54;
-            --primary-dark: #005240;
-            --background: #f8f9fa;
-            --card-bg: #ffffff;
-            --border: #e2e8f0;
-            --border-strong: #d1d5db;
-            --text-primary: #111827;
-            --text-secondary: #4b5563;
-            --text-muted: #6b7280;
-            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
-            --max-width: 80rem;
-          }
-
-          *, *::before, *::after { box-sizing: border-box; }
-
-          body {
-            font-family: var(--font-body);
-            background-color: transparent;
-            color: var(--text-primary);
-            margin: 0;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-          }
-
-          /* Text directly on chalkboard background */
-          .text-on-dark { color: #ffffff; }
-          .text-on-dark-muted { color: #ffffff; }
-          .text-on-dark-faint { color: #ffffff; }
+          /* Text utilities */
+          .text-accent { font-family: var(--font-accent); color: var(--primary); }
+          .text-secondary { color: var(--text-secondary); }
+          .text-muted { color: var(--text-muted); }
+          .text-primary-color { color: var(--primary); }
+          .text-sm { font-size: 0.875rem; }
+          .text-xs { font-size: 0.75rem; }
 
           h1, h2, h3, h4, h5, h6 {
             font-family: var(--font-heading);
@@ -204,16 +145,9 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             width: auto;
             display: block;
             margin-top: 1.5rem;
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95));
+            filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.05));
           }
           .brand--home { font-size: 1.5rem; }
-
-          /* ── Text utilities ── */
-          .text-secondary { color: var(--text-secondary); }
-          .text-muted { color: var(--text-muted); }
-          .text-primary-color { color: var(--primary); }
-          .text-sm { font-size: 0.875rem; }
-          .text-xs { font-size: 0.75rem; }
 
           /* ── Hero ── */
           .hero-text { text-align: center; margin-bottom: 3rem; }
@@ -234,13 +168,14 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            box-shadow: var(--shadow-sm);
           }
           .feature-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-          .feature-label { font-size: 0.75rem; font-weight: 400; color: #ffffff; }
+          .feature-label { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
 
           /* ── Form group ── */
           .form-group { margin-bottom: 1.5rem; }
@@ -363,13 +298,12 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
         `}</style>
       </head>
       <body>
-        {/* Chalkboard background */}
-        <div style="position:fixed; inset:0; z-index:-1; background:#2d5016;">
-          <img
-            src="/chalk-board-bg.png"
-            alt=""
-            style="width:100%; height:100%; object-fit:cover; display:block;"
-          />
+        {/* Organic wavy background */}
+        <div style="position:fixed; inset:0; z-index:-1; background:var(--background); overflow:hidden;">
+          <svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" style="position:absolute; width:100%; height:100%; top:0; left:0;">
+            <path fill="var(--pastel-green)" d="M0,0 L1440,0 L1440,250 C1100,400 900,100 500,250 C200,350 0,150 0,150 Z" />
+            <path fill="var(--pastel-green-light)" d="M1440,900 L0,900 L0,750 C300,550 500,850 900,650 C1200,500 1440,750 1440,750 Z" />
+          </svg>
         </div>
         {children}
       </body>

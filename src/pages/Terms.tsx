@@ -7,10 +7,10 @@ export const Terms: FC = () => {
     <Layout title="Terms of Service">
       <div class="page-wrapper">
         {/* Header */}
-        <header class="site-header" style="border-bottom:1px solid rgba(255,255,255,0.15);">
-          <a href="/" class="brand" style="color:#ffffff; font-family:var(--font-heading); font-size:1.25rem; font-weight:600;">Teach Anything Now</a>
+        <header class="site-header" style="border-bottom:1px solid var(--border-strong);">
+          <a href="/" class="brand" style="color:var(--text-primary); font-family:var(--font-heading); font-size:1.25rem; font-weight:700; letter-spacing:-0.03em;">Teach Anything Now</a>
           <nav class="site-nav">
-            <a href="/" class="text-sm" style="transition:color 0.2s; color:#ffffff;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#ffffff'">Home</a>
+            <a href="/" class="text-sm font-semibold" style="transition:color 0.2s; color:var(--text-primary);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">Home</a>
           </nav>
         </header>
 
@@ -128,11 +128,11 @@ export const Terms: FC = () => {
         </main>
 
         {/* Footer */}
-        <footer style="border-top:1px solid rgba(255,255,255,0.15); padding:2rem 1.5rem; text-align:center;">
-          <p class="text-xs" style="margin:0 0 0.5rem; color:#ffffff;">
+        <footer style="border-top:1px solid var(--border-strong); padding:2rem 1.5rem; text-align:center;">
+          <p class="text-xs" style="margin:0 0 0.5rem; color:var(--text-secondary);">
             © 2025 EduConnect Asia Ltd. All rights reserved. Built by James Pares.
           </p>
-          <p class="text-xs" style="margin:0; color:#ffffff;">
+          <p class="text-xs" style="margin:0; color:var(--text-secondary);">
             71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ
           </p>
         </footer>

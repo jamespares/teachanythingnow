@@ -37,35 +37,40 @@
   src: url('/fonts/Quicksand-Bold.ttf') format('truetype');
 }
 
-/* Light, accessible design system */
+/* Light, accessible design system - Google Labs Inspired */
 :root {
   /* Primary brand - deep teal */
   --primary: #006b54;
   --primary-dark: #005240;
   --primary-light: #008f70;
+  
+  /* Pastel Accent - light green */
+  --pastel-green: #d8f3dc;
+  --pastel-green-light: #e9fbf0;
 
-  /* Neutral palette - clean light theme */
-  --background: #f8f9fa;
+  /* Neutral palette - airy, clean */
+  --background: #fafafa;
   --surface: #ffffff;
   --text-primary: #111827;
   --text-secondary: #4b5563;
   --text-muted: #6b7280;
-  --border: #e2e8f0;
-  --border-strong: #d1d5db;
+  --border: #f3f4f6;
+  --border-strong: #e5e7eb;
 
   /* Accent colors */
   --success: #006b54;
-  --error: #dc2626;
-  --warning: #d97706;
+  --error: #ef4444;
+  --warning: #f59e0b;
 
-  /* Shadows - subtle for light theme */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.08);
+  /* Shadows - deep soft diffuse for Labs feel */
+  --shadow-sm: 0 4px 14px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
 
-  /* Font stacks - Patrick Hand + Quicksand for a handwritten chalkboard classroom feel */
-  --font-heading: 'Patrick Hand', cursive;
-  --font-body: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Font stacks - Quicksand for clean geometry, Patrick Hand for accents */
+  --font-heading: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-accent: 'Patrick Hand', cursive;
+  --font-body: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 * {
@@ -77,27 +82,26 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
+  line-height: 1.6;
   background-color: var(--background);
+  margin: 0;
 }
 
-/* Consistent typography - All headings use Lexend for clarity & accessibility */
+/* Consistent typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 700;
   line-height: 1.2;
   color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 h1 {
-  font-size: 2.25rem; /* 36px */
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 2.5rem; /* 40px */
 }
 
 h2 {
-  font-size: 1.875rem; /* 30px */
-  font-weight: 600;
+  font-size: 2rem; /* 32px */
 }
 
 h3 {
@@ -110,22 +114,9 @@ h4 {
   font-weight: 600;
 }
 
-h5 {
-  font-size: 1.125rem; /* 18px */
-  font-weight: 600;
-}
-
-h6 {
-  font-size: 1rem; /* 16px */
-  font-weight: 600;
-}
-
-/* Hero typography - Lexend for bold, readable headings */
-.hero-title {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+.text-accent {
+  font-family: var(--font-accent);
+  color: var(--primary);
 }
 
 /* Body text and paragraphs */
@@ -138,26 +129,23 @@ p {
 a {
   font-family: var(--font-body);
   color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
   color: var(--primary-dark);
 }
 
-/* Buttons - ensure consistent font */
+/* Buttons - pill shaped */
 button, .btn {
-  font-family: var(--font-body);
-}
-
-/* Inputs and form elements */
-input, textarea, select {
-  font-family: var(--font-body);
+  font-family: var(--font-heading);
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -165,12 +153,12 @@ input, textarea, select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border-radius: 3px;
+  background: #cbd5e1;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: #94a3b8;
 }
 
 /* Button base styles */
@@ -178,56 +166,76 @@ input, textarea, select {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 500;
-  border-radius: 24px;
-  padding: 12px 24px;
-  font-size: 15px;
-  transition: all 0.15s ease;
+  font-weight: 600;
+  border-radius: 999px; /* Pill shape */
+  padding: 12px 28px;
+  font-size: 16px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
   border: none;
   outline: none;
+  text-decoration: none;
+}
+
+.btn:active {
+  transform: scale(0.97);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn-primary {
   background: var(--primary);
   color: white;
+  box-shadow: 0 4px 14px rgba(0, 107, 84, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-dark);
+  box-shadow: 0 6px 20px rgba(0, 107, 84, 0.3);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: var(--surface);
+  background: transparent;
   color: var(--text-primary);
-  border: 1px solid var(--border-strong);
+  border: 1.5px solid var(--border-strong);
 }
 
 .btn-secondary:hover:not(:disabled) {
   background: var(--background);
+  border-color: var(--text-muted);
+}
+
+.btn-outline {
+  background: white;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--pastel-green-light);
 }
 
 /* Input styles */
 .input {
   width: 100%;
-  padding: 14px 16px;
-  font-size: 15px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  padding: 14px 20px;
+  font-size: 16px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
   background: var(--surface);
   color: var(--text-primary);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .input:focus {
   outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 107, 84, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 107, 84, 0.1);
 }
 
 .input::placeholder {
@@ -237,19 +245,20 @@ input, textarea, select {
 /* Card styles */
 .card {
   background: var(--surface);
-  border-radius: 8px;
+  border-radius: 24px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Animation */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(12px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.3s ease forwards;
+  animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes spin {
@@ -262,23 +271,23 @@ input, textarea, select {
 
 /* Stripe Elements customization */
 .StripeElement {
-  padding: 14px 16px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  padding: 14px 20px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
   background: var(--surface);
-  transition: border-color 0.15s ease;
+  transition: all 0.2s ease;
 }
 
 .StripeElement--focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(0, 107, 84, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 107, 84, 0.1);
 }
 
 .StripeElement--invalid {
   border-color: var(--error);
 }
 
-/* Logo styling - transparent blend for white-background logos */
+/* Logo styling */
 .logo-image,
 header img[alt="Teach Anything Now"],
 header img[src="/logo.png"] {

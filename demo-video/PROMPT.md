@@ -18,7 +18,7 @@ Then in Claude Code, run:
 
 ## Product Overview
 
-**Teach Anything Now** — an AI tool for teachers and educators. Type any topic, pay £1, and instantly receive a complete lesson package: PowerPoint presentation, podcast audio MP3, student worksheet, and AI-generated images.
+**Teach Anything Now** — an AI tool for teachers and educators. Type any topic, pay £1, and instantly receive a complete lesson package: PowerPoint presentation, podcast audio MP3, student worksheet, and AI-generated images. All generated images are aligned and follow a single source of truth. 
 
 **Brand colors:**
 - Primary green: `#00a884`
