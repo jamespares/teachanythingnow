@@ -46,21 +46,6 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             </div>
           </section>
 
-          {/* ── Demo Video ── */}
-          <section class="site-main--narrow" style="padding-top:0; padding-bottom:2rem; text-align:center;">
-            <div style="max-width:900px; margin:0 auto; border-radius:24px; overflow:hidden; box-shadow:var(--shadow-lg); border:1px solid var(--border);">
-              <video
-                src="/demo.mp4"
-                autoplay
-                muted
-                loop
-                playsinline
-                controls
-                style="width:100%; height:auto; display:block;"
-              />
-            </div>
-          </section>
-
           {/* ── Generator Form ── */}
           <section class="site-main--narrow" style="padding-top:0; padding-bottom:4rem; text-align:center;">
             <div class="card card-body-lg" style="max-width:640px; margin:0 auto; box-shadow:var(--shadow-lg); position:relative;">
@@ -96,6 +81,21 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               </div>
 
               <div id="error-message" class="hidden error-box" style="margin-top:1rem; text-align:left;"></div>
+            </div>
+          </section>
+
+          {/* ── Demo Video ── */}
+          <section class="site-main--narrow" style="padding-top:0; padding-bottom:2rem; text-align:center;">
+            <div style="max-width:900px; margin:0 auto; border-radius:24px; overflow:hidden; box-shadow:var(--shadow-lg); border:1px solid var(--border);">
+              <video
+                src="/demo.mp4"
+                autoplay
+                muted
+                loop
+                playsinline
+                controls
+                style="width:100%; height:auto; display:block;"
+              />
             </div>
           </section>
 
