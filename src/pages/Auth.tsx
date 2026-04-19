@@ -8,8 +8,8 @@ export const Auth: FC = () => {
       <div class="auth-wrapper">
         <div class="card auth-card">
           <div class="auth-header">
-            <a href="/" style="display:inline-block; margin-bottom:1.5rem;">
-              <img src="/logo.png" alt="Teach Anything Now" style="height:40px; width:auto; display:block;" />
+            <a href="/" class="text-sm text-muted" style="display:inline-block; margin-bottom:1.5rem; text-decoration:none; transition:color 0.2s;">
+              ← Back to home
             </a>
             <h1 id="auth-title" style="font-size:1.875rem; margin-bottom:0.5rem;">Welcome Back</h1>
             <p id="auth-subtitle" class="text-secondary" style="margin:0;">Sign in to your account</p>
@@ -64,11 +64,6 @@ export const Auth: FC = () => {
               <span id="toggle-text">Don't have an account?</span>
               <a href="#" id="toggle-link" style="color:var(--primary); margin-left:0.25rem;">Sign up</a>
             </p>
-          </div>
-          <div style="text-align:center; padding-bottom:1.5rem;">
-            <a href="/" class="text-sm text-muted" style="transition:color 0.2s; text-decoration:none;">
-              ← Back to home
-            </a>
           </div>
         </div>
 
