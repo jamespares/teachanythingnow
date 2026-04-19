@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { getAuth } from "./lib/auth";
 import { getDb } from "./lib/db";
+import { detectLang, getDict, t } from "./lib/i18n";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
@@ -21,15 +22,14 @@ type Bindings = {
   DB: D1Database;
   BUCKET: R2Bucket;
   STRIPE_SECRET_KEY: string;
+  OPENAI_API_KEY: string;
   DEEPSEEK_API_KEY: string;
   GOOGLE_GEMINI_API_KEY: string;
-  GOOGLE_TTS_API_KEY: string;
   SEND_EMAIL: SendEmail;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   STRIPE_PUBLISHABLE_KEY: string;
   STRIPE_WEBHOOK_SECRET: string;
-
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -50,14 +50,28 @@ app.get("/", async (c) => {
   const db = getDb(c.env.DB);
   const auth = getAuth(db, c.env);
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  return c.html(Home({ user: session?.user, stripeKey: c.env.STRIPE_PUBLISHABLE_KEY }));
+  const lang = detectLang(c);
+  const dict = getDict(lang);
+  return c.html(Home({ user: session?.user, stripeKey: c.env.STRIPE_PUBLISHABLE_KEY, lang, dict }));
 });
 
-app.get("/login", (c) => c.html(Auth({})));
+app.get("/login", (c) => {
+  const lang = detectLang(c);
+  const dict = getDict(lang);
+  return c.html(Auth({ lang, dict }));
+});
 
-app.get("/reset-password", (c) => c.html(ResetPassword({})));
+app.get("/reset-password", (c) => {
+  const lang = detectLang(c);
+  const dict = getDict(lang);
+  return c.html(ResetPassword({ lang, dict }));
+});
 
-app.get("/terms", (c) => c.html(Terms({})));
+app.get("/terms", (c) => {
+  const lang = detectLang(c);
+  const dict = getDict(lang);
+  return c.html(Terms({ lang, dict }));
+});
 
 app.get("/dashboard", async (c) => {
   const db = getDb(c.env.DB);
@@ -72,7 +86,9 @@ app.get("/dashboard", async (c) => {
     .where(eq(packages.userId, session.user.id))
     .orderBy(desc(packages.createdAt));
 
-  return c.html(Dashboard({ user: session.user, packages: userPackages }));
+  const lang = detectLang(c);
+  const dict = getDict(lang);
+  return c.html(Dashboard({ user: session.user, packages: userPackages, lang, dict }));
 });
 
 // --- Auth Routes ---
@@ -90,7 +106,7 @@ app.post("/api/payment/create", async (c) => {
   const auth = getAuth(db, c.env);
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   
-  if (!session) return c.json({ error: "Unauthorized" }, 401);
+  if (!session) return c.json({ error: t(c, "apiErrorUnauthorized") }, 401);
   
   const { topic, curriculum, yearLevel } = await c.req.json();
   const stripeInstance = stripe(c.env.STRIPE_SECRET_KEY);
@@ -186,7 +202,7 @@ app.post("/api/generate", async (c) => {
     )
     .limit(1);
 
-  if (!payment) return c.json({ error: "No unused payment found for this topic" }, 400);
+  if (!payment) return c.json({ error: t(c, "apiErrorNoPayment") }, 400);
 
   // Verify payment succeeded (webhook or synchronous)
   if (payment.status !== "succeeded") {
@@ -194,7 +210,7 @@ app.post("/api/generate", async (c) => {
     const pi = await stripeInstance.paymentIntents.retrieve(payment.stripePaymentIntentId);
 
     if (pi.status !== "succeeded") {
-      return c.json({ error: "Payment not completed" }, 400);
+      return c.json({ error: t(c, "apiErrorPaymentNotCompleted") }, 400);
     }
 
     // Sync our DB since webhook may not have arrived yet
@@ -221,7 +237,7 @@ app.post("/api/generate", async (c) => {
   };
 
   const audioTask = async () => {
-    const audioRes = await generateAudio(content.podcastScript, topic, c.env.GOOGLE_TTS_API_KEY);
+    const audioRes = await generateAudio(content.podcastScript, topic, c.env.OPENAI_API_KEY);
     await storage.upload(audioRes.buffer, `${fileId}.mp3`, "audio/mpeg");
     return `${fileId}.mp3`;
   };
@@ -272,10 +288,10 @@ app.post("/api/generate", async (c) => {
 
 app.get("/api/download", async (c) => {
   const fileName = c.req.query("file");
-  if (!fileName) return c.text("Missing file name", 400);
+  if (!fileName) return c.text(t(c, "apiErrorMissingFile"), 400);
 
   const object = await c.env.BUCKET.get(fileName);
-  if (!object) return c.text("File not found", 404);
+  if (!object) return c.text(t(c, "apiErrorFileNotFound"), 404);
 
   const headers = new Headers();
   object.writeHttpMetadata(headers);

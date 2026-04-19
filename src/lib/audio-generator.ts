@@ -1,5 +1,5 @@
-// Audio generation using Google Cloud Text-to-Speech API
-// Uses Journey voices for professional podcast-quality audio
+// Audio generation using OpenAI TTS API
+// Uses high-quality HD models for professional podcast audio
 
 export interface AudioResult {
   buffer: Buffer;
@@ -13,7 +13,7 @@ export async function generateAudio(script: string, topic: string, apiKey: strin
   }
 
   if (!apiKey) {
-    throw new Error("Google TTS API key is missing.");
+    throw new Error("OpenAI API key is missing.");
   }
 
   // Clean and optimize script for TTS
@@ -62,27 +62,29 @@ export async function generateAudio(script: string, topic: string, apiKey: strin
     console.log(`Truncated script to ${cleanedScript.length} characters`);
   }
   
-  // Call Google Cloud TTS API
-  const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`, {
+  // Call OpenAI TTS API
+  const response = await fetch(`https://api.openai.com/v1/audio/speech`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      input: { text: cleanedScript },
-      voice: { languageCode: 'en-US', name: 'en-US-Journey-F' },
-      audioConfig: { audioEncoding: 'MP3' }
+      model: 'tts-1-hd', // Latest high-definition model
+      input: cleanedScript,
+      voice: 'alloy', // Professional, neutral podcast voice
+      response_format: 'mp3'
     })
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    console.error("Google TTS API Error:", errorText);
-    throw new Error(`Google TTS API failed with status ${response.status}`);
+    console.error("OpenAI TTS API Error:", errorText);
+    throw new Error(`OpenAI TTS API failed with status ${response.status}`);
   }
 
-  const data = await response.json();
-  const buffer = Buffer.from(data.audioContent, 'base64');
+  const audioBlob = await response.blob();
+  const buffer = Buffer.from(await audioBlob.arrayBuffer());
   
   return {
     buffer,
