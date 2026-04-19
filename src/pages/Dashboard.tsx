@@ -13,8 +13,8 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
             <img src="/logo.png" alt="Teach Anything Now" />
           </a>
           <nav class="site-nav">
-            <span class="text-sm" style="color:rgba(255,255,255,0.75);">{user.email}</span>
-            <a href="/" class="text-sm" style="transition:color 0.2s; color:rgba(255,255,255,0.85);" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Create New</a>
+            <span class="text-sm" style="color:#ffffff;">{user.email}</span>
+            <a href="/" class="text-sm" style="transition:color 0.2s; color:#ffffff;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#ffffff'">Create New</a>
             <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem; color:#ffffff; border-color:rgba(255,255,255,0.35);">Sign out</button>
           </nav>
         </header>

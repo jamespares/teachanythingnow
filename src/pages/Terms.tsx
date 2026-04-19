@@ -10,7 +10,7 @@ export const Terms: FC = () => {
         <header class="site-header" style="border-bottom:1px solid rgba(255,255,255,0.15);">
           <a href="/" class="brand" style="color:#ffffff; font-family:var(--font-heading); font-size:1.25rem; font-weight:600;">Teach Anything Now</a>
           <nav class="site-nav">
-            <a href="/" class="text-sm" style="transition:color 0.2s; color:rgba(255,255,255,0.85);" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='rgba(255,255,255,0.85)'">Home</a>
+            <a href="/" class="text-sm" style="transition:color 0.2s; color:#ffffff;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='#ffffff'">Home</a>
           </nav>
         </header>
 
@@ -129,10 +129,10 @@ export const Terms: FC = () => {
 
         {/* Footer */}
         <footer style="border-top:1px solid rgba(255,255,255,0.15); padding:2rem 1.5rem; text-align:center;">
-          <p class="text-xs" style="margin:0 0 0.5rem; color:rgba(255,255,255,0.55);">
-            © 2025 EduConnect Asia Ltd. All rights reserved.
+          <p class="text-xs" style="margin:0 0 0.5rem; color:#ffffff;">
+            © 2025 EduConnect Asia Ltd. All rights reserved. Built by James Pares.
           </p>
-          <p class="text-xs" style="margin:0; color:rgba(255,255,255,0.55);">
+          <p class="text-xs" style="margin:0; color:#ffffff;">
             71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ
           </p>
         </footer>

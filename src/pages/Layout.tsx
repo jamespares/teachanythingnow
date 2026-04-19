@@ -11,14 +11,14 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
 
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
         <link rel="stylesheet" href="/globals.css" />
         <style>{`
           :root {
-            --font-heading: 'Lexend', sans-serif;
-            --font-body: 'Inter', sans-serif;
+            --font-heading: 'Space Grotesk', sans-serif;
+            --font-body: 'DM Sans', sans-serif;
             --primary: #006b54;
             --primary-dark: #005240;
             --background: #f8f9fa;
@@ -46,8 +46,8 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
 
           /* Text directly on chalkboard background */
           .text-on-dark { color: #ffffff; }
-          .text-on-dark-muted { color: rgba(255, 255, 255, 0.75); }
-          .text-on-dark-faint { color: rgba(255, 255, 255, 0.55); }
+          .text-on-dark-muted { color: #ffffff; }
+          .text-on-dark-faint { color: #ffffff; }
 
           h1, h2, h3, h4, h5, h6 {
             font-family: var(--font-heading);
@@ -125,7 +125,7 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
           .page-wrapper { min-height: 100vh; display: flex; flex-direction: column; }
 
           .site-header {
-            height: 4rem;
+            height: 11rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -167,10 +167,11 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             gap: 0.5rem;
           }
           .brand img {
-            height: 52px;
+            height: 170px;
             width: auto;
             display: block;
-            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.9));
+            margin-top: 1.5rem;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95));
           }
           .brand--home { font-size: 1.5rem; }
 
@@ -206,7 +207,7 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             background: rgba(255, 255, 255, 0.1);
           }
           .feature-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-          .feature-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); }
+          .feature-label { font-size: 0.75rem; font-weight: 600; color: #ffffff; }
 
           /* ── Form group ── */
           .form-group { margin-bottom: 1.5rem; }
