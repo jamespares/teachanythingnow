@@ -81,7 +81,7 @@ export const Auth: FC = () => {
               </div>
               <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem; color:var(--text-primary); opacity:0.6; text-decoration:none; transition:opacity 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.6'">jamespares.me</a>
               <p class="text-xs" style="margin:0; color:var(--text-muted);">
-                all profit go to putting food on the table for me and my family x
+                All profits go to putting food on the table for me and my family x
               </p>
             </div>
             <a href="/" class="text-sm text-muted" style="transition:color 0.2s; display:block; margin-bottom:0.5rem;">
