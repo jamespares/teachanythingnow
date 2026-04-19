@@ -22,3 +22,7 @@ directory = "./public"
 
 [observability]
 enabled = true
+
+send_email = [
+  { name = "SEND_EMAIL" }
+]

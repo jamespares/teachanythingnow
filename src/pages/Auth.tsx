@@ -37,8 +37,11 @@ export const Auth: FC = () => {
               />
             </div>
 
-            <div>
-              <label class="form-label">Password</label>
+            <div id="password-field">
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <label class="form-label">Password</label>
+                <a href="#" id="forgot-link" class="text-xs" style="color:var(--primary); transition:opacity 0.2s; text-decoration:none;">Forgot password?</a>
+              </div>
               <input
                 id="password"
                 type="password"
@@ -99,14 +102,16 @@ export const Auth: FC = () => {
         const nameInput = document.getElementById('name');
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
+        const passwordField = document.getElementById('password-field');
         const submitBtn = document.getElementById('auth-submit');
         const errorBox = document.getElementById('error-message');
         const authTitle = document.getElementById('auth-title');
         const authSubtitle = document.getElementById('auth-subtitle');
         const toggleText = document.getElementById('toggle-text');
         const toggleLink = document.getElementById('toggle-link');
+        const forgotLink = document.getElementById('forgot-link');
 
-        let mode = 'signin'; // 'signin' or 'signup'
+        let mode = 'signin'; // 'signin', 'signup', or 'forgot'
 
         function showError(msg) {
           errorBox.textContent = msg;
@@ -121,28 +126,51 @@ export const Auth: FC = () => {
         function setMode(newMode) {
           mode = newMode;
           clearError();
+          
           if (mode === 'signup') {
             nameField.classList.remove('hidden');
+            passwordField.classList.remove('hidden');
             nameInput.required = true;
+            passwordInput.required = true;
             submitBtn.textContent = 'Create Account';
             authTitle.textContent = 'Get Started';
             authSubtitle.textContent = 'Create your free account';
             toggleText.textContent = 'Already have an account?';
             toggleLink.textContent = 'Sign in';
-          } else {
+            forgotLink.classList.add('hidden');
+          } else if (mode === 'signin') {
             nameField.classList.add('hidden');
+            passwordField.classList.remove('hidden');
             nameInput.required = false;
+            passwordInput.required = true;
             submitBtn.textContent = 'Sign In';
             authTitle.textContent = 'Welcome Back';
             authSubtitle.textContent = 'Sign in to your account';
             toggleText.textContent = "Don't have an account?";
             toggleLink.textContent = 'Sign up';
+            forgotLink.classList.remove('hidden');
+          } else if (mode === 'forgot') {
+            nameField.classList.add('hidden');
+            passwordField.classList.add('hidden');
+            nameInput.required = false;
+            passwordInput.required = false;
+            submitBtn.textContent = 'Send Reset Link';
+            authTitle.textContent = 'Reset Password';
+            authSubtitle.textContent = 'We will email you a reset link';
+            toggleText.textContent = "Remember your password?";
+            toggleLink.textContent = 'Sign in';
+            forgotLink.classList.add('hidden');
           }
         }
 
         toggleLink.addEventListener('click', (e) => {
           e.preventDefault();
-          setMode(mode === 'signin' ? 'signup' : 'signin');
+          setMode(mode === 'signup' ? 'signin' : mode === 'forgot' ? 'signin' : 'signup');
+        });
+
+        forgotLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          setMode('forgot');
         });
 
         form.addEventListener('submit', async (e) => {
@@ -163,7 +191,24 @@ export const Auth: FC = () => {
               if (error) {
                 showError(error.message || 'Invalid email or password.');
               } else {
-                window.location.href = '/';
+                window.location.href = '/dashboard';
+              }
+            } else if (mode === 'forgot') {
+              const { data, error } = await client.forgetPassword({
+                email,
+                redirectTo: window.location.origin + '/reset-password'
+              });
+              
+              if (error) {
+                showError(error.message || 'Failed to send reset email.');
+              } else {
+                // Show success block inline without redirect
+                errorBox.classList.remove('hidden');
+                errorBox.classList.remove('error-box');
+                errorBox.style.color = '#059669'; // Green success color
+                errorBox.textContent = 'Check your email for a password reset link!';
+                submitBtn.disabled = true;
+                return; // Leave button disabled
               }
             } else {
               const name = nameInput.value.trim();
@@ -190,6 +235,8 @@ export const Auth: FC = () => {
             submitBtn.disabled = false;
             if (mode === 'signin') {
               submitBtn.textContent = 'Sign In';
+            } else if (mode === 'forgot') {
+              submitBtn.textContent = 'Send Reset Link';
             } else {
               submitBtn.textContent = 'Create Account';
             }

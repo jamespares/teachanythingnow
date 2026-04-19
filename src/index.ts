@@ -4,6 +4,7 @@ import { getDb } from "./lib/db";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
+import { ResetPassword } from "./pages/ResetPassword";
 import { Terms } from "./pages/Terms";
 import { payments, packages } from "./db/schema";
 import { eq, and, isNull, desc } from "drizzle-orm";
@@ -23,6 +24,7 @@ type Bindings = {
   DEEPSEEK_API_KEY: string;
   GOOGLE_GEMINI_API_KEY: string;
   GOOGLE_TTS_API_KEY: string;
+  SEND_EMAIL: SendEmail;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   STRIPE_PUBLISHABLE_KEY: string;
@@ -52,6 +54,8 @@ app.get("/", async (c) => {
 });
 
 app.get("/login", (c) => c.html(Auth({})));
+
+app.get("/reset-password", (c) => c.html(ResetPassword({})));
 
 app.get("/terms", (c) => c.html(Terms({})));
 
