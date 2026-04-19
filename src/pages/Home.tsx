@@ -206,8 +206,8 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               </a>
             </div>
             <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.8125rem; color:#ffffff; opacity:0.7; text-decoration:none; transition:opacity 0.2s;" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='0.7'">jamespares.me</a>
-            <p class="text-xs" style="margin:0; color:#ffffff; opacity:0.5;">
-              © {new Date().getFullYear()} EduConnect Asia Ltd. All rights reserved.
+            <p class="text-xs" style="margin:0; color:#ffffff; opacity:0.6;">
+              all profit go to putting food on the table for me and my family x
             </p>
           </div>
         </footer>
