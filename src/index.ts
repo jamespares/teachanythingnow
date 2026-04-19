@@ -20,8 +20,9 @@ type Bindings = {
   DB: D1Database;
   BUCKET: R2Bucket;
   STRIPE_SECRET_KEY: string;
-  OPENAI_API_KEY: string;
+  DEEPSEEK_API_KEY: string;
   GOOGLE_GEMINI_API_KEY: string;
+  GOOGLE_TTS_API_KEY: string;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
   STRIPE_PUBLISHABLE_KEY: string;
@@ -31,7 +32,15 @@ type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-
+// Redirect www → non-www (before auth sees mismatched origins)
+app.use("*", async (c, next) => {
+  const url = new URL(c.req.url);
+  if (url.hostname === "www.teachanythingnow.com") {
+    url.hostname = "teachanythingnow.com";
+    return c.redirect(url.toString(), 301);
+  }
+  await next();
+});
 
 // --- UI Routes ---
 
@@ -189,7 +198,7 @@ app.post("/api/generate", async (c) => {
   const fileId = `${topic.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
 
   // 1. Generate Content
-  const content = await generateContent(topic, c.env.OPENAI_API_KEY);
+  const content = await generateContent(topic, c.env.DEEPSEEK_API_KEY);
   
   // 2. Parallel Generation Tasks
   const pptTask = async () => {
@@ -199,7 +208,7 @@ app.post("/api/generate", async (c) => {
   };
 
   const audioTask = async () => {
-    const audioRes = await generateAudio(content.podcastScript, topic, c.env.OPENAI_API_KEY);
+    const audioRes = await generateAudio(content.podcastScript, topic, c.env.GOOGLE_TTS_API_KEY);
     await storage.upload(audioRes.buffer, `${fileId}.mp3`, "audio/mpeg");
     return `${fileId}.mp3`;
   };
@@ -211,7 +220,7 @@ app.post("/api/generate", async (c) => {
   };
 
   const imageTask = async () => {
-    const imageResult = await generateImages(topic, content.slides, c.env.GOOGLE_GEMINI_API_KEY, c.env.OPENAI_API_KEY);
+    const imageResult = await generateImages(topic, content.slides, c.env.GOOGLE_GEMINI_API_KEY, c.env.DEEPSEEK_API_KEY);
     const downloadedImages = await downloadImages(imageResult.images);
     const savedImages: string[] = [];
     for (let i = 0; i < downloadedImages.length; i++) {

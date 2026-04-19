@@ -276,7 +276,7 @@ async function generateImagePrompts(
     try {
       // First, identify 3 specific key events, people, or places
       const identificationResponse = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "deepseek-chat",
         messages: [
           {
             role: "system",
@@ -362,6 +362,7 @@ function getOpenAIClient(apiKey: string): OpenAI | null {
     return null;
   }
   return new OpenAI({
+    baseURL: 'https://api.deepseek.com',
     apiKey: apiKey,
     timeout: 60000,
     maxRetries: 2,

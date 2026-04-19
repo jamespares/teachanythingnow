@@ -5,7 +5,7 @@ compatibility_flags = [ "nodejs_compat" ]
 
 [vars]
 STRIPE_PUBLISHABLE_KEY = "pk_live_51Sgg3aBYRA6cNlBJ0It49XIgT9m3sfasq999J2K0aLIPW3SuBy7IJ6l70bY9MUovpg1HE2uPV4xBAZotqdS3NTWV003zYv1lJo"
-BETTER_AUTH_URL = "https://www.teachanythingnow.com"
+BETTER_AUTH_URL = "https://teachanythingnow.com"
 
 [[d1_databases]]
 binding = "DB"

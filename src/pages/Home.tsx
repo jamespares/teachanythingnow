@@ -19,7 +19,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                 <a href="/dashboard" class="text-sm font-semibold" style="color:var(--text-primary); transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">My Packages</a>
                 <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem;">Sign out</button>
                 <script type="module" dangerouslySetInnerHTML={{ __html: `
-                  import { createAuthClient } from "https://esm.sh/better-auth/client";
+                  import { createAuthClient } from "https://esm.sh/better-auth@1.1.1/client";
                   const client = createAuthClient({ baseURL: window.location.origin });
                   document.getElementById('sign-out').addEventListener('click', async () => {
                     await client.signOut();

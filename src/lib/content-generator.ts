@@ -10,6 +10,7 @@ function getOpenAIClient(apiKey: string): OpenAI | null {
     return null;
   }
   return new OpenAI({
+    baseURL: 'https://api.deepseek.com',
     apiKey: apiKey,
     timeout: 60000,
     maxRetries: 2,
@@ -71,7 +72,7 @@ async function generateSlidesWithAI(topic: string, apiKey: string): Promise<Arra
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Using GPT-4o for high quality output
+      model: "deepseek-chat", // Using DeepSeek V3 for high quality JSON output
       messages: [
         {
           role: "system",
@@ -123,7 +124,7 @@ async function generatePodcastScriptWithAI(topic: string, slides: Array<{ title:
     const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Using GPT-4o for high quality output
+      model: "deepseek-chat", // Using DeepSeek V3 for high quality output
       messages: [
         {
           role: "system",
@@ -184,7 +185,7 @@ async function generateWorksheetWithAI(topic: string, slides: Array<{ title: str
     const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o", // Using GPT-4o for high quality output
+      model: "deepseek-chat", // Using DeepSeek V3 for high quality output
       messages: [
         {
           role: "system",

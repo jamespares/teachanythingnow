@@ -88,7 +88,7 @@ export const Auth: FC = () => {
       </div>
 
       <script type="module" dangerouslySetInnerHTML={{ __html: `
-        import { createAuthClient } from "https://esm.sh/better-auth/client";
+        import { createAuthClient } from "https://esm.sh/better-auth@1.1.1/client";
 
         const client = createAuthClient({
           baseURL: window.location.origin
