@@ -8,6 +8,9 @@ export const ResetPassword: FC = () => {
       <div class="auth-wrapper">
         <div class="card auth-card">
           <div class="auth-header">
+            <a href="/" class="text-sm text-muted" style="display:inline-block; margin-bottom:1.5rem; text-decoration:none; transition:color 0.2s;">
+              ← Back to home
+            </a>
             <h1 id="auth-title" style="font-size:1.875rem; margin-bottom:0.5rem;">Reset Password</h1>
             <p id="auth-subtitle" class="text-secondary" style="margin:0;">Enter your new password below.</p>
           </div>

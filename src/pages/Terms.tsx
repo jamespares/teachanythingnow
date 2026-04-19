@@ -7,15 +7,15 @@ export const Terms: FC = () => {
     <Layout title="Terms of Service">
       <div class="page-wrapper">
         {/* Header */}
-        <header class="site-header" style="border-bottom:1px solid var(--border-strong);">
-          <a href="/" class="brand" style="color:var(--text-primary); font-family:var(--font-heading); font-size:1.25rem; font-weight:700; letter-spacing:-0.03em;">Teach Anything Now</a>
+        <header class="site-header">
+          <a href="/" class="brand">Teach Anything Now</a>
           <nav class="site-nav">
             <a href="/" class="text-sm font-semibold" style="transition:color 0.2s; color:var(--text-primary);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">Home</a>
           </nav>
         </header>
 
         {/* Content */}
-        <main class="site-main--narrow" style="padding-top:3rem; padding-bottom:4rem;">
+        <main class="site-main--narrow">
           <div class="card" style="padding:2.5rem;">
             <h1 style="font-size:2rem; margin-bottom:2rem; color:var(--text-primary);">Terms of Service</h1>
             <p class="text-secondary" style="margin-bottom:2rem;">

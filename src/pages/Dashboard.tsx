@@ -8,7 +8,7 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
       <div class="page-wrapper">
 
         {/* Header */}
-        <header class="site-header" style="border-bottom:1px solid var(--border-strong);">
+        <header class="site-header">
           <a href="/" class="brand">
             <img src="/logo.png" alt="Teach Anything Now" />
           </a>
@@ -65,9 +65,9 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
 };
 
 const DownloadLink: FC<{ href: string; label: string }> = ({ href, label }) => (
-  <a href={href} download class="download-link">
+  <a href={href} download class="btn btn-secondary" style="width:100%; justify-content:space-between; margin-bottom:0.75rem; padding:0.6rem 1.25rem; font-size:0.9rem;">
     <span>{label}</span>
-    <svg width="16" height="16" fill="none" stroke="var(--text-muted)" viewBox="0 0 24 24">
+    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
     </svg>
   </a>

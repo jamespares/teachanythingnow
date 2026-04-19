@@ -3,6 +3,10 @@ main = "src/index.ts"
 compatibility_date = "2024-11-01"
 compatibility_flags = [ "nodejs_compat" ]
 
+send_email = [
+  { name = "SEND_EMAIL" }
+]
+
 [vars]
 STRIPE_PUBLISHABLE_KEY = "pk_live_51Sgg3aBYRA6cNlBJ0It49XIgT9m3sfasq999J2K0aLIPW3SuBy7IJ6l70bY9MUovpg1HE2uPV4xBAZotqdS3NTWV003zYv1lJo"
 BETTER_AUTH_URL = "https://teachanythingnow.com"
@@ -22,7 +26,3 @@ directory = "./public"
 
 [observability]
 enabled = true
-
-send_email = [
-  { name = "SEND_EMAIL" }
-]

@@ -18,7 +18,8 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               <>
                 <a href="/dashboard" class="text-sm font-semibold" style="color:var(--text-primary); transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">My Packages</a>
                 <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem;">Sign out</button>
-                <script type="module" dangerouslySetInnerHTML={{ __html: `
+                <script type="module" dangerouslySetInnerHTML={{
+                  __html: `
                   import { createAuthClient } from "https://esm.sh/better-auth@1.1.1/client";
                   const client = createAuthClient({ baseURL: window.location.origin });
                   document.getElementById('sign-out').addEventListener('click', async () => {
@@ -38,11 +39,21 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           <section class="site-main--narrow" style="padding-top:4rem; padding-bottom:2rem; text-align:center;">
             <div class="hero-text">
               <h1 class="hero-title" style="font-size:clamp(2.5rem, 6vw, 4.5rem); margin-bottom:1.5rem; letter-spacing:-0.03em;">
-                Lesson materials,<br/>generated <span class="text-accent">instantly.</span>
+                Lesson materials,<br />generated <span class="text-accent">instantly.</span>
               </h1>
               <p style="font-size:clamp(1.125rem, 2.5vw, 1.5rem); max-width:600px; margin:0 auto; line-height:1.6; color:var(--text-secondary);">
-                Type any topic. Get a complete teaching package — presentation, podcast, worksheet, and AI images — in under 60 seconds.
+                Type any topic. Get a complete, multi-media lesson package — presentation, podcast audio file, worksheet, and AI images — all aligned to your topic.
               </p>
+              
+              {/* ── AI Branding ── */}
+              <div style="margin-top:2.5rem; display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
+                <p class="text-xs font-semibold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);">Powered by world-class intelligence</p>
+                <div style="display:flex; align-items:center; gap:2.5rem; filter:grayscale(1); opacity:0.6; transition:opacity 0.3s;" onmouseover="this.style.filter='none'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.6'">
+                  <img src="/gemini.jpg" alt="Gemini" style="height:28px; width:auto;" />
+                  <img src="/claude.png" alt="Claude" style="height:28px; width:auto;" />
+                  <img src="/deepseek.jpg" alt="DeepSeek" style="height:28px; width:auto;" />
+                </div>
+              </div>
             </div>
           </section>
 
@@ -51,24 +62,42 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             <div class="card card-body-lg" style="max-width:640px; margin:0 auto; box-shadow:var(--shadow-lg); position:relative;">
               {/* Decorative blob behind card for Labs feel */}
               <div style="position:absolute; top:-20px; left:-20px; right:-20px; bottom:-20px; background:var(--pastel-green-light); border-radius:36px; z-index:-1; transform:rotate(-1deg);"></div>
-              
+
               <div class="form-group" style="text-align:left;">
-                <label for="topic" class="form-label" style="font-size:1.1rem; color:var(--text-primary); margin-bottom:0.75rem;">What do you want to teach?</label>
+                <label for="topic" class="form-label" style="font-size:1rem; color:var(--text-primary); margin-bottom:0.5rem;">What do you want to teach?</label>
                 <input
                   id="topic"
                   type="text"
-                  placeholder="e.g., Photosynthesis, The French Revolution, Python Basics"
-                  class="input input-lg"
-                  style="border-radius:999px; padding-left:1.5rem; border-color:var(--border-strong);"
+                  placeholder="e.g., Photosynthesis, The French Revolution, Python"
+                  class="input"
                   required
                 />
               </div>
 
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.5rem; text-align:left;">
+                <div>
+                  <label for="curriculum" class="form-label" style="font-size:0.9rem;">Curriculum (Optional)</label>
+                  <input id="curriculum" type="text" placeholder="e.g., IB, IGCSE, US K-12" class="input" style="padding:10px 16px; font-size:0.9rem;" />
+                </div>
+                <div>
+                  <label for="yearLevel" class="form-label" style="font-size:0.9rem;">Year Level</label>
+                  <input id="yearLevel" type="text" placeholder="e.g., Year 9, Grade 5" class="input" style="padding:10px 16px; font-size:0.9rem;" />
+                </div>
+              </div>
+
               <div id="payment-element" class="hidden animate-fade-in" style="margin-bottom:1.5rem; text-align:left;"></div>
 
-              <button id="generate-btn" class="btn btn-primary btn-full btn-lg" style="font-size:1.25rem;">
+              <button id="generate-btn" class="btn btn-primary btn-full btn-lg">
                 Generate Package
               </button>
+              
+              <p class="text-xs" style="margin-top:1rem; color:var(--text-muted); font-weight:500;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="margin-right:4px; vertical-align:middle;">
+                  <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                Lesson materials aligned with research-backed learning standards
+              </p>
 
               <div id="status-container" class="hidden animate-fade-in" style="margin-top:1rem;">
                 <div class="status-box" style="border-radius:1rem;">
@@ -215,13 +244,13 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             </p>
             <div style="display:flex; align-items:center; gap:1.25rem;">
               <a href="https://www.linkedin.com/in/james-p-ba7653207/" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary); hover:color:var(--primary); transition:color 0.2s;" aria-label="LinkedIn">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
               </a>
               <a href="https://x.com/jamespareslfg" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary); hover:color:var(--primary); transition:color 0.2s;" aria-label="X">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
               </a>
               <a href="https://github.com/jamespares" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary); hover:color:var(--primary); transition:color 0.2s;" aria-label="GitHub">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>
               </a>
             </div>
             <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">jamespares.me</a>
@@ -230,20 +259,27 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
       </div>
 
       <script src="https://js.stripe.com/v3/"></script>
-      <script dangerouslySetInnerHTML={{ __html: `
+      <script dangerouslySetInnerHTML={{
+        __html: `
         const stripe = Stripe('${stripeKey}');
         const generateBtn = document.getElementById('generate-btn');
         const statusContainer = document.getElementById('status-container');
         const paymentElementContainer = document.getElementById('payment-element');
         const topicInput = document.getElementById('topic');
+        const curriculumInput = document.getElementById('curriculum');
+        const yearLevelInput = document.getElementById('yearLevel');
         const errorMsg = document.getElementById('error-message');
         const user = ${JSON.stringify(user || null)};
 
         let elements;
         let currentTopic = '';
+        let currentCurriculum = '';
+        let currentYearLevel = '';
 
-        async function startPaymentFlow(topic) {
+        async function startPaymentFlow(topic, curriculum, yearLevel) {
           currentTopic = topic;
+          currentCurriculum = curriculum;
+          currentYearLevel = yearLevel;
           generateBtn.disabled = true;
           generateBtn.innerText = 'Preparing...';
           errorMsg.classList.add('hidden');
@@ -252,7 +288,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             const res = await fetch('/api/payment/create', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ topic })
+              body: JSON.stringify({ topic, curriculum, yearLevel })
             });
 
             if (res.status === 401) {
@@ -281,10 +317,13 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
 
         generateBtn.addEventListener('click', async () => {
           const topic = topicInput.value.trim();
+          const curriculum = curriculumInput.value.trim();
+          const yearLevel = yearLevelInput.value.trim();
+          
           if (!topic) return alert('Please enter a topic');
 
           if (generateBtn.innerText.includes('Generate')) {
-            await startPaymentFlow(topic);
+            await startPaymentFlow(topic, curriculum, yearLevel);
           } else {
             generateBtn.disabled = true;
             generateBtn.innerText = 'Processing Payment...';
@@ -307,17 +346,17 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               paymentElementContainer.classList.add('hidden');
               generateBtn.classList.add('hidden');
               statusContainer.classList.remove('hidden');
-              startGeneration(currentTopic);
+              startGeneration(currentTopic, currentCurriculum, currentYearLevel);
             }
           }
         });
 
-        async function startGeneration(topic) {
+        async function startGeneration(topic, curriculum, yearLevel) {
           try {
             const res = await fetch('/api/generate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ topic })
+              body: JSON.stringify({ topic, curriculum, yearLevel })
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error);
@@ -333,10 +372,17 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
         }
 
         const pendingTopic = sessionStorage.getItem('pendingTopic');
+        const pendingCurriculum = sessionStorage.getItem('pendingCurriculum');
+        const pendingYearLevel = sessionStorage.getItem('pendingYearLevel');
+
         if (pendingTopic && user) {
           sessionStorage.removeItem('pendingTopic');
+          sessionStorage.removeItem('pendingCurriculum');
+          sessionStorage.removeItem('pendingYearLevel');
           topicInput.value = pendingTopic;
-          startPaymentFlow(pendingTopic);
+          curriculumInput.value = pendingCurriculum || '';
+          yearLevelInput.value = pendingYearLevel || '';
+          startPaymentFlow(pendingTopic, pendingCurriculum, pendingYearLevel);
         }
       `}} />
     </Layout>

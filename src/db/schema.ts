@@ -60,6 +60,8 @@ export const payments = sqliteTable("payments", {
   currency: text("currency").notNull().default("gbp"),
   status: text("status").notNull(), // 'pending', 'succeeded', 'failed', 'canceled'
   topic: text("topic"),
+  curriculum: text("curriculum"),
+  yearLevel: text("year_level"),
   usedAt: integer("used_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
   updatedAt: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
@@ -70,6 +72,8 @@ export const packages = sqliteTable("packages", {
   userId: text("user_id").notNull().references(() => user.id),
   paymentId: text("payment_id").references(() => payments.id),
   topic: text("topic").notNull(),
+  curriculum: text("curriculum"),
+  yearLevel: text("year_level"),
   fileId: text("file_id").notNull(),
   files: text("files").notNull(), // JSON string: {presentation, audio, worksheet, answerSheet, images[]}
   createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),

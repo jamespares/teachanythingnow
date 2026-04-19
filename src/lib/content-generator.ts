@@ -33,16 +33,16 @@ export interface GeneratedContent {
   };
 }
 
-export async function generateContent(topic: string, apiKey: string): Promise<GeneratedContent> {
+export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string): Promise<GeneratedContent> {
   try {
     // Generate slides using AI - this is the foundation for all other content
-    const slides = await generateSlidesWithAI(topic, apiKey);
+    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey);
     
     // Generate podcast script - uses slides for consistency
-    const podcastScript = await generatePodcastScriptWithAI(topic, slides, apiKey);
+    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey);
     
     // Generate worksheet questions - uses slides for consistency
-    const worksheet = await generateWorksheetWithAI(topic, slides, apiKey);
+    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey);
 
     return {
       slides,
@@ -64,7 +64,7 @@ export async function generateContent(topic: string, apiKey: string): Promise<Ge
   }
 }
 
-async function generateSlidesWithAI(topic: string, apiKey: string): Promise<Array<{ title: string; content: string[] }>> {
+async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string): Promise<Array<{ title: string; content: string[] }>> {
   const openai = getOpenAIClient(apiKey);
   if (!openai) {
     return generateSlides(topic);
@@ -80,9 +80,14 @@ async function generateSlidesWithAI(topic: string, apiKey: string): Promise<Arra
         },
         {
           role: "user",
-          content: `Create an educational presentation about "${topic}".
-
-Create 6-8 slides with:
+          content: `Create an educational presentation about "${topic}" specialized for the "${curriculum}" curriculum and "${yearLevel}" students.
+          
+          Guidelines:
+          - Align content specifically with "${curriculum}" learning standards.
+          - Ensure vocabulary and concept complexity is appropriate for "${yearLevel}".
+          - Use research-backed pedagogical standards (scaffolding, direct instruction).
+          
+          Create 6-8 slides with:`,
 - Clear, descriptive titles
 - 3-5 bullet points per slide (1-2 sentences each)
 - Logical flow: introduction, main concepts, examples, summary
@@ -114,7 +119,7 @@ Make it educational and suitable for teaching.`,
   return generateSlides(topic);
 }
 
-async function generatePodcastScriptWithAI(topic: string, slides: Array<{ title: string; content: string[] }>, apiKey: string): Promise<string> {
+async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string): Promise<string> {
   const openai = getOpenAIClient(apiKey);
   if (!openai) {
     return generatePodcastScript(topic, slides);
@@ -132,7 +137,12 @@ async function generatePodcastScriptWithAI(topic: string, slides: Array<{ title:
         },
         {
           role: "user",
-          content: `Create a podcast script about "${topic}". The script MUST be under 3800 characters (approximately 600-800 words) to ensure it fits within technical limits.
+          content: `Create a podcast script about "${topic}" for "${yearLevel}" students following the "${curriculum}" syllabus. The script MUST be under 3800 characters (approximately 600-800 words) to ensure it fits within technical limits.
+          
+          Educational Context:
+          - Target Audience: "${yearLevel}"
+          - Curriculum: "${curriculum}"
+          - Tone: Engaging, age-appropriate, and aligned with research-backed learning standards.`,
 
 Structure:
 - Engaging introduction with a hook
@@ -168,7 +178,7 @@ ${slideContent}`,
   return generatePodcastScript(topic, slides);
 }
 
-async function generateWorksheetWithAI(topic: string, slides: Array<{ title: string; content: string[] }>, apiKey: string): Promise<{
+async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string): Promise<{
   questions: Array<{
     question: string;
     type: "multiple-choice" | "short-answer" | "essay";
@@ -193,7 +203,12 @@ async function generateWorksheetWithAI(topic: string, slides: Array<{ title: str
         },
         {
           role: "user",
-          content: `Create 8-10 assessment questions about "${topic}".
+          content: `Create 8-10 assessment questions about "${topic}" for "${yearLevel}" following the "${curriculum}" curriculum.
+          
+          Standards:
+          - Questions should map to "${curriculum}" assessment criteria.
+          - Difficulty and wording must be suitable for "${yearLevel}".
+          - Include clear, research-backed answer keys.`,
 
 Include:
 - 4-5 multiple-choice questions (with 4 options each)

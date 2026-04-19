@@ -91,14 +91,19 @@ app.post("/api/payment/create", async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   
   if (!session) return c.json({ error: "Unauthorized" }, 401);
-
-  const { topic } = await c.req.json();
+  
+  const { topic, curriculum, yearLevel } = await c.req.json();
   const stripeInstance = stripe(c.env.STRIPE_SECRET_KEY);
 
   const paymentIntent = await stripeInstance.paymentIntents.create({
     amount: 100, // £1.00
     currency: "gbp",
-    metadata: { topic, userId: session.user.id },
+    metadata: { 
+      userId: session.user.id, 
+      topic,
+      curriculum,
+      yearLevel
+    }
   });
 
   await db.insert(payments).values({
@@ -108,6 +113,8 @@ app.post("/api/payment/create", async (c) => {
     amount: 100,
     status: "pending",
     topic,
+    curriculum,
+    yearLevel
   });
 
   return c.json({
@@ -172,6 +179,8 @@ app.post("/api/generate", async (c) => {
       and(
         eq(payments.userId, session.user.id),
         eq(payments.topic, topic),
+        eq(payments.curriculum, curriculum),
+        eq(payments.yearLevel, yearLevel),
         isNull(payments.usedAt)
       )
     )
@@ -202,7 +211,7 @@ app.post("/api/generate", async (c) => {
   const fileId = `${topic.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
 
   // 1. Generate Content
-  const content = await generateContent(topic, c.env.DEEPSEEK_API_KEY);
+  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.DEEPSEEK_API_KEY);
   
   // 2. Parallel Generation Tasks
   const pptTask = async () => {
@@ -247,6 +256,8 @@ app.post("/api/generate", async (c) => {
     userId: session.user.id,
     paymentId: payment.id,
     topic,
+    curriculum,
+    yearLevel,
     fileId,
     files: JSON.stringify({
       presentation,
