@@ -9,13 +9,46 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title ? `${title} | Teach Anything Now` : "Teach Anything Now"}</title>
 
-        {/* Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        {/* Fonts - self-hosted for China accessibility */}
 
         <link rel="stylesheet" href="/globals.css" />
         <style>{`
+          @font-face {
+            font-family: 'Patrick Hand';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('/fonts/PatrickHand-Regular.ttf') format('truetype');
+          }
+          @font-face {
+            font-family: 'Quicksand';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('/fonts/Quicksand-Regular.ttf') format('truetype');
+          }
+          @font-face {
+            font-family: 'Quicksand';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url('/fonts/Quicksand-Medium.ttf') format('truetype');
+          }
+          @font-face {
+            font-family: 'Quicksand';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url('/fonts/Quicksand-SemiBold.ttf') format('truetype');
+          }
+          @font-face {
+            font-family: 'Quicksand';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url('/fonts/Quicksand-Bold.ttf') format('truetype');
+          }
+
           :root {
             --font-heading: 'Patrick Hand', cursive;
             --font-body: 'Quicksand', sans-serif;
