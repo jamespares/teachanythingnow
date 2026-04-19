@@ -4,11 +4,12 @@ import type { Lang, Dict } from "../lib/i18n";
 
 export const Layout: FC<PropsWithChildren<{ title?: string; lang: Lang; dict: Dict }>> = ({ children, title, lang, dict }) => {
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{title ? `${title} | ${dict.siteName}` : dict.siteName}</title>
+        <meta name="description" content={dict.siteDescription} />
         <link rel="stylesheet" href="/globals.css" />
         <style>{`
           .hidden { display: none !important; }

@@ -44,6 +44,15 @@ app.use("*", async (c, next) => {
   await next();
 });
 
+// Persist language preference when ?lang= is present
+app.use("*", async (c, next) => {
+  const queryLang = c.req.query("lang");
+  if (queryLang === "en" || queryLang === "fr" || queryLang === "zh") {
+    c.header("Set-Cookie", `lang=${queryLang}; Path=/; Max-Age=31536000; SameSite=Lax`);
+  }
+  await next();
+});
+
 // --- UI Routes ---
 
 app.get("/", async (c) => {
@@ -157,7 +166,7 @@ app.post("/api/webhooks/stripe", async (c) => {
     );
   } catch (err: any) {
     console.error("Webhook signature verification failed:", err.message);
-    return c.text(`Webhook Error: ${err.message}`, 400);
+    return c.text(`${t(c, "apiErrorWebhookFailed")}: ${err.message}`, 400);
   }
 
   const db = getDb(c.env.DB);
@@ -184,9 +193,9 @@ app.post("/api/generate", async (c) => {
   const auth = getAuth(db, c.env);
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   
-  if (!session) return c.json({ error: "Unauthorized" }, 401);
+  if (!session) return c.json({ error: t(c, "apiErrorUnauthorized") }, 401);
 
-  const { topic } = await c.req.json();
+  const { topic, curriculum, yearLevel } = await c.req.json();
   
   const [payment] = await db
     .select()
@@ -227,7 +236,8 @@ app.post("/api/generate", async (c) => {
   const fileId = `${topic.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
 
   // 1. Generate Content
-  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.DEEPSEEK_API_KEY);
+  const lang = detectLang(c);
+  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.DEEPSEEK_API_KEY, lang);
   
   // 2. Parallel Generation Tasks
   const pptTask = async () => {

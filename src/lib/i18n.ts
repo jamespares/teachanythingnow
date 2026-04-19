@@ -25,6 +25,7 @@ const en = {
   langToggleEn: "EN",
   langToggleFr: "FR",
   langToggleZh: "中文",
+  siteDescription: "Create a complete, multi-media educational lesson package in 60 seconds. Includes slides, podast audio, worksheets, and AI images.",
 
   // ── Home ──
   homeTitle: "Create Lesson",
@@ -210,6 +211,8 @@ const en = {
   apiErrorPaymentNotCompleted: "Payment not completed",
   apiErrorMissingFile: "Missing file name",
   apiErrorFileNotFound: "File not found",
+  apiErrorWebhookFailed: "Webhook signature verification failed",
+  apiErrorGeneric: "Something went wrong. Please try again.",
 } as const;
 
 /* ───────────────────────────────────────────────────────────
@@ -220,6 +223,7 @@ const fr: Record<keyof typeof en, string> = {
   langToggleEn: "EN",
   langToggleFr: "FR",
   langToggleZh: "中文",
+  siteDescription: "Créez un package de cours pédagogique complet en 60 secondes. Comprend des diapositives, un audio podcast, des fiches d'exercices et des images IA.",
 
   homeTitle: "Créer un cours",
   homeNavMyPackages: "Mes packages",
@@ -397,6 +401,8 @@ const fr: Record<keyof typeof en, string> = {
   apiErrorPaymentNotCompleted: "Paiement non effectué",
   apiErrorMissingFile: "Nom de fichier manquant",
   apiErrorFileNotFound: "Fichier non trouvé",
+  apiErrorWebhookFailed: "Échec de la vérification de la signature du webhook",
+  apiErrorGeneric: "Une erreur s'est produite. Veuillez réessayer.",
 };
 
 /* ───────────────────────────────────────────────────────────
@@ -407,6 +413,7 @@ const zh: Record<keyof typeof en, string> = {
   langToggleEn: "EN",
   langToggleFr: "FR",
   langToggleZh: "中文",
+  siteDescription: "在60秒内创建完整的教育课程包。包含幻灯片、播客音频、练习题和AI图像。",
 
   homeTitle: "创建课程",
   homeNavMyPackages: "我的课程包",
@@ -442,7 +449,7 @@ const zh: Record<keyof typeof en, string> = {
 
   homeSamplesLabel: "查看您将获得什么",
   homeSamplesTitle: "真实输出，真实品质",
-  homeSamplesSubtitle: "每个课程包包含四份专业格式的资源。以下是为"光合作用"生成的示例。",
+  homeSamplesSubtitle: '每个课程包包含四份专业格式的资源。以下是为"光合作用"生成的示例。',
   homeSamplePPTLabel: "PowerPoint演示文稿",
   homeSamplePPTDesc: "包含演讲者备注的完整幻灯片，可直接演示。",
   homeSampleWorksheetLabel: "学生练习题",
@@ -531,14 +538,14 @@ const zh: Record<keyof typeof en, string> = {
   termsNavHome: "首页",
   termsLastUpdated: "最后更新：2025年4月18日",
   termsSection1Title: "一、简介与条款接受",
-  termsSection1Body1: "本服务条款管辖您对Teach Anything Now网站和服务的使用，该网站和服务由EduConnect Asia Ltd（"我们"、"我们的"）运营，该公司在英格兰和威尔士注册，注册办公地址为71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ。",
+  termsSection1Body1: '本服务条款管辖您对Teach Anything Now网站和服务的使用，该网站和服务由EduConnect Asia Ltd（"我们"、"我们的"）运营，该公司在英格兰和威尔士注册，注册办公地址为71-75 Shelton Street, Covent Garden, London, United Kingdom, WC2H 9JQ。',
   termsSection1Body2: "通过访问、浏览、注册或使用我们服务的任何部分——包括生成课程包、付款或下载内容——您确认已阅读、理解并同意受本服务条款的完全约束。如果您不同意这些条款，则不得使用我们的服务。我们可能会不时更新这些条款，您在任何更改后继续使用服务即构成对修订条款的接受。",
   termsSection2Title: "二、服务描述",
   termsSection2Body: "Teach Anything Now是一个在线平台，根据您提供的主题生成教育课程包——包括演示文稿、音频内容、练习题和AI生成图像。每个课程包按需生成，以可下载的数字文件形式交付。",
   termsSection3Title: "三、支付与定价",
   termsSection3Body: "我们的服务按每个课程包1.00英镑收费。付款通过Stripe安全处理。所有价格在适用情况下均包含增值税。您同意提供准确完整的付款信息。我们保留随时更改价格的权利，但任何价格变动不会影响已完成的购买。",
   termsSection4Title: "四、退款政策",
-  termsSection4_1: "由于我们服务的即时性、自动化和数字化性质——课程包在付款后立即生成，无法"退货"——所有购买均为最终交易。完成付款即表示您承认，一旦生成过程开始，您将丧失根据《2013年消费者合同条例》享有的法定取消权。",
+  termsSection4_1: '由于我们服务的即时性、自动化和数字化性质——课程包在付款后立即生成，无法"退货"——所有购买均为最终交易。完成付款即表示您承认，一旦生成过程开始，您将丧失根据《2013年消费者合同条例》享有的法定取消权。',
   termsSection4_2: "我们仅在以下有限情况下发放退款：",
   termsSection4_2_list1: "我们的技术故障阻止了课程包的生成或交付。",
   termsSection4_2_list2: "您被错误收费（例如重复扣款或金额错误）。",
@@ -560,7 +567,7 @@ const zh: Record<keyof typeof en, string> = {
   termsSection8Title: "八、管辖法律",
   termsSection8Body: "这些条款受英格兰和威尔士法律管辖并按其解释。因这些条款引起的任何争议应受英格兰和威尔士法院的专属管辖。",
   termsSection9Title: "九、条款变更",
-  termsSection9Body: "我们可能会不时更新这些服务条款。我们将通过在此页面发布更新后的条款并附上修订的"最后更新"日期来通知您任何重大变更。您在变更后继续使用服务即构成对修订条款的接受。",
+  termsSection9Body: '我们可能会不时更新这些服务条款。我们将通过在此页面发布更新后的条款并附上修订的"最后更新"日期来通知您任何重大变更。您在变更后继续使用服务即构成对修订条款的接受。',
   termsSection10Title: "十、联系方式",
   termsSection10Body: "如果您对这些服务条款有任何疑问，请联系我们：<br /><br />EduConnect Asia Ltd<br />71-75 Shelton Street, Covent Garden<br />London, United Kingdom, WC2H 9JQ<br />电子邮件：support@teachanythingnow.com",
   termsFooterCopyright: "© 2025 EduConnect Asia Ltd。保留所有权利。由 James Pares 创建。",
@@ -583,7 +590,9 @@ const zh: Record<keyof typeof en, string> = {
   apiErrorNoPayment: "未找到此主题的未使用付款",
   apiErrorPaymentNotCompleted: "付款未完成",
   apiErrorMissingFile: "缺少文件名",
-  apiErrorFileNotFound: "文件未找到",
+  apiErrorFileNotFound: "未找到文件",
+  apiErrorWebhookFailed: "Webhook 签名验证失败",
+  apiErrorGeneric: "发生错误，请重试。",
 };
 
 /* ───────────────────────────────────────────────────────────

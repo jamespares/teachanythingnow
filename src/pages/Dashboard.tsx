@@ -1,49 +1,51 @@
 /** @jsxImportSource hono/jsx */
 import { FC } from "hono/jsx";
 import { Layout } from "./Layout";
+import type { Lang, Dict } from "../lib/i18n";
 
-export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }) => {
+export const Dashboard: FC<{ user: any; packages: any[]; lang: Lang; dict: Dict }> = ({ user, packages, lang, dict }) => {
   return (
-    <Layout title="My Dashboard">
+    <Layout title={dict.dashTitle} lang={lang} dict={dict}>
       <div class="page-wrapper">
 
         {/* Header */}
         <header class="site-header">
           <a href="/" class="brand">
-            <img src="/logo.png" alt="Teach Anything Now" />
+            <img src="/logo.png" alt={dict.siteName} />
           </a>
           <nav class="site-nav">
             <span class="text-sm font-semibold" style="color:var(--text-primary);">{user.email}</span>
-            <a href="/" class="text-sm font-semibold" style="transition:color 0.2s; color:var(--text-primary);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">Create New</a>
-            <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem;">Sign out</button>
+            <a href="/" class="text-sm font-semibold" style="transition:color 0.2s; color:var(--text-primary);" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">{dict.dashNavCreateNew}</a>
+            <button id="sign-out" class="text-sm btn btn-secondary" style="padding:0.4rem 0.9rem;">{dict.dashNavSignOut}</button>
           </nav>
         </header>
 
         {/* Main */}
         <main class="site-main">
           <div class="dash-heading-row">
-            <h2 style="font-size:2rem; letter-spacing:-0.03em;">My Lesson Packages</h2>
+            <h2 style="font-size:2rem; letter-spacing:-0.03em;">{dict.dashHeading}</h2>
           </div>
 
           {packages.length === 0 ? (
             <div class="card" style="padding:3rem; text-align:center;">
-              <p class="text-secondary" style="margin:0 0 1.5rem;">You haven't generated any lessons yet.</p>
-              <a href="/" class="btn btn-primary">Create your first lesson</a>
+              <p class="text-secondary" style="margin:0 0 1.5rem;">{dict.dashEmptyMsg}</p>
+              <a href="/" class="btn btn-primary">{dict.dashEmptyBtn}</a>
             </div>
           ) : (
             <div class="packages-grid">
               {packages.map((pkg) => {
                 const files = JSON.parse(pkg.files);
+                const locale = lang === "zh" ? "zh-CN" : lang === "fr" ? "fr-FR" : "en-GB";
                 return (
                   <div key={pkg.id} class="card card-hover package-card">
                     <h3 style="font-size:1.25rem; margin-bottom:0.5rem; color:var(--text-primary);">{pkg.topic}</h3>
                     <p class="text-xs text-muted" style="margin:0 0 1.5rem;">
-                      Generated on {new Date(pkg.createdAt).toLocaleDateString()}
+                      {dict.dashGeneratedOn} {new Date(pkg.createdAt).toLocaleDateString(locale)}
                     </p>
                     <div>
-                      {files.presentation && <DownloadLink href={`/api/download?file=${files.presentation}`} label="PowerPoint Presentation" />}
-                      {files.audio        && <DownloadLink href={`/api/download?file=${files.audio}`}        label="Podcast Audio" />}
-                      {files.worksheet    && <DownloadLink href={`/api/download?file=${files.worksheet}`}    label="Student Worksheet" />}
+                      {files.presentation && <DownloadLink href={`/api/download?file=${files.presentation}`} label={dict.dashDownloadPPT} />}
+                      {files.audio        && <DownloadLink href={`/api/download?file=${files.audio}`}        label={dict.dashDownloadPodcast} />}
+                      {files.worksheet    && <DownloadLink href={`/api/download?file=${files.worksheet}`}    label={dict.dashDownloadWorksheet} />}
                     </div>
                   </div>
                 );
@@ -53,7 +55,7 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
         </main>
       </div>
       <script type="module" dangerouslySetInnerHTML={{ __html: `
-        import { createAuthClient } from "https://esm.sh/better-auth/client";
+        import { createAuthClient } from "https://esm.sh/better-auth@1.1.1/client";
         const client = createAuthClient({ baseURL: window.location.origin });
         document.getElementById('sign-out').addEventListener('click', async () => {
           await client.signOut();

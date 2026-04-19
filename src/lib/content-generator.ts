@@ -3,6 +3,13 @@
 // All generation uses GPT-4o model for best quality output
 
 import OpenAI from "openai";
+import type { Lang } from "./i18n";
+
+const langMap: Record<Lang, string> = {
+  en: "English",
+  fr: "French",
+  zh: "Simplified Chinese"
+};
 
 // Lazy initialization of OpenAI client to avoid errors when API key is missing
 function getOpenAIClient(apiKey: string): OpenAI | null {
@@ -33,16 +40,16 @@ export interface GeneratedContent {
   };
 }
 
-export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string): Promise<GeneratedContent> {
+export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang = "en"): Promise<GeneratedContent> {
   try {
     // Generate slides using AI - this is the foundation for all other content
-    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey);
+    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, targetLang);
     
     // Generate podcast script - uses slides for consistency
-    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey);
+    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang);
     
     // Generate worksheet questions - uses slides for consistency
-    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey);
+    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang);
 
     return {
       slides,
@@ -64,7 +71,7 @@ export async function generateContent(topic: string, curriculum: string, yearLev
   }
 }
 
-async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string): Promise<Array<{ title: string; content: string[] }>> {
+async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang): Promise<Array<{ title: string; content: string[] }>> {
   const openai = getOpenAIClient(apiKey);
   if (!openai) {
     return generateSlides(topic);
@@ -76,7 +83,11 @@ async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel
       messages: [
         {
           role: "system",
-          content: "You are an expert educator who creates engaging, clear educational content. Create professional slides that are well-structured and easy to understand. Return ONLY valid JSON in this exact format: {\"slides\": [{\"title\": \"...\", \"content\": [\"...\", \"...\"]}]}.",
+          content: `You are an expert educator who creates engaging, clear educational content. Create professional slides that are well-structured and easy to understand. 
+          
+          CRITICAL: You MUST generate all content (titles, bullet points, labels) EXCLUSIVELY in ${langMap[targetLang]}.
+          
+          Return ONLY valid JSON in this exact format: {"slides": [{"title": "...", "content": ["...", "..."]}]}.`,
         },
         {
           role: "user",
@@ -87,7 +98,7 @@ async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel
           - Ensure vocabulary and concept complexity is appropriate for "${yearLevel}".
           - Use research-backed pedagogical standards (scaffolding, direct instruction).
           
-          Create 6-8 slides with:`,
+          Create 6-8 slides with:
 - Clear, descriptive titles
 - 3-5 bullet points per slide (1-2 sentences each)
 - Logical flow: introduction, main concepts, examples, summary
@@ -119,7 +130,7 @@ Make it educational and suitable for teaching.`,
   return generateSlides(topic);
 }
 
-async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string): Promise<string> {
+async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang): Promise<string> {
   const openai = getOpenAIClient(apiKey);
   if (!openai) {
     return generatePodcastScript(topic, slides);
@@ -133,7 +144,9 @@ async function generatePodcastScriptWithAI(topic: string, curriculum: string, ye
       messages: [
         {
           role: "system",
-          content: "You are an engaging podcast host who makes educational content interesting and accessible. Create conversational podcast scripts that sound natural when spoken. Write for the ear, not the eye - use natural spoken language.",
+          content: `You are an engaging podcast host who makes educational content interesting and accessible. Create conversational podcast scripts that sound natural when spoken. Write for the ear, not the eye - use natural spoken language.
+          
+          CRITICAL: You MUST write the script EXCLUSIVELY in ${langMap[targetLang]}.`,
         },
         {
           role: "user",
@@ -142,7 +155,7 @@ async function generatePodcastScriptWithAI(topic: string, curriculum: string, ye
           Educational Context:
           - Target Audience: "${yearLevel}"
           - Curriculum: "${curriculum}"
-          - Tone: Engaging, age-appropriate, and aligned with research-backed learning standards.`,
+          - Tone: Engaging, age-appropriate, and aligned with research-backed learning standards.
 
 Structure:
 - Engaging introduction with a hook
@@ -178,14 +191,7 @@ ${slideContent}`,
   return generatePodcastScript(topic, slides);
 }
 
-async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string): Promise<{
-  questions: Array<{
-    question: string;
-    type: "multiple-choice" | "short-answer" | "essay";
-    options?: string[];
-    correctAnswer: string;
-  }>;
-}> {
+async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
   const openai = getOpenAIClient(apiKey);
   if (!openai) {
     return generateWorksheet(topic, slides);
@@ -199,7 +205,11 @@ async function generateWorksheetWithAI(topic: string, curriculum: string, yearLe
       messages: [
         {
           role: "system",
-          content: "You are an expert educator creating assessment questions. Return ONLY valid JSON in this exact format: {\"questions\": [{\"question\": \"...\", \"type\": \"multiple-choice\"|\"short-answer\"|\"essay\", \"options\": [\"...\"], \"correctAnswer\": \"...\"}]}. Create clear, educational questions that assess understanding.",
+          content: `You are an expert educator creating assessment questions. 
+          
+          CRITICAL: You MUST generate all questions and answers EXCLUSIVELY in ${langMap[targetLang]}.
+          
+          Return ONLY valid JSON in this exact format: {"questions": [{"question": "...", "type": "multiple-choice"|"short-answer"|"essay", "options": ["..."], "correctAnswer": "..."}]}. Create clear, educational questions that assess understanding.`,
         },
         {
           role: "user",
@@ -208,7 +218,7 @@ async function generateWorksheetWithAI(topic: string, curriculum: string, yearLe
           Standards:
           - Questions should map to "${curriculum}" assessment criteria.
           - Difficulty and wording must be suitable for "${yearLevel}".
-          - Include clear, research-backed answer keys.`,
+          - Include clear, research-backed answer keys.
 
 Include:
 - 4-5 multiple-choice questions (with 4 options each)
