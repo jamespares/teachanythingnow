@@ -83,7 +83,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* ── How It Works ── */}
           <section style="background:rgba(0,0,0,0.35); padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:var(--max-width); margin:0 auto;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">How It Works</p>
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:400; color:#4ade80; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">How It Works</p>
               <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:3.5rem; color:#ffffff;">Three steps to your lesson</h2>
 
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:2rem; max-width:900px; margin:0 auto;">
@@ -93,7 +93,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                   { num: "03", title: "Download everything", desc: "Get your full package in under a minute. Ready to teach." },
                 ].map(step => (
                   <div key={step.num} style="text-align:center; padding:2rem;">
-                    <div style="font-family:var(--font-heading); font-size:3rem; font-weight:700; color:#ffffff; line-height:1; margin-bottom:1rem;">{step.num}</div>
+                    <div style="font-family:var(--font-heading); font-size:3rem; font-weight:400; color:#ffffff; line-height:1; margin-bottom:1rem;">{step.num}</div>
                     <h3 style="font-size:1.25rem; margin-bottom:0.5rem; color:#ffffff;">{step.title}</h3>
                     <p style="font-size:0.9375rem; line-height:1.6; margin:0; color:#ffffff;">{step.desc}</p>
                   </div>
@@ -105,7 +105,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* ── Proof / Sample Gallery ── */}
           <section style="padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:var(--max-width); margin:0 auto;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">See What You Get</p>
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:400; color:#4ade80; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">See What You Get</p>
               <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:1rem; color:#ffffff;">Real output, real quality</h2>
               <p style="font-size:1.0625rem; max-width:560px; margin:0 auto 3.5rem; line-height:1.6; color:#ffffff;">Every lesson package includes four professionally formatted resources. Here's a sample generated for "Photosynthesis."</p>
 
@@ -130,7 +130,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                     <div style="padding:1.5rem; text-align:left;">
                       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.5rem;">
                         <h3 style="font-size:1.0625rem; margin:0; color:var(--text-primary);">{item.label}</h3>
-                        <span style="font-family:var(--font-heading); font-size:0.75rem; font-weight:600; color:var(--primary); background:rgba(0,107,84,0.08); padding:0.25rem 0.625rem; border-radius:999px;">{item.ext}</span>
+                        <span style="font-family:var(--font-heading); font-size:0.75rem; font-weight:400; color:var(--primary); background:rgba(0,107,84,0.08); padding:0.25rem 0.625rem; border-radius:999px;">{item.ext}</span>
                       </div>
                       <p class="text-secondary" style="font-size:0.875rem; margin:0; line-height:1.5;">{item.desc}</p>
                     </div>
@@ -149,7 +149,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* ── What's Included ── */}
           <section style="background:rgba(0,0,0,0.35); padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:var(--max-width); margin:0 auto;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">What's Included</p>
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:400; color:#4ade80; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">What's Included</p>
               <h2 style="font-size:clamp(1.75rem, 4vw, 2.5rem); margin-bottom:3.5rem; color:#ffffff;">Everything you need to teach</h2>
 
               <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:1.5rem; max-width:1000px; margin:0 auto;">
@@ -172,7 +172,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* ── Final CTA ── */}
           <section style="padding:5rem 1.5rem; text-align:center;">
             <div style="max-width:560px; margin:0 auto; text-align:center;">
-              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:600; color:#4ade80; text-transform:uppercase; letter-spacing:0.15em; margin-bottom:1rem;">Get Started</p>
+              <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:400; color:#4ade80; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">Get Started</p>
               <h2 style="font-size:clamp(2rem, 5vw, 3rem); margin-bottom:1rem; color:#ffffff;">Ready when you are.</h2>
               <p style="font-size:1.125rem; line-height:1.6; margin-bottom:2.5rem; color:#ffffff;">
                 No subscriptions. No credits. Just enter a topic and get four professional teaching resources back in seconds.
@@ -191,7 +191,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
         {/* ── Footer ── */}
         <footer style="border-top:1px solid rgba(255,255,255,0.15); padding:2.5rem 1.5rem; text-align:center;">
           <div style="display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
-            <p style="font-family:var(--font-heading); font-size:0.9375rem; font-weight:500; color:#ffffff; letter-spacing:0.02em; margin:0;">
+            <p style="font-family:var(--font-heading); font-size:1rem; font-weight:400; color:#ffffff; margin:0;"
               Built by James Pares
             </p>
             <div style="display:flex; align-items:center; gap:1rem;">

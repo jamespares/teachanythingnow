@@ -51,7 +51,7 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
 
           h1, h2, h3, h4, h5, h6 {
             font-family: var(--font-heading);
-            font-weight: 600;
+            font-weight: 400;
             line-height: 1.2;
             margin: 0;
           }
@@ -207,14 +207,14 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
             background: rgba(255, 255, 255, 0.1);
           }
           .feature-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
-          .feature-label { font-size: 0.75rem; font-weight: 600; color: #ffffff; }
+          .feature-label { font-size: 0.75rem; font-weight: 400; color: #ffffff; }
 
           /* ── Form group ── */
           .form-group { margin-bottom: 1.5rem; }
           .form-label {
             display: block;
             font-size: 0.875rem;
-            font-weight: 600;
+            font-weight: 500;
             margin-bottom: 0.5rem;
             margin-left: 0.25rem;
             color: var(--text-primary);
