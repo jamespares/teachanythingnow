@@ -12,13 +12,13 @@ export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, ti
         {/* Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
         <link rel="stylesheet" href="/globals.css" />
         <style>{`
           :root {
-            --font-heading: 'Space Grotesk', sans-serif;
-            --font-body: 'DM Sans', sans-serif;
+            --font-heading: 'Patrick Hand', cursive;
+            --font-body: 'Quicksand', sans-serif;
             --primary: #006b54;
             --primary-dark: #005240;
             --background: #f8f9fa;
