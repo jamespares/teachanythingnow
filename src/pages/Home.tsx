@@ -131,7 +131,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; max-width:1200px; margin:0 auto;">
                 {[
                   { src: "/samples/ppt-screenshot.png", label: "PowerPoint Presentation", ext: ".pptx", desc: "Full-slide deck with speaker notes, ready to present." },
-                  { src: "/samples/worksheet-screenshot.png", label: "Student Worksheet", ext: ".docx", desc: "Print-ready exercises with clear instructions." },
+                  { src: "/samples/worksheet-screenshot.png", label: "Student Worksheet", ext: ".docx", desc: "Print-ready exercises with clear instructions and an answer key." },
                   { src: "/samples/answer-key-screenshot.png", label: "Answer Key", ext: ".docx", desc: "Complete solutions for every question." },
                   { src: "/samples/image-sample.png", label: "AI Images", ext: ".png", desc: "Custom illustrations to support your lesson." },
                 ].map(item => (
