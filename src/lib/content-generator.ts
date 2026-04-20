@@ -22,8 +22,21 @@ function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: str
     headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
   }
 
+  // Determine if this is an OpenAI key or DeepSeek key
+  // OpenAI project keys start with sk-proj-
+  const isOpenAI = apiKey.startsWith("sk-proj-");
+  
+  let baseURL = isOpenAI ? 'https://api.openai.com/v1' : 'https://api.deepseek.com';
+  
+  // If using Cloudflare AI Gateway, append the provider to the gateway URL
+  if (gatewayUrl) {
+    // Ensure we don't double-append /v1 or similar if the gatewayUrl already has it
+    const cleanGatewayUrl = gatewayUrl.replace(/\/+$/, "");
+    baseURL = isOpenAI ? `${cleanGatewayUrl}/openai` : `${cleanGatewayUrl}/deepseek`;
+  }
+
   return new OpenAI({
-    baseURL: gatewayUrl ? `${gatewayUrl}/deepseek` : 'https://api.deepseek.com',
+    baseURL,
     apiKey: apiKey,
     timeout: 60000,
     maxRetries: 2,
@@ -85,9 +98,11 @@ async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel
     return generateSlides(topic);
   }
 
-  try {
+    const isOpenAI = apiKey.startsWith("sk-proj-");
+    const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
+
     const response = await openai.chat.completions.create({
-      model: "deepseek-chat", // Using DeepSeek V3 for high quality JSON output
+      model: model, // Dynamic model selection based on provider
       messages: [
         {
           role: "system",
@@ -146,9 +161,11 @@ async function generatePodcastScriptWithAI(topic: string, curriculum: string, ye
 
   try {
     const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
+    const isOpenAI = apiKey.startsWith("sk-proj-");
+    const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
 
     const response = await openai.chat.completions.create({
-      model: "deepseek-chat", // Using DeepSeek V3 for high quality output
+      model: model, // Dynamic model selection
       messages: [
         {
           role: "system",
@@ -207,9 +224,11 @@ async function generateWorksheetWithAI(topic: string, curriculum: string, yearLe
 
   try {
     const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
+    const isOpenAI = apiKey.startsWith("sk-proj-");
+    const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
 
     const response = await openai.chat.completions.create({
-      model: "deepseek-chat", // Using DeepSeek V3 for high quality output
+      model: model, // Dynamic model selection
       messages: [
         {
           role: "system",

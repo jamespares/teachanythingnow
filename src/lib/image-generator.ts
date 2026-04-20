@@ -249,8 +249,11 @@ async function generateImagePrompts(
   if (openai) {
     try {
       // First, identify 3 specific key events, people, or places
+      const isOpenAI = openaiApiKey.startsWith("sk-proj-");
+      const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
+
       const identificationResponse = await openai.chat.completions.create({
-        model: "deepseek-chat",
+        model: model,
         messages: [
           {
             role: "system",
@@ -341,8 +344,18 @@ function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: str
     headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
   }
 
+  // Determine if this is an OpenAI key or DeepSeek key
+  const isOpenAI = apiKey.startsWith("sk-proj-");
+  
+  let baseURL = isOpenAI ? 'https://api.openai.com/v1' : 'https://api.deepseek.com';
+  
+  if (gatewayUrl) {
+    const cleanGatewayUrl = gatewayUrl.replace(/\/+$/, "");
+    baseURL = isOpenAI ? `${cleanGatewayUrl}/openai` : `${cleanGatewayUrl}/deepseek`;
+  }
+
   return new OpenAI({
-    baseURL: gatewayUrl ? `${gatewayUrl}/deepseek` : 'https://api.deepseek.com',
+    baseURL,
     apiKey: apiKey,
     timeout: 60000,
     maxRetries: 2,

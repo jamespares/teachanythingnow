@@ -247,7 +247,7 @@ app.post("/api/generate", async (c) => {
 
   // 1. Generate Content
   const lang = detectLang(c);
-  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, lang, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
+  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.DEEPSEEK_API_KEY || c.env.OPENAI_API_KEY, lang, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
   
   // 2. Parallel Generation Tasks
   const pptTask = async () => {
@@ -269,7 +269,7 @@ app.post("/api/generate", async (c) => {
   };
 
   const imageTask = async () => {
-    const imageResult = await generateImages(topic, content.slides, c.env.GOOGLE_GEMINI_API_KEY, c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
+    const imageResult = await generateImages(topic, content.slides, c.env.GOOGLE_GEMINI_API_KEY, c.env.DEEPSEEK_API_KEY || c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
     const downloadedImages = await downloadImages(imageResult.images);
     const savedImages: string[] = [];
     for (let i = 0; i < downloadedImages.length; i++) {
