@@ -57,7 +57,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
               {/* ── AI Branding ── */}
               <div style="margin-top:2.5rem; display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
                 <p class="text-xs font-semibold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);">{dict.homePoweredBy}</p>
-                <div style="display:flex; align-items:center; gap:2.5rem; filter:grayscale(1); opacity:0.6; transition:opacity 0.3s;" onmouseover="this.style.filter='none'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.6'">
+                <div style="display:flex; align-items:center; gap:2.5rem; mix-blend-mode:multiply; filter:grayscale(1); opacity:0.6; transition:opacity 0.3s;" onmouseover="this.style.filter='none'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.6'">
                   <img src="/gemini.jpg" alt="Gemini" style="height:28px; width:auto;" />
                   <img src="/claude.png" alt="Claude" style="height:28px; width:auto;" />
                   <img src="/deepseek.jpg" alt="DeepSeek" style="height:28px; width:auto;" />
@@ -68,7 +68,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
 
           {/* ── Generator Form ── */}
           <section class="site-main--narrow" style="padding-top:0; padding-bottom:4rem; text-align:center;">
-            <div class="card card-body-lg" style="max-width:640px; margin:0 auto; box-shadow:var(--shadow-lg); position:relative;">
+            <div class="card card-body-lg" style="max-width:768px; padding: 2.5rem; margin:0 auto; box-shadow:var(--shadow-lg); position:relative;">
               {/* Decorative blob behind card for Labs feel */}
               <div style="position:absolute; top:-20px; left:-20px; right:-20px; bottom:-20px; background:var(--pastel-green-light); border-radius:36px; z-index:-1; transform:rotate(-1deg);"></div>
 
