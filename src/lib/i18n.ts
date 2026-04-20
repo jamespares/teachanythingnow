@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import { getCookie } from "hono/cookie";
 
 export type Lang = "en" | "fr" | "zh";
 
@@ -6,8 +7,8 @@ export function detectLang(c: Context): Lang {
   const query = c.req.query("lang");
   if (query === "fr" || query === "zh") return query;
 
-  const cookie = c.req.cookie("lang");
-  if (cookie === "fr" || cookie === "zh") return cookie;
+  const cookie = getCookie(c, "lang");
+  if (cookie === "en" || cookie === "fr" || cookie === "zh") return cookie;
 
   const accept = c.req.header("accept-language") || "";
   if (accept.includes("zh")) return "zh";
@@ -163,19 +164,19 @@ const en = {
   termsSection3Title: "3. Payments & Pricing",
   termsSection3Body: "Our service is charged at £1.00 (one British pound) per lesson package. Payments are processed securely via Stripe. All prices include VAT where applicable. You agree to provide accurate and complete payment information. We reserve the right to change pricing at any time, but any price changes will not affect purchases already completed.",
   termsSection4Title: "4. Refund Policy",
-  termsSection4_1: 'Due to the instant, automated, and digital nature of our service — lesson packages are generated immediately upon payment and cannot be "returned" — all purchases are final. By completing your payment, you acknowledge that you lose your statutory right to cancel under the Consumer Contracts Regulations 2013 once the generation process has begun.',
-  termsSection4_2: "We will issue a refund only in the following limited circumstances:",
+  termsSection4_1: '4.1 Due to the instant, automated, and digital nature of our service — lesson packages are generated immediately upon payment and cannot be "returned" — all purchases are final. By completing your payment, you acknowledge that you lose your statutory right to cancel under the Consumer Contracts Regulations 2013 once the generation process has begun.',
+  termsSection4_2: "4.2 We will issue a refund only in the following limited circumstances:",
   termsSection4_2_list1: "A technical failure on our side prevented the lesson package from being generated or delivered.",
   termsSection4_2_list2: "You were charged in error (e.g., duplicate charge or incorrect amount).",
   termsSection4_2_list3: "You did not receive any downloadable files after a successful payment due to a system malfunction attributable to us.",
-  termsSection4_3: "Refunds will not be granted for:",
+  termsSection4_3: "4.3 Refunds will not be granted for:",
   termsSection4_3_list1: "Dissatisfaction with the content, quality, or subject matter of the generated materials.",
   termsSection4_3_list2: "Change of mind after the lesson package has been generated.",
   termsSection4_3_list3: "Errors in the topic or instructions you provided.",
   termsSection4_3_list4: "Incompatibility with your software, device, or teaching environment.",
   termsSection4_3_list5: "Failure to download files within a reasonable time.",
-  termsSection4_4: "To request a refund, you must contact us within 14 days of your purchase at support@teachanythingnow.com with your payment confirmation and a description of the issue. We will review your request within 5 business days. If approved, refunds will be issued to the original payment method within 10 business days. We reserve the right to deny refund requests that do not meet the eligible criteria above.",
-  termsSection4_5: "Initiating a chargeback with your bank or payment provider without first contacting us to resolve the issue may result in the suspension or termination of your account. We reserve the right to dispute fraudulent chargebacks and provide evidence of service delivery to the payment processor.",
+  termsSection4_4: "4.4 To request a refund, you must contact us within 14 days of your purchase at support@teachanythingnow.com with your payment confirmation and a description of the issue. We will review your request within 5 business days. If approved, refunds will be issued to the original payment method within 10 business days. We reserve the right to deny refund requests that do not meet the eligible criteria above.",
+  termsSection4_5: "4.5 Initiating a chargeback with your bank or payment provider without first contacting us to resolve the issue may result in the suspension or termination of your account. We reserve the right to dispute fraudulent chargebacks and provide evidence of service delivery to the payment processor.",
   termsSection5Title: "5. Intellectual Property",
   termsSection5Body: "All intellectual property rights in the Teach Anything Now platform, software, and branding belong to EduConnect Asia Ltd. Upon successful payment and generation, you are granted a non-exclusive, perpetual, royalty-free licence to use the lesson package content for your personal or institutional teaching purposes. You may not resell, redistribute, or commercially exploit the generated materials outside of your direct teaching activities without our prior written consent.",
   termsSection6Title: "6. User Accounts",
@@ -355,19 +356,19 @@ const fr: Record<keyof typeof en, string> = {
   termsSection3Title: "3. Paiements et tarification",
   termsSection3Body: "Notre service est facturé à £1,00 (un livre sterling) par package de cours. Les paiements sont traités en toute sécurité via Stripe. Tous les prix incluent la TVA le cas échéant. Vous acceptez de fournir des informations de paiement exactes et complètes. Nous nous réservons le droit de modifier les tarifs à tout moment, mais tout changement de prix n'affectera pas les achats déjà effectués.",
   termsSection4Title: "4. Politique de remboursement",
-  termsSection4_1: 'En raison de la nature instantanée, automatisée et numérique de notre service — les packages de cours sont générés immédiatement après le paiement et ne peuvent pas être « retournés » — tous les achats sont définitifs. En effectuant votre paiement, vous reconnaissez perdre votre droit légal d\'annulation en vertu des Consumer Contracts Regulations 2013 une fois le processus de génération commencé.',
-  termsSection4_2: "Nous émettrons un remboursement uniquement dans les circonstances limitées suivantes :",
+  termsSection4_1: '4.1 En raison de la nature instantanée, automatisée et numérique de notre service — les packages de cours sont générés immédiatement après le paiement et ne peuvent pas être « retournés » — tous les achats sont définitifs. En effectuant votre paiement, vous reconnaissez perdre votre droit légal d\'annulation en vertu des Consumer Contracts Regulations 2013 une fois le processus de génération commencé.',
+  termsSection4_2: "4.2 Nous émettrons un remboursement uniquement dans les circonstances limitées suivantes :",
   termsSection4_2_list1: "Une défaillance technique de notre côté a empêché la génération ou la livraison du package de cours.",
   termsSection4_2_list2: "Vous avez été facturé par erreur (par exemple, double facturation ou montant incorrect).",
-  termsSection4_2_list3: "Vous n'avez reçu aucun fichier téléchargeable après un paiement réussi en raison d'un dysfonctionnement système imputable à nous.",
-  termsSection4_3: "Les remboursements ne seront pas accordés pour :",
-  termsSection4_3_list1: "L'insatisfaction concernant le contenu, la qualité ou le sujet des supports générés.",
-  termsSection4_3_list2: "Un changement d'avis après la génération du package de cours.",
+  termsSection4_2_list3: "Vous n’avez reçu aucun fichier téléchargeable après un paiement réussi en raison d’un dysfonctionnement système imputable à nous.",
+  termsSection4_3: "4.3 Les remboursements ne seront pas accordés pour :",
+  termsSection4_3_list1: "L’insatisfaction concernant le contenu, la qualité ou le sujet des supports générés.",
+  termsSection4_3_list2: "Un changement d’avis après la génération du package de cours.",
   termsSection4_3_list3: "Des erreurs dans le sujet ou les instructions que vous avez fournis.",
-  termsSection4_3_list4: "L'incompatibilité avec votre logiciel, appareil ou environnement d'enseignement.",
-  termsSection4_3_list5: "L'échec de téléchargement des fichiers dans un délai raisonnable.",
-  termsSection4_4: "Pour demander un remboursement, vous devez nous contacter dans les 14 jours suivant votre achat à support@teachanythingnow.com avec votre confirmation de paiement et une description du problème. Nous examinerons votre demande dans un délai de 5 jours ouvrables. Si elle est approuvée, les remboursements seront émis sur le mode de paiement d'origine dans un délai de 10 jours ouvrables. Nous nous réservons le droit de refuser les demandes de remboursement qui ne répondent pas aux critères éligibles ci-dessus.",
-  termsSection4_5: "L'initiation d'une rétrofacturation auprès de votre banque ou fournisseur de paiement sans nous avoir d'abord contactés pour résoudre le problème peut entraîner la suspension ou la résiliation de votre compte. Nous nous réservons le droit de contester les rétrofacturations frauduleuses et de fournir des preuves de livraison du service au processeur de paiement.",
+  termsSection4_3_list4: "L’incompatibilité avec votre logiciel, appareil ou environnement d’enseignement.",
+  termsSection4_3_list5: "L’échec de téléchargement des fichiers dans un délai raisonnable.",
+  termsSection4_4: "4.4 Pour demander un remboursement, vous devez nous contacter dans les 14 jours suivant votre achat à support@teachanythingnow.com avec votre confirmation de paiement et une description du problème. Nous examinerons votre demande dans un délai de 5 jours ouvrables. Si elle est approuvée, les remboursements seront émis sur le mode de paiement d’origine dans un délai de 10 jours ouvrables. Nous nous réservons le droit de refuser les demandes de remboursement qui ne répondent pas aux critères éligibles ci-dessus.",
+  termsSection4_5: "4.5 L’initiation d’une rétrofacturation auprès de votre banque ou fournisseur de paiement sans nous avoir d’abord contactés pour résoudre le problème peut entraîner la suspension ou la résiliation de votre compte. Nous nous réservons le droit de contester les rétrofacturations frauduleuses et de fournir des preuves de livraison du service au processeur de paiement.",
   termsSection5Title: "5. Propriété intellectuelle",
   termsSection5Body: "Tous les droits de propriété intellectuelle sur la plateforme Teach Anything Now, les logiciels et l'image de marque appartiennent à EduConnect Asia Ltd. Après paiement et génération réussis, vous obtenez une licence non exclusive, perpétuelle et libre de redevances pour utiliser le contenu du package de cours à des fins d'enseignement personnel ou institutionnel. Vous ne pouvez pas revendre, redistribuer ou exploiter commercialement les supports générés en dehors de vos activités d'enseignement direct sans notre consentement écrit préalable.",
   termsSection6Title: "6. Comptes utilisateurs",
@@ -545,19 +546,19 @@ const zh: Record<keyof typeof en, string> = {
   termsSection3Title: "三、支付与定价",
   termsSection3Body: "我们的服务按每个课程包1.00英镑收费。付款通过Stripe安全处理。所有价格在适用情况下均包含增值税。您同意提供准确完整的付款信息。我们保留随时更改价格的权利，但任何价格变动不会影响已完成的购买。",
   termsSection4Title: "四、退款政策",
-  termsSection4_1: '由于我们服务的即时性、自动化和数字化性质——课程包在付款后立即生成，无法"退货"——所有购买均为最终交易。完成付款即表示您承认，一旦生成过程开始，您将丧失根据《2013年消费者合同条例》享有的法定取消权。',
-  termsSection4_2: "我们仅在以下有限情况下发放退款：",
+  termsSection4_1: '4.1 由于我们服务的即时性、自动化和数字化性质——课程包在付款后立即生成，无法"退货"——所有购买均为最终交易。完成付款即表示您承认，一旦生成过程开始，您将丧失根据《2013年消费者合同条例》享有的法定取消权。',
+  termsSection4_2: "4.2 我们仅在以下有限情况下发放退款：",
   termsSection4_2_list1: "我们的技术故障阻止了课程包的生成或交付。",
   termsSection4_2_list2: "您被错误收费（例如重复扣款或金额错误）。",
   termsSection4_2_list3: "由于可归因于我们的系统故障，您在付款成功后未收到任何可下载文件。",
-  termsSection4_3: "以下情况不予退款：",
+  termsSection4_3: "4.3 以下情况不予退款：",
   termsSection4_3_list1: "对生成材料的内容、质量或主题不满意。",
   termsSection4_3_list2: "课程包生成后改变主意。",
   termsSection4_3_list3: "您提供的主题或说明有误。",
   termsSection4_3_list4: "与您的软件、设备或教学环境不兼容。",
   termsSection4_3_list5: "未在合理时间内下载文件。",
-  termsSection4_4: "如需申请退款，您必须在购买后14天内通过support@teachanythingnow.com联系我们，提供付款确认和问题描述。我们将在5个工作日内审核您的申请。如获批准，退款将在10个工作日内退回原付款方式。我们保留拒绝不符合上述条件的退款申请的权利。",
-  termsSection4_5: "在未先联系我们解决问题的情况下，向您的银行或付款提供商发起拒付可能会导致您的账户被暂停或终止。我们保留对欺诈性拒付提出异议并向付款处理商提供服务交付证据的权利。",
+  termsSection4_4: "4.4 如需申请退款，您必须在购买后14天内通过support@teachanythingnow.com联系我们，提供付款确认和问题描述。我们将在5个工作日内审核您的申请。如获批准，退款将在10个工作日内退回原付款方式。我们保留拒绝不符合上述条件的退款申请的权利。",
+  termsSection4_5: "4.5 在未先联系我们解决问题的情况下，向您的银行或付款提供商发起拒付可能会导致您的账户被暂停或终止。我们保留对欺诈性拒付提出异议并向付款处理商提供服务交付证据的权利。",
   termsSection5Title: "五、知识产权",
   termsSection5Body: "Teach Anything Now平台、软件和品牌中的所有知识产权均属于EduConnect Asia Ltd。成功付款和生成后，您获得非排他性、永久、免版税的许可，可将课程包内容用于个人或机构教学目的。未经我们事先书面同意，您不得在教学活动之外转售、再分发或商业利用生成的材料。",
   termsSection6Title: "六、用户账户",
@@ -600,7 +601,7 @@ const zh: Record<keyof typeof en, string> = {
    ─────────────────────────────────────────────────────────── */
 const dicts: Record<Lang, Record<keyof typeof en, string>> = { en, fr, zh };
 
-export type Dict = typeof en;
+export type Dict = Record<keyof typeof en, string>;
 
 export function getDict(lang: Lang): Dict {
   return dicts[lang] ?? dicts.en;

@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { getAuth } from "./lib/auth";
 import { getDb } from "./lib/db";
 import { detectLang, getDict, t } from "./lib/i18n";
+import { setCookie } from "hono/cookie";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
@@ -44,11 +45,18 @@ app.use("*", async (c, next) => {
   await next();
 });
 
-// Persist language preference when ?lang= is present
+// Persist language preference when ?lang= is present (UI routes only)
 app.use("*", async (c, next) => {
+  const path = c.req.path;
+  if (path.startsWith("/api/")) return await next();
+
   const queryLang = c.req.query("lang");
   if (queryLang === "en" || queryLang === "fr" || queryLang === "zh") {
-    c.header("Set-Cookie", `lang=${queryLang}; Path=/; Max-Age=31536000; SameSite=Lax`);
+    setCookie(c, "lang", queryLang, {
+      path: "/",
+      maxAge: 31536000,
+      sameSite: "Lax",
+    });
   }
   await next();
 });
@@ -61,25 +69,25 @@ app.get("/", async (c) => {
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   const lang = detectLang(c);
   const dict = getDict(lang);
-  return c.html(Home({ user: session?.user, stripeKey: c.env.STRIPE_PUBLISHABLE_KEY, lang, dict }));
+  return c.html(Home({ user: session?.user, stripeKey: c.env.STRIPE_PUBLISHABLE_KEY, lang, dict }) as any);
 });
 
 app.get("/login", (c) => {
   const lang = detectLang(c);
   const dict = getDict(lang);
-  return c.html(Auth({ lang, dict }));
+  return c.html(Auth({ lang, dict }) as any);
 });
 
 app.get("/reset-password", (c) => {
   const lang = detectLang(c);
   const dict = getDict(lang);
-  return c.html(ResetPassword({ lang, dict }));
+  return c.html(ResetPassword({ lang, dict }) as any);
 });
 
 app.get("/terms", (c) => {
   const lang = detectLang(c);
   const dict = getDict(lang);
-  return c.html(Terms({ lang, dict }));
+  return c.html(Terms({ lang, dict }) as any);
 });
 
 app.get("/dashboard", async (c) => {
@@ -97,7 +105,7 @@ app.get("/dashboard", async (c) => {
 
   const lang = detectLang(c);
   const dict = getDict(lang);
-  return c.html(Dashboard({ user: session.user, packages: userPackages, lang, dict }));
+  return c.html(Dashboard({ user: session.user, packages: userPackages, lang, dict }) as any);
 });
 
 // --- Auth Routes ---

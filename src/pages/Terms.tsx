@@ -51,10 +51,10 @@ export const Terms: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
               <section>
                 <h2 style="font-size:1.25rem; margin-bottom:0.75rem;">{dict.termsSection4Title}</h2>
                 <p class="text-secondary" style="line-height:1.7; margin-bottom:0.75rem;">
-                  <strong>4.1</strong> {dict.termsSection4_1}
+                  {dict.termsSection4_1}
                 </p>
                 <p class="text-secondary" style="line-height:1.7; margin-bottom:0.75rem;">
-                  <strong>4.2</strong> {dict.termsSection4_2}
+                  {dict.termsSection4_2}
                 </p>
                 <ul class="text-secondary" style="line-height:1.7; padding-left:1.5rem; margin-bottom:0.75rem;">
                   <li>{dict.termsSection4_2_list1}</li>
@@ -62,7 +62,7 @@ export const Terms: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
                   <li>{dict.termsSection4_2_list3}</li>
                 </ul>
                 <p class="text-secondary" style="line-height:1.7; margin-bottom:0.75rem;">
-                  <strong>4.3</strong> {dict.termsSection4_3}
+                  {dict.termsSection4_3}
                 </p>
                 <ul class="text-secondary" style="line-height:1.7; padding-left:1.5rem; margin-bottom:0.75rem;">
                   <li>{dict.termsSection4_3_list1}</li>
@@ -72,10 +72,10 @@ export const Terms: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
                   <li>{dict.termsSection4_3_list5}</li>
                 </ul>
                 <p class="text-secondary" style="line-height:1.7; margin-bottom:0.75rem;">
-                  <strong>4.4</strong> {dict.termsSection4_4}
+                  {dict.termsSection4_4}
                 </p>
                 <p class="text-secondary" style="line-height:1.7;">
-                  <strong>4.5</strong> {dict.termsSection4_5}
+                  {dict.termsSection4_5}
                 </p>
               </section>
 

@@ -1,7 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { getDb } from "./db";
-import { EmailMessage } from "cloudflare:email";
 
 export function getAuth(db: ReturnType<typeof getDb>, env: { BETTER_AUTH_SECRET: string; BETTER_AUTH_URL: string; SEND_EMAIL?: SendEmail }) {
   return betterAuth({
@@ -14,6 +13,15 @@ export function getAuth(db: ReturnType<typeof getDb>, env: { BETTER_AUTH_SECRET:
       sendResetPassword: async ({ user, url }, request) => {
         if (!env.SEND_EMAIL) {
           console.warn("SEND_EMAIL binding is missing. Cannot send reset password email.");
+          return;
+        }
+
+        let EmailMessage: any;
+        try {
+          const mod = await import("cloudflare:email");
+          EmailMessage = mod.EmailMessage;
+        } catch {
+          console.warn("cloudflare:email module not available. Cannot send reset password email.");
           return;
         }
 
