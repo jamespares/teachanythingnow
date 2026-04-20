@@ -88,7 +88,7 @@ export async function generateImages(
           );
 
           if (response.ok) {
-            const data = await response.json();
+            const data = await response.json() as any;
             // Check for inline image data
             const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
             
