@@ -26,7 +26,8 @@ export async function generateImages(
   topic: string,
   slides: Array<{ title: string; content: string[] }>,
   apiKey: string,
-  openaiApiKey: string
+  openaiApiKey: string,
+  gatewayUrl?: string
 ): Promise<ImageGenerationResult> {
   const geminiApiKey = getGeminiApiKey(apiKey);
   
@@ -39,7 +40,7 @@ export async function generateImages(
 
   try {
     // Generate prompts for image generation based on the topic and ALL slides for consistency
-    const imagePrompts = await generateImagePrompts(topic, slides, openaiApiKey);
+    const imagePrompts = await generateImagePrompts(topic, slides, openaiApiKey, gatewayUrl);
     
     const images: Array<{ url: string; description: string }> = [];
     
@@ -53,96 +54,64 @@ export async function generateImages(
         // Also ensure hyper-realistic, photorealistic style (not animated/cartoon)
         const enhancedPrompt = `${prompt.prompt} ABSOLUTELY NO animated style, NO cartoon style, NO illustration style, NO artistic filters. Must be photorealistic and hyper-realistic only.`;
         
-        // Use Google Gemini Nano Banana for image generation
-        // Try Banana.dev API first (if using Banana.dev hosting)
+        const googleBaseUrl = gatewayUrl ? `${gatewayUrl}/google-ai-studio` : 'https://generativelanguage.googleapis.com';
         let response;
         let imageUrl: string | null = null;
-        
+
         try {
-          // Try Banana.dev endpoint first
+          // Try gemini-2.5-flash-image first (supports image generation)
           response = await fetch(
-            `https://api.banana.dev/v1/models/gemini-2.5-flash-image-preview/generate`,
+            `${googleBaseUrl}/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`,
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${apiKey}`,
               },
               body: JSON.stringify({
-                prompt: enhancedPrompt,
-                num_outputs: 1,
-                width: 1024,
-                height: 1024,
+                contents: [{
+                  parts: [{
+                    text: enhancedPrompt
+                  }]
+                }],
+                generationConfig: {
+                  temperature: 0.7,
+                  responseModalities: ["IMAGE"],
+                }
               }),
             }
           );
 
           if (response.ok) {
             const data = await response.json();
-            imageUrl = data.images?.[0]?.url || data.image_url || data.url;
-            console.log(`Generated via Banana.dev API`);
-          }
-        } catch (bananaError) {
-          console.log(`Banana.dev API failed, trying Google Gemini API directly...`);
-        }
-
-        // If Banana.dev didn't work, try Google Gemini API directly
-        // Use gemini-2.5-flash-image which supports image generation
-        if (!imageUrl) {
-          try {
-            // Try gemini-2.5-flash-image first (supports image generation)
-            response = await fetch(
-              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  contents: [{
-                    parts: [{
-                      text: enhancedPrompt
-                    }]
-                  }],
-                  generationConfig: {
-                    temperature: 0.7,
-                    responseModalities: ["IMAGE"],
-                  }
-                }),
-              }
-            );
-
-            if (response.ok) {
-              const data = await response.json();
-              // Check for inline image data
-              const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-              
-              if (imageData) {
-                // Convert base64 to data URL
-                imageUrl = `data:image/png;base64,${imageData}`;
-                console.log(`Generated via Google Gemini 2.5 Flash Image API`);
-              } else {
-                // Try alternative response structure
-                const alternativeImageData = data.candidates?.[0]?.content?.parts?.find((part: any) => part.inlineData?.data)?.inlineData?.data;
-                if (alternativeImageData) {
-                  imageUrl = `data:image/png;base64,${alternativeImageData}`;
-                  console.log(`Generated via Google Gemini 2.5 Flash Image API (alternative structure)`);
-                } else {
-                  console.warn(`No image data found in Gemini response:`, JSON.stringify(data).substring(0, 500));
-                }
-              }
+            // Check for inline image data
+            const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+            
+            if (imageData) {
+              // Convert base64 to data URL
+              imageUrl = `data:image/png;base64,${imageData}`;
+              console.log(`Generated via Google Gemini 2.5 Flash Image API`);
             } else {
-              const errorText = await response.text();
-              console.error(`Gemini API error: ${response.status} - ${errorText}`);
-              
-              // Try imagen-4.0 as fallback
-              if (response.status === 400) {
-                console.log(`Trying imagen-4.0 as fallback...`);
-                try {
-                  const imagenResponse = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0:generateContent?key=${apiKey}`,
-                    {
-                      method: "POST",
+              // Try alternative response structure
+              const alternativeImageData = data.candidates?.[0]?.content?.parts?.find((part: any) => part.inlineData?.data)?.inlineData?.data;
+              if (alternativeImageData) {
+                imageUrl = `data:image/png;base64,${alternativeImageData}`;
+                console.log(`Generated via Google Gemini 2.5 Flash Image API (alternative structure)`);
+              } else {
+                console.warn(`No image data found in Gemini response:`, JSON.stringify(data).substring(0, 500));
+              }
+            }
+          } else {
+            const errorText = await response.text();
+            console.error(`Gemini API error: ${response.status} - ${errorText}`);
+            
+            // Try imagen-4.0 as fallback
+            if (response.status === 400) {
+              console.log(`Trying imagen-4.0 as fallback...`);
+              try {
+                const imagenResponse = await fetch(
+                  `${googleBaseUrl}/v1beta/models/imagen-4.0:generateContent?key=${apiKey}`,
+                  {
+                    method: "POST",
                       headers: {
                         "Content-Type": "application/json",
                       },
@@ -267,10 +236,11 @@ export async function downloadImages(
 async function generateImagePrompts(
   topic: string,
   slides: Array<{ title: string; content: string[] }>,
-  openaiApiKey: string
+  openaiApiKey: string,
+  gatewayUrl?: string
 ): Promise<Array<{ prompt: string; description: string }>> {
   // Use OpenAI to identify 3 specific key subjects (events, people, or places)
-  const openai = getOpenAIClient(openaiApiKey);
+  const openai = getOpenAIClient(openaiApiKey, gatewayUrl);
   
   if (openai) {
     try {
@@ -357,12 +327,12 @@ Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
 }
 
 // Helper function to get OpenAI client (same pattern as content-generator.ts)
-function getOpenAIClient(apiKey: string): OpenAI | null {
+function getOpenAIClient(apiKey: string, gatewayUrl?: string): OpenAI | null {
   if (!apiKey) {
     return null;
   }
   return new OpenAI({
-    baseURL: 'https://api.deepseek.com',
+    baseURL: gatewayUrl ? `${gatewayUrl}/deepseek` : 'https://api.deepseek.com',
     apiKey: apiKey,
     timeout: 60000,
     maxRetries: 2,
