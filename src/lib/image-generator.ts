@@ -133,7 +133,7 @@ export async function generateImages(
                   );
                   
                   if (imagenResponse.ok) {
-                    const imagenData = await imagenResponse.json();
+                    const imagenData = await imagenResponse.json() as any;
                     const imagenImageData = imagenData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
                     if (imagenImageData) {
                       imageUrl = `data:image/png;base64,${imagenImageData}`;
