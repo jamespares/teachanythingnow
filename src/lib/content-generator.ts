@@ -98,6 +98,7 @@ async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel
     return generateSlides(topic);
   }
 
+  try {
     const isOpenAI = apiKey.startsWith("sk-proj-");
     const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
 
