@@ -148,7 +148,6 @@ export async function generateImages(
           } catch (geminiError: any) {
             console.error(`Error calling Gemini API:`, geminiError?.message || geminiError);
           }
-        }
 
         if (imageUrl) {
           images.push({
