@@ -27,7 +27,8 @@ export async function generateImages(
   slides: Array<{ title: string; content: string[] }>,
   apiKey: string,
   openaiApiKey: string,
-  gatewayUrl?: string
+  gatewayUrl?: string,
+  gatewayToken?: string
 ): Promise<ImageGenerationResult> {
   const geminiApiKey = getGeminiApiKey(apiKey);
   
@@ -40,7 +41,7 @@ export async function generateImages(
 
   try {
     // Generate prompts for image generation based on the topic and ALL slides for consistency
-    const imagePrompts = await generateImagePrompts(topic, slides, openaiApiKey, gatewayUrl);
+    const imagePrompts = await generateImagePrompts(topic, slides, openaiApiKey, gatewayUrl, gatewayToken);
     
     const images: Array<{ url: string; description: string }> = [];
     
@@ -57,6 +58,13 @@ export async function generateImages(
         const googleBaseUrl = gatewayUrl ? `${gatewayUrl}/google-ai-studio` : 'https://generativelanguage.googleapis.com';
         let response;
         let imageUrl: string | null = null;
+        
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (gatewayToken) {
+          headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
+        }
 
         try {
           // Try gemini-2.5-flash-image first (supports image generation)
@@ -64,9 +72,7 @@ export async function generateImages(
             `${googleBaseUrl}/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`,
             {
               method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
+              headers,
               body: JSON.stringify({
                 contents: [{
                   parts: [{
@@ -108,13 +114,11 @@ export async function generateImages(
             if (response.status === 400) {
               console.log(`Trying imagen-4.0 as fallback...`);
               try {
-                const imagenResponse = await fetch(
-                  `${googleBaseUrl}/v1beta/models/imagen-4.0:generateContent?key=${apiKey}`,
-                  {
-                    method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
+                  const imagenResponse = await fetch(
+                    `${googleBaseUrl}/v1beta/models/imagen-4.0:generateContent?key=${apiKey}`,
+                    {
+                      method: "POST",
+                      headers,
                       body: JSON.stringify({
                         contents: [{
                           parts: [{
@@ -237,10 +241,11 @@ async function generateImagePrompts(
   topic: string,
   slides: Array<{ title: string; content: string[] }>,
   openaiApiKey: string,
-  gatewayUrl?: string
+  gatewayUrl?: string,
+  gatewayToken?: string
 ): Promise<Array<{ prompt: string; description: string }>> {
   // Use OpenAI to identify 3 specific key subjects (events, people, or places)
-  const openai = getOpenAIClient(openaiApiKey, gatewayUrl);
+  const openai = getOpenAIClient(openaiApiKey, gatewayUrl, gatewayToken);
   
   if (openai) {
     try {
@@ -327,15 +332,22 @@ Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
 }
 
 // Helper function to get OpenAI client (same pattern as content-generator.ts)
-function getOpenAIClient(apiKey: string, gatewayUrl?: string): OpenAI | null {
+function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: string): OpenAI | null {
   if (!apiKey) {
     return null;
   }
+  
+  const headers: Record<string, string> = {};
+  if (gatewayToken) {
+    headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
+  }
+
   return new OpenAI({
     baseURL: gatewayUrl ? `${gatewayUrl}/deepseek` : 'https://api.deepseek.com',
     apiKey: apiKey,
     timeout: 60000,
     maxRetries: 2,
+    defaultHeaders: Object.keys(headers).length > 0 ? headers : undefined,
   });
 }
 

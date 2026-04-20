@@ -6,7 +6,7 @@ export interface AudioResult {
   isAudio: boolean; // Always true - MP3 audio buffer
 }
 
-export async function generateAudio(script: string, topic: string, apiKey: string, gatewayUrl?: string): Promise<AudioResult> {
+export async function generateAudio(script: string, topic: string, apiKey: string, gatewayUrl?: string, gatewayToken?: string): Promise<AudioResult> {
   // Validate that we have a script to convert
   if (!script || script.trim().length === 0) {
     throw new Error("Cannot generate audio: script is empty");
@@ -63,12 +63,18 @@ export async function generateAudio(script: string, topic: string, apiKey: strin
   }
   
   const endpoint = gatewayUrl ? `${gatewayUrl}/openai/v1/audio/speech` : `https://api.openai.com/v1/audio/speech`;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`
+  };
+  
+  if (gatewayToken) {
+    headers['cf-aig-authorization'] = `Bearer ${gatewayToken}`;
+  }
+
   const response = await fetch(endpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
+    headers,
     body: JSON.stringify({
       model: 'tts-1-hd', // Latest high-definition model
       input: cleanedScript,

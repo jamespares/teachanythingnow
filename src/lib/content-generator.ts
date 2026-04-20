@@ -12,15 +12,22 @@ const langMap: Record<Lang, string> = {
 };
 
 // Lazy initialization of OpenAI client to avoid errors when API key is missing
-function getOpenAIClient(apiKey: string, gatewayUrl?: string): OpenAI | null {
+function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: string): OpenAI | null {
   if (!apiKey) {
     return null;
   }
+  
+  const headers: Record<string, string> = {};
+  if (gatewayToken) {
+    headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
+  }
+
   return new OpenAI({
     baseURL: gatewayUrl ? `${gatewayUrl}/deepseek` : 'https://api.deepseek.com',
     apiKey: apiKey,
     timeout: 60000,
     maxRetries: 2,
+    defaultHeaders: Object.keys(headers).length > 0 ? headers : undefined,
   });
 }
 
@@ -41,16 +48,16 @@ export interface GeneratedContent {
   };
 }
 
-export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang = "en", gatewayUrl?: string): Promise<GeneratedContent> {
+export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang = "en", gatewayUrl?: string, gatewayToken?: string): Promise<GeneratedContent> {
   try {
     // Generate slides using AI - this is the foundation for all other content
-    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, targetLang, gatewayUrl);
+    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, targetLang, gatewayUrl, gatewayToken);
     
     // Generate podcast script - uses slides for consistency
-    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl);
+    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken);
     
     // Generate worksheet questions - uses slides for consistency
-    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl);
+    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken);
 
     return {
       slides,
@@ -72,8 +79,8 @@ export async function generateContent(topic: string, curriculum: string, yearLev
   }
 }
 
-async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang, gatewayUrl?: string): Promise<Array<{ title: string; content: string[] }>> {
-  const openai = getOpenAIClient(apiKey, gatewayUrl);
+async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string): Promise<Array<{ title: string; content: string[] }>> {
+  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
   if (!openai) {
     return generateSlides(topic);
   }
@@ -131,8 +138,8 @@ Make it educational and suitable for teaching.`,
   return generateSlides(topic);
 }
 
-async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string): Promise<string> {
-  const openai = getOpenAIClient(apiKey, gatewayUrl);
+async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string): Promise<string> {
+  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
   if (!openai) {
     return generatePodcastScript(topic, slides);
   }
@@ -192,8 +199,8 @@ ${slideContent}`,
   return generatePodcastScript(topic, slides);
 }
 
-async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
-  const openai = getOpenAIClient(apiKey, gatewayUrl);
+async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
+  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
   if (!openai) {
     return generateWorksheet(topic, slides);
   }
