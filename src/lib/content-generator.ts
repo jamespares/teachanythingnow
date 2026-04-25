@@ -22,17 +22,13 @@ function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: str
     headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
   }
 
-  // Determine if this is an OpenAI key or DeepSeek key
-  // OpenAI project keys start with sk-proj-
-  const isOpenAI = apiKey.startsWith("sk-proj-");
-  
-  let baseURL = isOpenAI ? 'https://api.openai.com/v1' : 'https://api.deepseek.com';
+  let baseURL = 'https://api.openai.com/v1';
   
   // If using Cloudflare AI Gateway, append the provider to the gateway URL
   if (gatewayUrl) {
     // Ensure we don't double-append /v1 or similar if the gatewayUrl already has it
     const cleanGatewayUrl = gatewayUrl.replace(/\/+$/, "");
-    baseURL = isOpenAI ? `${cleanGatewayUrl}/openai` : `${cleanGatewayUrl}/deepseek`;
+    baseURL = `${cleanGatewayUrl}/openai`;
   }
 
   return new OpenAI({
@@ -99,11 +95,8 @@ async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel
   }
 
   try {
-    const isOpenAI = apiKey.startsWith("sk-proj-");
-    const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
-
     const response = await openai.chat.completions.create({
-      model: model, // Dynamic model selection based on provider
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -132,7 +125,7 @@ async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel
 Make it educational and suitable for teaching.`,
         },
       ],
-      temperature: 0.8, // Balanced creativity and consistency
+      temperature: 0.8,
       max_tokens: 3000,
     });
 
@@ -162,11 +155,9 @@ async function generatePodcastScriptWithAI(topic: string, curriculum: string, ye
 
   try {
     const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
-    const isOpenAI = apiKey.startsWith("sk-proj-");
-    const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
 
     const response = await openai.chat.completions.create({
-      model: model, // Dynamic model selection
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -197,8 +188,8 @@ Reference these slides for content:
 ${slideContent}`,
         },
       ],
-      temperature: 0.8, // Creative and engaging
-      max_tokens: 2000, // Limit tokens to ensure script stays under 3800 characters
+      temperature: 0.8,
+      max_tokens: 2000,
     });
 
     const script = response.choices[0]?.message?.content;
@@ -225,11 +216,9 @@ async function generateWorksheetWithAI(topic: string, curriculum: string, yearLe
 
   try {
     const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
-    const isOpenAI = apiKey.startsWith("sk-proj-");
-    const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
 
     const response = await openai.chat.completions.create({
-      model: model, // Dynamic model selection
+      model: "gpt-4o",
       messages: [
         {
           role: "system",
@@ -259,7 +248,7 @@ ${slideContent}
 Provide detailed correct answers. Return valid JSON.`,
         },
       ],
-      temperature: 0.7, // Balanced for quality questions
+      temperature: 0.7,
       max_tokens: 3000,
     });
 
@@ -388,4 +377,3 @@ function generateWorksheet(topic: string, slides: Array<{ title: string; content
     ]
   };
 }
-

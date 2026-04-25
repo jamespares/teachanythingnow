@@ -10,7 +10,7 @@ A Cloudflare-native educational content generation platform. This application al
 - **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
 - **Authentication**: [Better Auth](https://better-auth.com/)
 - **Storage**: [Cloudflare R2](https://developers.cloudflare.com/r2/)
-- **AI Stack**: OpenAI (GPT-4o, TTS-1-HD), Google Gemini (Image Generation)
+- **AI Stack**: OpenAI (GPT-4o, TTS-1-HD, DALL-E 3)
 - **Payments**: Stripe
 
 ## 🛠️ Getting Started
@@ -53,7 +53,6 @@ A Cloudflare-native educational content generation platform. This application al
    ```bash
    npx wrangler secret put STRIPE_SECRET_KEY
    npx wrangler secret put OPENAI_API_KEY
-   npx wrangler secret put GOOGLE_GEMINI_API_KEY
    npx wrangler secret put BETTER_AUTH_SECRET
    ```
 

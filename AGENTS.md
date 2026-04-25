@@ -32,7 +32,7 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.teach
 | Auth | Better Auth v1.1+ (email/password, Drizzle adapter) |
 | Object Storage | Cloudflare R2 — edge object storage |
 | AI / Content | OpenAI GPT-4o, OpenAI TTS-1-HD |
-| Image Generation | Google Gemini / Imagen (via Banana.dev or direct API) |
+| Image Generation | OpenAI DALL-E 3 |
 | Payments | Stripe (Payment Intents + webhooks) |
 | Email | Resend |
 | Language | TypeScript (ES modules, strict mode) |
@@ -55,7 +55,7 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.teach
 │   │   ├── ppt-generator.ts     # PPTX generation via PptxGenJS
 │   │   ├── audio-generator.ts   # MP3 generation via OpenAI TTS
 │   │   ├── worksheet-generator.ts # DOCX worksheet + PDF answer key generation
-│   │   └── image-generator.ts   # Image generation via Google Gemini/Imagen
+│   │   └── image-generator.ts   # Image generation via OpenAI DALL-E 3
 │   └── pages/
 │       ├── Layout.tsx           # Root layout component (HTML shell, CSS, global styles)
 │       ├── Home.tsx             # Landing page with topic input, Stripe payment, generation flow
@@ -173,8 +173,8 @@ npm run lint
 |--------|---------|
 | `STRIPE_SECRET_KEY` | Stripe server-side API key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook endpoint secret |
-| `OPENAI_API_KEY` | OpenAI API for content and audio generation |
-| `GOOGLE_GEMINI_API_KEY` | Google Gemini/Imagen API for image generation |
+
+| `OPENAI_API_KEY` | OpenAI API for content, audio, and image generation |
 | `BETTER_AUTH_SECRET` | Encryption secret for Better Auth sessions/tokens |
 | `RESEND_API_KEY` | Resend API for transactional emails (configured but not actively used in main flow) |
 
@@ -269,7 +269,7 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 ## Security Considerations
 
-1. **Secrets Management:** Live API keys (Stripe, OpenAI, Gemini, Better Auth) are stored in `.dev.vars` for local dev and as Wrangler secrets for production. Never commit `.dev.vars`.
+1. **Secrets Management:** Live API keys (Stripe, OpenAI, Better Auth) are stored in `.dev.vars` for local dev and as Wrangler secrets for production. Never commit `.dev.vars`.
 2. **Stripe Webhooks:** The webhook endpoint (`/api/webhooks/stripe`) validates the Stripe signature using `STRIPE_WEBHOOK_SECRET`. Always verify signatures in production.
 3. **Auth Sessions:** Better Auth sessions are cookie-based and encrypted with `BETTER_AUTH_SECRET`. The `baseURL` must match the deployed domain.
 4. **File Downloads:** The `/api/download` endpoint does not enforce authentication — anyone with the filename can download. Files in R2 should ideally be non-listable, and filenames contain random IDs for obscurity.
@@ -337,7 +337,7 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
   ```bash
   stripe listen --forward-to localhost:8787/api/webhooks/stripe
   ```
-- **OpenAI/Gemini timeouts:** The OpenAI client is configured with a 60s–120s timeout. In Wrangler dev, Workers have a 50ms CPU limit in the free tier but longer wall-clock time for I/O. For long generations, monitor for 524/1101 errors.
+- **OpenAI timeouts:** The OpenAI client is configured with a 60s–120s timeout. In Wrangler dev, Workers have a 50ms CPU limit in the free tier but longer wall-clock time for I/O. For long generations, monitor for 524/1101 errors.
 
 ---
 

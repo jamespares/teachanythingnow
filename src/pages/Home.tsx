@@ -58,9 +58,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
               <div style="margin-top:2.5rem; display:flex; flex-direction:column; align-items:center; gap:0.75rem;">
                 <p class="text-xs font-semibold" style="text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted);">{dict.homePoweredBy}</p>
                 <div style="display:flex; align-items:center; gap:2.5rem; mix-blend-mode:multiply; filter:grayscale(1); opacity:0.6; transition:opacity 0.3s;" onmouseover="this.style.filter='none'; this.style.opacity='1'" onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.6'">
-                  <img src="/gemini.jpg" alt="Gemini" style="height:28px; width:auto;" />
-                  <img src="/claude.png" alt="Claude" style="height:28px; width:auto;" />
-                  <img src="/deepseek.jpg" alt="DeepSeek" style="height:28px; width:auto;" />
+                  <img src="/claude.png" alt="OpenAI" style="height:28px; width:auto;" />
                 </div>
               </div>
             </div>

@@ -1,13 +1,7 @@
-// Image generation utility using Google Gemini Nano Banana
+// Image generation utility using OpenAI DALL-E 3
 // Generates high-quality educational images for presentations and materials
-// Gemini Nano Banana offers fast, efficient image generation
 
 import OpenAI from "openai";
-
-// Lazy initialization to check if API key is available
-function getGeminiApiKey(apiKey: string): string | null {
-  return apiKey || null;
-}
 
 export interface ImageGenerationResult {
   images: Array<{
@@ -19,21 +13,18 @@ export interface ImageGenerationResult {
 
 /**
  * Generates high-quality educational images related to the topic
- * Uses GPT-Image-1.5 for enhanced instruction following and faster generation
+ * Uses OpenAI DALL-E 3 for consistent, high-quality image generation
  * Images are generated to be consistent with the slide content and topic
  */
 export async function generateImages(
   topic: string,
   slides: Array<{ title: string; content: string[] }>,
   apiKey: string,
-  openaiApiKey: string,
   gatewayUrl?: string,
   gatewayToken?: string
 ): Promise<ImageGenerationResult> {
-  const geminiApiKey = getGeminiApiKey(apiKey);
-  
   if (!apiKey) {
-    console.warn("Google Gemini API key not set, skipping image generation");
+    console.warn("OpenAI API key not set, skipping image generation");
     return {
       images: [],
     };
@@ -41,7 +32,7 @@ export async function generateImages(
 
   try {
     // Generate prompts for image generation based on the topic and ALL slides for consistency
-    const imagePrompts = await generateImagePrompts(topic, slides, openaiApiKey, gatewayUrl, gatewayToken);
+    const imagePrompts = await generateImagePrompts(topic, slides, apiKey, gatewayUrl, gatewayToken);
     
     const images: Array<{ url: string; description: string }> = [];
     
@@ -49,118 +40,35 @@ export async function generateImages(
     for (let i = 0; i < Math.min(imagePrompts.length, 3); i++) {
       try {
         const prompt = imagePrompts[i];
-        console.log(`Generating image ${i + 1} with Gemini Nano Banana: ${prompt.prompt.substring(0, 100)}...`);
+        console.log(`Generating image ${i + 1} with DALL-E 3: ${prompt.prompt.substring(0, 100)}...`);
         
-        // The prompt already includes text exclusion, but reinforce it for the API call
-        // Also ensure hyper-realistic, photorealistic style (not animated/cartoon)
-        const enhancedPrompt = `${prompt.prompt} ABSOLUTELY NO animated style, NO cartoon style, NO illustration style, NO artistic filters. Must be photorealistic and hyper-realistic only.`;
-        
-        const googleBaseUrl = gatewayUrl ? `${gatewayUrl}/google-ai-studio` : 'https://generativelanguage.googleapis.com';
-        let response;
-        let imageUrl: string | null = null;
-        
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-        };
-        if (gatewayToken) {
-          headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
+        const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
+        if (!openai) {
+          console.warn("OpenAI client not available, skipping image generation");
+          break;
         }
 
-        try {
-          // Try gemini-2.5-flash-image first (supports image generation)
-          response = await fetch(
-            `${googleBaseUrl}/v1beta/models/gemini-2.5-flash-image:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers,
-              body: JSON.stringify({
-                contents: [{
-                  parts: [{
-                    text: enhancedPrompt
-                  }]
-                }],
-                generationConfig: {
-                  temperature: 0.7,
-                  responseModalities: ["IMAGE"],
-                }
-              }),
-            }
-          );
+        const response = await openai.images.generate({
+          model: "dall-e-3",
+          prompt: prompt.prompt,
+          n: 1,
+          size: "1024x1024",
+          quality: "standard",
+          response_format: "url",
+        });
 
-          if (response.ok) {
-            const data = await response.json() as any;
-            // Check for inline image data
-            const imageData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-            
-            if (imageData) {
-              // Convert base64 to data URL
-              imageUrl = `data:image/png;base64,${imageData}`;
-              console.log(`Generated via Google Gemini 2.5 Flash Image API`);
-            } else {
-              // Try alternative response structure
-              const alternativeImageData = data.candidates?.[0]?.content?.parts?.find((part: any) => part.inlineData?.data)?.inlineData?.data;
-              if (alternativeImageData) {
-                imageUrl = `data:image/png;base64,${alternativeImageData}`;
-                console.log(`Generated via Google Gemini 2.5 Flash Image API (alternative structure)`);
-              } else {
-                console.warn(`No image data found in Gemini response:`, JSON.stringify(data).substring(0, 500));
-              }
-            }
-          } else {
-            const errorText = await response.text();
-            console.error(`Gemini API error: ${response.status} - ${errorText}`);
-            
-            // Try imagen-4.0 as fallback
-            if (response.status === 400) {
-              console.log(`Trying imagen-4.0 as fallback...`);
-              try {
-                  const imagenResponse = await fetch(
-                    `${googleBaseUrl}/v1beta/models/imagen-4.0:generateContent?key=${apiKey}`,
-                    {
-                      method: "POST",
-                      headers,
-                      body: JSON.stringify({
-                        contents: [{
-                          parts: [{
-                            text: enhancedPrompt
-                          }]
-                        }],
-                        generationConfig: {
-                          temperature: 0.7,
-                        }
-                      }),
-                    }
-                  );
-                  
-                  if (imagenResponse.ok) {
-                    const imagenData = await imagenResponse.json() as any;
-                    const imagenImageData = imagenData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-                    if (imagenImageData) {
-                      imageUrl = `data:image/png;base64,${imagenImageData}`;
-                      console.log(`Generated via Imagen 4.0 API`);
-                    }
-                  }
-                } catch (imagenError: any) {
-                  console.error(`Error calling Imagen API:`, imagenError?.message || imagenError);
-                }
-              }
-            }
-          } catch (geminiError: any) {
-            console.error(`Error calling Gemini API:`, geminiError?.message || geminiError);
-          }
-
+        const imageUrl = response.data[0]?.url;
         if (imageUrl) {
           images.push({
             url: imageUrl,
             description: prompt.description,
           });
-          console.log(`Successfully generated image ${i + 1} using Gemini Nano Banana`);
+          console.log(`Successfully generated image ${i + 1} using DALL-E 3`);
         } else {
           console.warn(`Failed to generate image ${i + 1} - no URL returned`);
         }
       } catch (error: any) {
         console.error(`Error generating image ${i + 1}:`, error?.message || error);
-        console.error(`Full error:`, error);
         // Continue with other images even if one fails
       }
     }
@@ -248,12 +156,8 @@ async function generateImagePrompts(
   
   if (openai) {
     try {
-      // First, identify 3 specific key events, people, or places
-      const isOpenAI = openaiApiKey.startsWith("sk-proj-");
-      const model = isOpenAI ? "gpt-4o" : "deepseek-chat";
-
       const identificationResponse = await openai.chat.completions.create({
-        model: model,
+        model: "gpt-4o",
         messages: [
           {
             role: "system",
@@ -287,15 +191,15 @@ Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
               const subjectName = subject.name;
               const subjectType = subject.type;
               
-              // Create hyper-realistic, photorealistic prompts
-              let prompt = `Hyper-realistic, photorealistic photograph of ${subjectName}`;
+              // Create hyper-realistic, photorealistic prompts optimized for DALL-E 3
+              let prompt = `A highly detailed, photorealistic photograph of ${subjectName}`;
               
               if (subjectType === "event") {
-                prompt = `Hyper-realistic, photorealistic photograph capturing the historical moment of ${subjectName}, documentary photography style, high detail, sharp focus, natural lighting, professional photojournalism quality`;
+                prompt = `A highly detailed, photorealistic photograph capturing the historical moment of ${subjectName}, documentary photography style, high detail, sharp focus, natural lighting, professional photojournalism quality`;
               } else if (subjectType === "person") {
-                prompt = `Hyper-realistic, photorealistic portrait photograph of ${subjectName}, professional portrait photography, high detail, sharp focus, natural lighting, authentic and realistic`;
+                prompt = `A highly detailed, photorealistic portrait photograph of ${subjectName}, professional portrait photography, high detail, sharp focus, natural lighting, authentic and realistic`;
               } else if (subjectType === "place") {
-                prompt = `Hyper-realistic, photorealistic landscape photograph of ${subjectName}, professional landscape photography, high detail, sharp focus, natural lighting, wide angle view, authentic and realistic`;
+                prompt = `A highly detailed, photorealistic landscape photograph of ${subjectName}, professional landscape photography, high detail, sharp focus, natural lighting, wide angle view, authentic and realistic`;
               }
               
               // Add style requirements and text exclusion
@@ -319,21 +223,21 @@ Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
   // Still focus on hyper-realistic, single subjects
   return [
     {
-      prompt: `Hyper-realistic, photorealistic photograph related to ${topic}, professional documentary photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
+      prompt: `A highly detailed, photorealistic photograph related to ${topic}, professional documentary photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
       description: `Key subject for ${topic}`,
     },
     {
-      prompt: `Hyper-realistic, photorealistic photograph of an important historical figure or event related to ${topic}, professional portrait or documentary photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
+      prompt: `A highly detailed, photorealistic photograph of an important historical figure or event related to ${topic}, professional portrait or documentary photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
       description: `Historical subject for ${topic}`,
     },
     {
-      prompt: `Hyper-realistic, photorealistic photograph of a significant place or location related to ${topic}, professional landscape or architectural photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
+      prompt: `A highly detailed, photorealistic photograph of a significant place or location related to ${topic}, professional landscape or architectural photography style, high detail, sharp focus, natural lighting, authentic and realistic. Style: photorealistic, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only.`,
       description: `Significant location for ${topic}`,
     },
   ];
 }
 
-// Helper function to get OpenAI client (same pattern as content-generator.ts)
+// Helper function to get OpenAI client
 function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: string): OpenAI | null {
   if (!apiKey) {
     return null;
@@ -344,14 +248,11 @@ function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: str
     headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
   }
 
-  // Determine if this is an OpenAI key or DeepSeek key
-  const isOpenAI = apiKey.startsWith("sk-proj-");
-  
-  let baseURL = isOpenAI ? 'https://api.openai.com/v1' : 'https://api.deepseek.com';
+  let baseURL = 'https://api.openai.com/v1';
   
   if (gatewayUrl) {
     const cleanGatewayUrl = gatewayUrl.replace(/\/+$/, "");
-    baseURL = isOpenAI ? `${cleanGatewayUrl}/openai` : `${cleanGatewayUrl}/deepseek`;
+    baseURL = `${cleanGatewayUrl}/openai`;
   }
 
   return new OpenAI({
@@ -362,4 +263,3 @@ function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: str
     defaultHeaders: Object.keys(headers).length > 0 ? headers : undefined,
   });
 }
-
