@@ -74,7 +74,7 @@ export const Auth: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
                 placeholder={dict.authPlaceholderPassword}
                 class="input"
                 required
-                minlength="8"
+                minlength={8}
               />
             </div>
 

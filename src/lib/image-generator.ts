@@ -57,7 +57,7 @@ export async function generateImages(
           response_format: "url",
         });
 
-        const imageUrl = response.data[0]?.url;
+        const imageUrl = response.data?.[0]?.url;
         if (imageUrl) {
           images.push({
             url: imageUrl,
