@@ -1,41 +1,7 @@
 /* globals.css – plain CSS, no build step required */
 
-/* Self-hosted fonts for China accessibility */
-@font-face {
-  font-family: 'Patrick Hand';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/PatrickHand-Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Quicksand';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/Quicksand-Regular.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Quicksand';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/Quicksand-Medium.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Quicksand';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('/fonts/Quicksand-SemiBold.ttf') format('truetype');
-}
-@font-face {
-  font-family: 'Quicksand';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('/fonts/Quicksand-Bold.ttf') format('truetype');
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lexend:wght@400;500;600;700&family=Patrick+Hand&family=Quicksand:wght@300;400;500;600;700&display=swap');
+
 
 /* Light, accessible design system - Google Labs Inspired */
 :root {
@@ -67,10 +33,12 @@
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.08);
 
-  /* Font stacks - Quicksand for clean geometry, Patrick Hand for accents */
+  /* Font stacks */
   --font-heading: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-accent: 'Patrick Hand', cursive;
   --font-body: 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-footer-heading: 'Lexend', sans-serif;
+  --font-footer-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 * {
@@ -336,6 +304,21 @@ header img[src="/logo.png"] {
   max-width: var(--max-width, 1200px);
   margin: 0 auto;
   width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  transition: all 0.3s ease;
+}
+
+.site-header.nav-scrolled {
+  min-height: auto;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 24px 24px;
 }
 
 .site-nav {
@@ -370,6 +353,11 @@ header img[src="/logo.png"] {
   display: block;
   object-fit: contain;
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.05));
+  transition: height 0.3s ease;
+}
+
+.site-header.nav-scrolled .brand img {
+  height: 50px;
 }
 
 .dash-heading-row {

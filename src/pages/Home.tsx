@@ -25,6 +25,25 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
           </a>
 
           <nav class="site-nav">
+            <div id="lang-toggle" style="display:flex; gap:0.25rem; background:rgba(255,255,255,0.85); backdrop-filter:blur(8px); padding:0.35rem 0.5rem; border-radius:999px; border:1px solid var(--border); margin-right:1rem;">
+              {[
+                { code: "en", label: dict.langToggleEn },
+                { code: "fr", label: dict.langToggleFr },
+                { code: "zh", label: dict.langToggleZh },
+              ].map((l) => (
+                <a
+                  key={l.code}
+                  href="#"
+                  data-lang={l.code}
+                  class="lang-btn"
+                  style={`font-family:var(--font-footer-body, var(--font-body)); font-size:0.85rem; font-weight:500; padding:0.3rem 0.75rem; border-radius:999px; text-decoration:none; transition:all 0.2s; ${lang === l.code ? 'background:var(--primary); color:#fff;' : 'color:var(--text-secondary);'}`}
+                  onmouseenter={`if('${lang}'!=='${l.code}'){this.style.background='rgba(0,0,0,0.05)'; this.style.color='var(--text-primary)';}`}
+                  onmouseleave={`if('${lang}'!=='${l.code}'){this.style.background='transparent'; this.style.color='var(--text-secondary)';}`}
+                >
+                  {l.label}
+                </a>
+              ))}
+            </div>
             {user ? (
               <>
                 <a href="/dashboard" class="text-sm font-semibold" style="color:var(--text-primary); transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-primary)'">{dict.homeNavMyPackages}</a>
@@ -244,9 +263,9 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
         </main>
 
         {/* ── Footer ── */}
-        <footer style="border-top:1px solid var(--border-strong); padding:3rem 1.5rem; text-align:center;">
+        <footer style="border-top:1px solid var(--border-strong); padding:3rem 1.5rem; text-align:center; font-family:var(--font-footer-body);">
           <div style="display:flex; flex-direction:column; align-items:center; gap:1rem;">
-            <p style="font-family:var(--font-heading); font-size:1.1rem; font-weight:600; margin:0;">
+            <p style="font-family:var(--font-footer-heading); font-size:1.1rem; font-weight:600; margin:0;">
               {dict.homeFooterBuiltBy}
             </p>
             <div style="display:flex; align-items:center; gap:1.25rem;">
@@ -259,10 +278,14 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
               <a href="https://github.com/jamespares" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary); hover:color:var(--primary); transition:color 0.2s;" aria-label="GitHub">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
               </a>
+            {/* Legal */}
+            <div style="display:flex; align-items:center; gap:1rem; font-size:0.9rem; color:var(--text-muted);">
+              <a href="/terms" style="color:inherit; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">{dict.homeFooterTermsLink}</a>
+              <span>·</span>
+              <a href="/privacy" style="color:inherit; text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'">{dict.homeFooterPrivacyLink}</a>
             </div>
+
             <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">{dict.homeFooterWebsite}</a>
-            <span style="font-size:0.8rem; color:var(--text-muted);">·</span>
-            <a href="https://thedalfdojo.com" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">The DALF Dojo</a>
           </div>
         </footer>
       </div>

@@ -16,26 +16,7 @@ export const Layout: FC<PropsWithChildren<{ title?: string; lang: Lang; dict: Di
         `}</style>
       </head>
       <body>
-        {/* Language toggle — fixed top-right */}
-        <div id="lang-toggle" style="position:fixed; top:1rem; right:1rem; z-index:100; display:flex; gap:0.25rem; background:rgba(255,255,255,0.85); backdrop-filter:blur(8px); padding:0.35rem 0.5rem; border-radius:999px; box-shadow:var(--shadow-sm); border:1px solid var(--border);">
-          {[
-            { code: "en", label: dict.langToggleEn },
-            { code: "fr", label: dict.langToggleFr },
-            { code: "zh", label: dict.langToggleZh },
-          ].map((l) => (
-            <a
-              key={l.code}
-              href="#"
-              data-lang={l.code}
-              class="lang-btn"
-              style={`font-size:0.8rem; font-weight:600; padding:0.25rem 0.6rem; border-radius:999px; text-decoration:none; transition:all 0.2s; ${lang === l.code ? 'background:var(--primary); color:#fff;' : 'color:var(--text-secondary);'}`}
-              onmouseenter={`if('${lang}'!=='${l.code}')this.style.background='var(--pastel-green)'`}
-              onmouseleave={`if('${lang}'!=='${l.code}')this.style.background='transparent'`}
-            >
-              {l.label}
-            </a>
-          ))}
-        </div>
+
         <script dangerouslySetInnerHTML={{ __html: `
           document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -44,6 +25,14 @@ export const Layout: FC<PropsWithChildren<{ title?: string; lang: Lang; dict: Di
               u.searchParams.set('lang', btn.getAttribute('data-lang'));
               location.href = u.toString();
             });
+          });
+          
+          window.addEventListener('scroll', () => {
+            const header = document.querySelector('.site-header');
+            if (header) {
+              if (window.scrollY > 50) header.classList.add('nav-scrolled');
+              else header.classList.remove('nav-scrolled');
+            }
           });
         `}} />
 

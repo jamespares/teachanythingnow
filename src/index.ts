@@ -85,7 +85,9 @@ app.get("/reset-password", (c) => {
 });
 
 app.get("/terms", (c) => {
-  return c.redirect("https://jamespares.me/terms/");
+  const lang = detectLang(c);
+  const dict = getDict(lang);
+  return c.html(Terms({ lang, dict }) as any);
 });
 
 app.get("/privacy", (c) => {
