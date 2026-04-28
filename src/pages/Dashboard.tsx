@@ -23,7 +23,7 @@ export const Dashboard: FC<{ user: any; packages: any[]; lang: Lang; dict: Dict 
         {/* Main */}
         <main class="site-main">
           <div class="dash-heading-row">
-            <h2 style="font-size:2rem; letter-spacing:-0.03em;">{dict.dashHeading}</h2>
+            <h2 style="font-family:var(--font-accent); font-size:2rem; letter-spacing:-0.03em; font-weight:400;">{dict.dashHeading}</h2>
           </div>
 
           {packages.length === 0 ? (

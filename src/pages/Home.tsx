@@ -49,7 +49,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
         <main style="flex:1;">
           <section class="site-main--narrow" style="padding-top:4rem; padding-bottom:2rem; text-align:center;">
             <div class="hero-text">
-              <h1 class="hero-title" style="font-size:clamp(2.5rem, 6vw, 4.5rem); margin-bottom:1.5rem; letter-spacing:-0.03em;" dangerouslySetInnerHTML={{ __html: dict.homeHeroTitle }} />
+              <h1 class="hero-title" style="font-family:var(--font-accent); font-size:clamp(2.5rem, 6vw, 4.5rem); margin-bottom:1.5rem; letter-spacing:-0.03em; font-weight:400;" dangerouslySetInnerHTML={{ __html: dict.homeHeroTitle }} />
               <p style="font-size:clamp(1.125rem, 2.5vw, 1.5rem); max-width:600px; margin:0 auto; line-height:1.6; color:var(--text-secondary);">
                 {dict.homeHeroSubtitle}
               </p>
@@ -139,7 +139,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
           <section style="padding:5rem 1.5rem; text-align:center; position:relative;">
             <div style="max-width:var(--max-width); margin:0 auto;">
               <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">{dict.homeHowItWorksLabel}</p>
-              <h2 style="font-size:clamp(2rem, 4vw, 3rem); margin-bottom:4rem;">{dict.homeHowItWorksTitle}</h2>
+              <h2 style="font-family:var(--font-accent); font-size:clamp(2rem, 4vw, 3rem); margin-bottom:4rem; font-weight:400;">{dict.homeHowItWorksTitle}</h2>
 
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; max-width:1000px; margin:0 auto;">
                 {[
@@ -161,7 +161,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
           <section style="padding:6rem 1.5rem; text-align:center; background:rgba(255,255,255,0.4);">
             <div style="max-width:var(--max-width); margin:0 auto;">
               <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">{dict.homeSamplesLabel}</p>
-              <h2 style="font-size:clamp(2rem, 4vw, 3rem); margin-bottom:1.5rem;">{dict.homeSamplesTitle}</h2>
+              <h2 style="font-family:var(--font-accent); font-size:clamp(2rem, 4vw, 3rem); margin-bottom:1.5rem; font-weight:400;">{dict.homeSamplesTitle}</h2>
               <p style="font-size:1.125rem; max-width:600px; margin:0 auto 4rem; line-height:1.6; color:var(--text-secondary);">{dict.homeSamplesSubtitle}</p>
 
               <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; max-width:1200px; margin:0 auto;">
@@ -205,7 +205,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
           <section style="padding:6rem 1.5rem; text-align:center;">
             <div style="max-width:var(--max-width); margin:0 auto;">
               <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">{dict.homeWhatsIncludedLabel}</p>
-              <h2 style="font-size:clamp(2rem, 4vw, 3rem); margin-bottom:4rem;">{dict.homeWhatsIncludedTitle}</h2>
+              <h2 style="font-family:var(--font-accent); font-size:clamp(2rem, 4vw, 3rem); margin-bottom:4rem; font-weight:400;">{dict.homeWhatsIncludedTitle}</h2>
 
               <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:2rem; max-width:1100px; margin:0 auto;">
                 {[
@@ -228,7 +228,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
           <section style="padding:6rem 1.5rem; text-align:center; background:rgba(255,255,255,0.4);">
             <div style="max-width:600px; margin:0 auto; text-align:center;">
               <p style="font-family:var(--font-heading); font-size:0.875rem; font-weight:700; color:var(--primary); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:1rem;">{dict.homeFinalCtaLabel}</p>
-              <h2 style="font-size:clamp(2.5rem, 5vw, 3.5rem); margin-bottom:1.5rem;">{dict.homeFinalCtaTitle}</h2>
+              <h2 style="font-family:var(--font-accent); font-size:clamp(2.5rem, 5vw, 3.5rem); margin-bottom:1.5rem; font-weight:400;">{dict.homeFinalCtaTitle}</h2>
               <p style="font-size:1.125rem; line-height:1.6; margin-bottom:3rem; color:var(--text-secondary);">
                 {dict.homeFinalCtaSubtitle}
               </p>
@@ -237,7 +237,7 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
                 {dict.homeFinalCtaBtn}
               </a>
               <p class="text-sm" style="margin-top:1.5rem; color:var(--text-muted);">
-                {dict.homeFooterTerms} <a href="/terms" style="color:var(--primary); text-decoration:underline;">{dict.homeFooterTermsLink}</a>.
+                {dict.homeFooterTerms} <a href="https://jamespares.me/terms/" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:underline;">{dict.homeFooterTermsLink}</a> {dict.homeFooterAnd} <a href="https://jamespares.me/privacy/" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:underline;">{dict.homeFooterPrivacyLink}</a>.
               </p>
             </div>
           </section>
@@ -261,6 +261,8 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
               </a>
             </div>
             <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">{dict.homeFooterWebsite}</a>
+            <span style="font-size:0.8rem; color:var(--text-muted);">·</span>
+            <a href="https://thedalfdojo.com" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">The DALF Dojo</a>
           </div>
         </footer>
       </div>

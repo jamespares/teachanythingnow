@@ -21,7 +21,7 @@ export const ResetPassword: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) =>
             <a href="/" class="text-sm text-muted" style="display:inline-block; margin-bottom:1.5rem; text-decoration:none; transition:color 0.2s;">
               {dict.resetBackToHome}
             </a>
-            <h1 id="auth-title" style="font-size:1.875rem; margin-bottom:0.5rem;">{dict.resetHeading}</h1>
+            <h1 id="auth-title" style="font-family:var(--font-accent); font-size:1.875rem; margin-bottom:0.5rem; font-weight:400;">{dict.resetHeading}</h1>
             <p id="auth-subtitle" class="text-secondary" style="margin:0;">{dict.resetSubtitle}</p>
           </div>
 

@@ -37,7 +37,7 @@ export const Auth: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
             <a href="/" class="text-sm text-muted" style="display:inline-block; margin-bottom:1.5rem; text-decoration:none; transition:color 0.2s;">
               {dict.authBackToHome}
             </a>
-            <h1 id="auth-title" style="font-size:1.875rem; margin-bottom:0.5rem;">{dict.authTitleWelcomeBack}</h1>
+            <h1 id="auth-title" style="font-family:var(--font-accent); font-size:1.875rem; margin-bottom:0.5rem; font-weight:400;">{dict.authTitleWelcomeBack}</h1>
             <p id="auth-subtitle" class="text-secondary" style="margin:0;">{dict.authSubtitleSignIn}</p>
           </div>
 
@@ -87,7 +87,7 @@ export const Auth: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
 
           <div class="auth-footer">
             <p class="text-xs text-muted" style="margin:0 0 0.75rem; text-align:center;">
-              {dict.authTermsAgreement} <a href="/terms" style="color:var(--text-muted); text-decoration:underline;">{dict.authTermsLink}</a>.
+              {dict.authTermsAgreement} <a href="https://jamespares.me/terms/" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted); text-decoration:underline;">{dict.authTermsLink}</a> {dict.authAnd} <a href="https://jamespares.me/privacy/" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted); text-decoration:underline;">{dict.authPrivacyLink}</a>.
             </p>
             <p class="text-sm text-secondary" style="margin:0; text-align:center;">
               <span id="toggle-text">{dict.authToggleNoAccount}</span>
@@ -113,6 +113,8 @@ export const Auth: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
             </a>
           </div>
           <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">{dict.homeFooterWebsite}</a>
+          <span style="font-size:0.8rem; color:var(--text-muted);">·</span>
+          <a href="https://thedalfdojo.com" target="_blank" rel="noopener noreferrer" style="font-size:0.9rem; color:var(--text-secondary); text-decoration:none; font-weight:500;">The DALF Dojo</a>
         </div>
       </div>
 
