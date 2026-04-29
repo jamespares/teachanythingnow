@@ -1,5 +1,6 @@
-// Image generation utility using OpenAI DALL-E 3
-// Generates high-quality educational images for presentations and materials
+// Image generation utility using Cloudflare Workers AI
+// Generates high-quality educational images via FLUX.1 [schnell]
+// Prompts are still crafted using GPT-4o through Cloudflare AI Gateway for relevance
 
 import OpenAI from "openai";
 
@@ -13,18 +14,20 @@ export interface ImageGenerationResult {
 
 /**
  * Generates high-quality educational images related to the topic
- * Uses OpenAI DALL-E 3 for consistent, high-quality image generation
- * Images are generated to be consistent with the slide content and topic
+ * Uses Cloudflare Workers AI (FLUX.1 schnell) for fast, cost-effective image generation
+ * billed through Cloudflare's unified billing.
+ * Prompts are generated via GPT-4o for educational relevance and consistency.
  */
 export async function generateImages(
   topic: string,
   slides: Array<{ title: string; content: string[] }>,
+  ai: Ai,
   apiKey: string,
   gatewayUrl?: string,
   gatewayToken?: string
 ): Promise<ImageGenerationResult> {
   if (!apiKey) {
-    console.warn("OpenAI API key not set, skipping image generation");
+    console.warn("OpenAI API key not set, skipping image prompt generation");
     return {
       images: [],
     };
@@ -34,44 +37,34 @@ export async function generateImages(
     // Generate prompts for image generation based on the topic and ALL slides for consistency
     const imagePrompts = await generateImagePrompts(topic, slides, apiKey, gatewayUrl, gatewayToken);
     
-    const images: Array<{ url: string; description: string }> = [];
-    
-    // Generate up to 3 high-quality images that are consistent with the topic and slide content
-    for (let i = 0; i < Math.min(imagePrompts.length, 3); i++) {
+    // Generate up to 3 high-quality images in parallel using Cloudflare Workers AI
+    const imagePromises = imagePrompts.slice(0, 3).map(async (prompt, i) => {
       try {
-        const prompt = imagePrompts[i];
-        console.log(`Generating image ${i + 1} with DALL-E 3: ${prompt.prompt.substring(0, 100)}...`);
+        console.log(`Generating image ${i + 1} with Workers AI FLUX: ${prompt.prompt.substring(0, 100)}...`);
         
-        const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
-        if (!openai) {
-          console.warn("OpenAI client not available, skipping image generation");
-          break;
-        }
-
-        const response = await openai.images.generate({
-          model: "dall-e-3",
+        const response = await ai.run("@cf/black-forest-labs/flux-1-schnell", {
           prompt: prompt.prompt,
-          n: 1,
-          size: "1024x1024",
-          quality: "standard",
-          response_format: "url",
-        });
+        }) as { image: string };
 
-        const imageUrl = response.data?.[0]?.url;
-        if (imageUrl) {
-          images.push({
-            url: imageUrl,
+        if (response.image) {
+          console.log(`Successfully generated image ${i + 1}`);
+          return {
+            url: `data:image/png;base64,${response.image}`,
             description: prompt.description,
-          });
-          console.log(`Successfully generated image ${i + 1} using DALL-E 3`);
+          };
         } else {
-          console.warn(`Failed to generate image ${i + 1} - no URL returned`);
+          console.warn(`Failed to generate image ${i + 1} - no image data returned`);
+          return null;
         }
       } catch (error: any) {
         console.error(`Error generating image ${i + 1}:`, error?.message || error);
         // Continue with other images even if one fails
+        return null;
       }
-    }
+    });
+    
+    const results = await Promise.all(imagePromises);
+    const images = results.filter((img): img is { url: string; description: string } => img !== null);
     
     console.log(`Total images generated: ${images.length}`);
 
@@ -161,7 +154,7 @@ async function generateImagePrompts(
         messages: [
           {
             role: "system",
-            content: "You are an expert educator who identifies the most important and visually interesting subjects for educational images. Identify exactly 3 specific key events, historical figures, or important places related to the topic. Each should be a single, specific subject (not combinations). Return ONLY valid JSON in this exact format: {\"subjects\": [{\"type\": \"event\" | \"person\" | \"place\", \"name\": \"specific name\", \"description\": \"brief description\"}]}.",
+            content: "You are an expert educator who identifies the most important and visually interesting subjects for educational images. Identify exactly 3 specific key events, historical figures, or important places related to the topic. Each should be a single, specific subject (not combinations). Return ONLY valid JSON in this exact format: {\"subjects\": [{\"type\": \"event\" | \"person\" | \"place\", \"name\": \"specific name\", \"description\": \"brief description\"}]}}.",
           },
           {
             role: "user",
@@ -191,7 +184,7 @@ Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
               const subjectName = subject.name;
               const subjectType = subject.type;
               
-              // Create hyper-realistic, photorealistic prompts optimized for DALL-E 3
+              // Create hyper-realistic, photorealistic prompts optimized for FLUX
               let prompt = `A highly detailed, photorealistic photograph of ${subjectName}`;
               
               if (subjectType === "event") {

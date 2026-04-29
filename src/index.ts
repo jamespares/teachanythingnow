@@ -22,6 +22,7 @@ import { R2Storage } from "./lib/storage";
 type Bindings = {
   DB: D1Database;
   BUCKET: R2Bucket;
+  AI: Ai;
   STRIPE_SECRET_KEY: string;
   OPENAI_API_KEY: string;
   SEND_EMAIL: SendEmail;
@@ -271,7 +272,7 @@ app.post("/api/generate", async (c) => {
   };
 
   const imageTask = async () => {
-    const imageResult = await generateImages(topic, content.slides, c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
+    const imageResult = await generateImages(topic, content.slides, c.env.AI, c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
     const downloadedImages = await downloadImages(imageResult.images);
     const savedImages: string[] = [];
     for (let i = 0; i < downloadedImages.length; i++) {

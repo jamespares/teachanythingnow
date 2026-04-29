@@ -24,5 +24,8 @@ bucket_name = "teach-anything-assets"
 [assets]
 directory = "./public"
 
+[[ai]]
+binding = "AI"
+
 [observability]
 enabled = true
