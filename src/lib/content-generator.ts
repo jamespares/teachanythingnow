@@ -1,6 +1,6 @@
-// Content generation utility using OpenAI API (GPT-4o)
+// Content generation utility using OpenAI API (GPT-4o) with Cloudflare Workers AI fallback (kimi-k2.6)
 // This generates high-quality educational content for any topic
-// All generation uses GPT-4o model for best quality output
+// Primary: GPT-4o via Cloudflare AI Gateway | Fallback: @cf/moonshotai/kimi-k2.6 via Workers AI
 
 import OpenAI from "openai";
 import type { Lang } from "./i18n";
@@ -40,6 +40,33 @@ function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: str
   });
 }
 
+/**
+ * Helper to call Cloudflare Workers AI (kimi-k2.6) as a fallback.
+ * Returns the generated text or null if the call fails.
+ */
+async function generateWithWorkersAI(
+  ai: Ai,
+  messages: Array<{ role: string; content: string }>,
+  maxTokens = 3000
+): Promise<string | null> {
+  try {
+    console.log("Falling back to Workers AI (kimi-k2.6)...");
+    const response = await ai.run("@cf/moonshotai/kimi-k2.6", {
+      messages,
+      max_tokens: maxTokens,
+    }) as { response?: string };
+
+    if (response?.response) {
+      console.log("Workers AI fallback succeeded.");
+      return response.response;
+    }
+    console.warn("Workers AI returned empty response.");
+    return null;
+  } catch (error: any) {
+    console.error("Workers AI fallback failed:", error?.message || error);
+    return null;
+  }
+}
 
 export interface GeneratedContent {
   slides: Array<{
@@ -57,16 +84,16 @@ export interface GeneratedContent {
   };
 }
 
-export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang = "en", gatewayUrl?: string, gatewayToken?: string): Promise<GeneratedContent> {
+export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang = "en", gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<GeneratedContent> {
   try {
     // Generate slides using AI - this is the foundation for all other content
-    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, targetLang, gatewayUrl, gatewayToken);
+    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, targetLang, gatewayUrl, gatewayToken, ai);
     
     // Generate podcast script - uses slides for consistency
-    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken);
+    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken, ai);
     
     // Generate worksheet questions - uses slides for consistency
-    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken);
+    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken, ai);
 
     return {
       slides,
@@ -88,91 +115,96 @@ export async function generateContent(topic: string, curriculum: string, yearLev
   }
 }
 
-async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string): Promise<Array<{ title: string; content: string[] }>> {
-  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
-  if (!openai) {
-    return generateSlides(topic);
-  }
+async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<Array<{ title: string; content: string[] }>> {
+  const systemPrompt = `You are an expert educator who creates engaging, clear educational content. Create professional slides that are well-structured and easy to understand. 
+          
+CRITICAL: You MUST generate all content (titles, bullet points, labels) EXCLUSIVELY in ${langMap[targetLang]}.
+          
+Return ONLY valid JSON in this exact format: {"slides": [{"title": "...", "content": ["...", "..."]}]}.`;
 
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert educator who creates engaging, clear educational content. Create professional slides that are well-structured and easy to understand. 
+  const userPrompt = `Create an educational presentation about "${topic}" specialized for the "${curriculum}" curriculum and "${yearLevel}" students.
           
-          CRITICAL: You MUST generate all content (titles, bullet points, labels) EXCLUSIVELY in ${langMap[targetLang]}.
+Guidelines:
+- Align content specifically with "${curriculum}" learning standards.
+- Ensure vocabulary and concept complexity is appropriate for "${yearLevel}".
+- Use research-backed pedagogical standards (scaffolding, direct instruction).
           
-          Return ONLY valid JSON in this exact format: {"slides": [{"title": "...", "content": ["...", "..."]}]}.`,
-        },
-        {
-          role: "user",
-          content: `Create an educational presentation about "${topic}" specialized for the "${curriculum}" curriculum and "${yearLevel}" students.
-          
-          Guidelines:
-          - Align content specifically with "${curriculum}" learning standards.
-          - Ensure vocabulary and concept complexity is appropriate for "${yearLevel}".
-          - Use research-backed pedagogical standards (scaffolding, direct instruction).
-          
-          Create 6-8 slides with:
+Create 6-8 slides with:
 - Clear, descriptive titles
 - 3-5 bullet points per slide (1-2 sentences each)
 - Logical flow: introduction, main concepts, examples, summary
 - Engaging, accurate content about "${topic}"
 - Real-world examples where relevant
 
-Make it educational and suitable for teaching.`,
-        },
-      ],
-      temperature: 0.8,
-      max_tokens: 3000,
-    });
+Make it educational and suitable for teaching.`;
 
-    const content = response.choices[0]?.message?.content;
-    if (content) {
-      // Try to parse JSON from the response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length > 0) {
-          return parsed.slides;
+  // Try OpenAI first
+  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
+  if (openai) {
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.8,
+        max_tokens: 3000,
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (content) {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length > 0) {
+            return parsed.slides;
+          }
         }
       }
+    } catch (error) {
+      console.error("Error generating slides with OpenAI:", error);
     }
-  } catch (error) {
-    console.error("Error generating slides with AI:", error);
+  }
+
+  // Fallback to Workers AI (kimi-k2.6)
+  if (ai) {
+    try {
+      const content = await generateWithWorkersAI(ai, [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ], 3000);
+
+      if (content) {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.slides && Array.isArray(parsed.slides) && parsed.slides.length > 0) {
+            return parsed.slides;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error generating slides with Workers AI:", error);
+    }
   }
 
   return generateSlides(topic);
 }
 
-async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string): Promise<string> {
-  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
-  if (!openai) {
-    return generatePodcastScript(topic, slides);
-  }
+async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<string> {
+  const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
 
-  try {
-    const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
+  const systemPrompt = `You are an engaging podcast host who makes educational content interesting and accessible. Create conversational podcast scripts that sound natural when spoken. Write for the ear, not the eye - use natural spoken language.
+          
+CRITICAL: You MUST write the script EXCLUSIVELY in ${langMap[targetLang]}.`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are an engaging podcast host who makes educational content interesting and accessible. Create conversational podcast scripts that sound natural when spoken. Write for the ear, not the eye - use natural spoken language.
+  const userPrompt = `Create a podcast script about "${topic}" for "${yearLevel}" students following the "${curriculum}" syllabus. The script MUST be under 3800 characters (approximately 600-800 words) to ensure it fits within technical limits.
           
-          CRITICAL: You MUST write the script EXCLUSIVELY in ${langMap[targetLang]}.`,
-        },
-        {
-          role: "user",
-          content: `Create a podcast script about "${topic}" for "${yearLevel}" students following the "${curriculum}" syllabus. The script MUST be under 3800 characters (approximately 600-800 words) to ensure it fits within technical limits.
-          
-          Educational Context:
-          - Target Audience: "${yearLevel}"
-          - Curriculum: "${curriculum}"
-          - Tone: Engaging, age-appropriate, and aligned with research-backed learning standards.
+Educational Context:
+- Target Audience: "${yearLevel}"
+- Curriculum: "${curriculum}"
+- Tone: Engaging, age-appropriate, and aligned with research-backed learning standards.
 
 Structure:
 - Engaging introduction with a hook
@@ -185,57 +217,73 @@ Use natural, conversational language. Write in full paragraphs, not bullet point
 CRITICAL: The total script length must be under 3800 characters. Count your characters and ensure you stay under this limit.
 
 Reference these slides for content:
-${slideContent}`,
-        },
-      ],
-      temperature: 0.8,
-      max_tokens: 2000,
-    });
+${slideContent}`;
 
-    const script = response.choices[0]?.message?.content;
-    if (script && script.trim().length > 200) {
-      const trimmedScript = script.trim();
-      // Validate script length - warn if it exceeds TTS limit (truncation will happen in audio generator)
-      if (trimmedScript.length > 4000) {
-        console.warn(`Generated script (${trimmedScript.length} chars) exceeds TTS limit of 4000. Script will be truncated during audio generation.`);
+  // Try OpenAI first
+  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
+  if (openai) {
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.8,
+        max_tokens: 2000,
+      });
+
+      const script = response.choices[0]?.message?.content;
+      if (script && script.trim().length > 200) {
+        const trimmedScript = script.trim();
+        if (trimmedScript.length > 4000) {
+          console.warn(`Generated script (${trimmedScript.length} chars) exceeds TTS limit of 4000. Script will be truncated during audio generation.`);
+        }
+        return trimmedScript;
       }
-      return trimmedScript;
+    } catch (error) {
+      console.error("Error generating podcast script with OpenAI:", error);
     }
-  } catch (error) {
-    console.error("Error generating podcast script with AI:", error);
+  }
+
+  // Fallback to Workers AI (kimi-k2.6)
+  if (ai) {
+    try {
+      const script = await generateWithWorkersAI(ai, [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ], 2000);
+
+      if (script && script.trim().length > 200) {
+        const trimmedScript = script.trim();
+        if (trimmedScript.length > 4000) {
+          console.warn(`Generated script (${trimmedScript.length} chars) exceeds TTS limit of 4000. Script will be truncated during audio generation.`);
+        }
+        return trimmedScript;
+      }
+    } catch (error) {
+      console.error("Error generating podcast script with Workers AI:", error);
+    }
   }
 
   return generatePodcastScript(topic, slides);
 }
 
-async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
-  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
-  if (!openai) {
-    return generateWorksheet(topic, slides);
-  }
+async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
+  const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
 
-  try {
-    const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
+  const systemPrompt = `You are an expert educator creating assessment questions. 
+          
+CRITICAL: You MUST generate all questions and answers EXCLUSIVELY in ${langMap[targetLang]}.
+          
+Return ONLY valid JSON in this exact format: {"questions": [{"question": "...", "type": "multiple-choice"|"short-answer"|"essay", "options": ["..."], "correctAnswer": "..."}]}. Create clear, educational questions that assess understanding.`;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are an expert educator creating assessment questions. 
+  const userPrompt = `Create 8-10 assessment questions about "${topic}" for "${yearLevel}" following the "${curriculum}" curriculum.
           
-          CRITICAL: You MUST generate all questions and answers EXCLUSIVELY in ${langMap[targetLang]}.
-          
-          Return ONLY valid JSON in this exact format: {"questions": [{"question": "...", "type": "multiple-choice"|"short-answer"|"essay", "options": ["..."], "correctAnswer": "..."}]}. Create clear, educational questions that assess understanding.`,
-        },
-        {
-          role: "user",
-          content: `Create 8-10 assessment questions about "${topic}" for "${yearLevel}" following the "${curriculum}" curriculum.
-          
-          Standards:
-          - Questions should map to "${curriculum}" assessment criteria.
-          - Difficulty and wording must be suitable for "${yearLevel}".
-          - Include clear, research-backed answer keys.
+Standards:
+- Questions should map to "${curriculum}" assessment criteria.
+- Difficulty and wording must be suitable for "${yearLevel}".
+- Include clear, research-backed answer keys.
 
 Include:
 - 4-5 multiple-choice questions (with 4 options each)
@@ -245,25 +293,57 @@ Include:
 Make questions clear and directly related to "${topic}". Use concepts from these slides:
 ${slideContent}
 
-Provide detailed correct answers. Return valid JSON.`,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 3000,
-    });
+Provide detailed correct answers. Return valid JSON.`;
 
-    const content = response.choices[0]?.message?.content;
-    if (content) {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
-          return parsed;
+  // Try OpenAI first
+  const openai = getOpenAIClient(apiKey, gatewayUrl, gatewayToken);
+  if (openai) {
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+        temperature: 0.7,
+        max_tokens: 3000,
+      });
+
+      const content = response.choices[0]?.message?.content;
+      if (content) {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+            return parsed;
+          }
         }
       }
+    } catch (error) {
+      console.error("Error generating worksheet with OpenAI:", error);
     }
-  } catch (error) {
-    console.error("Error generating worksheet with AI:", error);
+  }
+
+  // Fallback to Workers AI (kimi-k2.6)
+  if (ai) {
+    try {
+      const content = await generateWithWorkersAI(ai, [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userPrompt },
+      ], 3000);
+
+      if (content) {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (parsed.questions && Array.isArray(parsed.questions) && parsed.questions.length > 0) {
+            return parsed;
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error generating worksheet with Workers AI:", error);
+    }
   }
 
   return generateWorksheet(topic, slides);

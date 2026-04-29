@@ -250,7 +250,7 @@ app.post("/api/generate", async (c) => {
 
   // 1. Generate Content
   const lang = detectLang(c);
-  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, lang, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
+  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, lang, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN, c.env.AI);
   
   // 2. Parallel Generation Tasks
   const pptTask = async () => {

@@ -31,7 +31,7 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.teach
 | ORM | Drizzle ORM v0.45+ |
 | Auth | Better Auth v1.1+ (email/password, Drizzle adapter) |
 | Object Storage | Cloudflare R2 — edge object storage |
-| AI / Content | OpenAI GPT-4o (via Cloudflare AI Gateway), OpenAI TTS-1-HD |
+| AI / Content | OpenAI GPT-4o (primary via AI Gateway), Workers AI `kimi-k2.6` (fallback), OpenAI TTS-1-HD |
 | Image Generation | Cloudflare Workers AI — `@cf/black-forest-labs/flux-1-schnell` |
 | Payments | Stripe (Payment Intents + webhooks) |
 | Email | Resend |
@@ -51,7 +51,7 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.teach
 │   │   ├── db.ts                # Drizzle client factory (getDb)
 │   │   ├── storage.ts           # R2Storage wrapper for R2 uploads/downloads
 │   │   ├── stripe.ts            # Stripe SDK initializer
-│   │   ├── content-generator.ts # OpenAI GPT-4o content generation (slides, script, worksheet)
+│   │   ├── content-generator.ts # GPT-4o content generation with Workers AI kimi-k2.6 fallback
 │   │   ├── ppt-generator.ts     # PPTX generation via PptxGenJS
 │   │   ├── audio-generator.ts   # MP3 generation via OpenAI TTS
 │   │   ├── worksheet-generator.ts # DOCX worksheet + PDF answer key generation
@@ -174,7 +174,7 @@ npm run lint
 | `STRIPE_SECRET_KEY` | Stripe server-side API key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook endpoint secret |
 
-| `OPENAI_API_KEY` | OpenAI API for content (GPT-4o via AI Gateway) and audio (TTS-1-HD) generation |
+| `OPENAI_API_KEY` | OpenAI API for content (GPT-4o via AI Gateway) and audio (TTS-1-HD) generation. If missing, Workers AI fallback handles content. |
 | `CF_AI_GATEWAY_URL` | Cloudflare AI Gateway base URL for OpenAI text completions |
 | `CF_AI_GATEWAY_TOKEN` | Cloudflare AI Gateway authorization token |
 | `BETTER_AUTH_SECRET` | Encryption secret for Better Auth sessions/tokens |
@@ -218,6 +218,7 @@ npm run lint
    - `generatePPT()` → uploads `.pptx` to R2
    - `generateAudio()` → uploads `.mp3` to R2
    - `generateWorksheet()` → uploads `.docx` to R2
+   - `generateContent()` → tries GPT-4o first, falls back to Workers AI `kimi-k2.6` if OpenAI fails
    - `generateImages()` (Workers AI FLUX-1-schnell) + `downloadImages()` → uploads `.png` files to R2
 6. File metadata is saved to the `packages` table as a JSON string.
 7. User is redirected to `/dashboard` to download files.
@@ -314,7 +315,9 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 - `src/lib/content-generator.ts` is the orchestrator. It generates slides first, then derives the podcast script and worksheet questions from those slides for consistency.
 - Each generator (`ppt-generator.ts`, `audio-generator.ts`, etc.) is independent and can be modified without affecting others, as long as the input/output interfaces remain compatible.
-- All generators include fallback logic (template-based) if the AI API fails or is unavailable, **except** `audio-generator.ts` which throws an error rather than falling back to text.
+- `content-generator.ts` has a two-tier fallback: OpenAI GPT-4o → Workers AI `kimi-k2.6` → template-based generation.
+- `image-generator.ts` falls back to empty images if Workers AI fails.
+- `audio-generator.ts` throws an error if OpenAI TTS fails (no fallback yet).
 
 ---
 
