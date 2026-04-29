@@ -31,8 +31,8 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.teach
 | ORM | Drizzle ORM v0.45+ |
 | Auth | Better Auth v1.1+ (email/password, Drizzle adapter) |
 | Object Storage | Cloudflare R2 — edge object storage |
-| AI / Content | OpenAI GPT-4o, OpenAI TTS-1-HD |
-| Image Generation | OpenAI DALL-E 3 |
+| AI / Content | OpenAI GPT-4o (via Cloudflare AI Gateway), OpenAI TTS-1-HD |
+| Image Generation | Cloudflare Workers AI — `@cf/black-forest-labs/flux-1-schnell` |
 | Payments | Stripe (Payment Intents + webhooks) |
 | Email | Resend |
 | Language | TypeScript (ES modules, strict mode) |
@@ -55,7 +55,7 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.teach
 │   │   ├── ppt-generator.ts     # PPTX generation via PptxGenJS
 │   │   ├── audio-generator.ts   # MP3 generation via OpenAI TTS
 │   │   ├── worksheet-generator.ts # DOCX worksheet + PDF answer key generation
-│   │   └── image-generator.ts   # Image generation via OpenAI DALL-E 3
+│   │   └── image-generator.ts   # Image generation via Cloudflare Workers AI (FLUX-1-schnell)
 │   └── pages/
 │       ├── Layout.tsx           # Root layout component (HTML shell, CSS, global styles)
 │       ├── Home.tsx             # Landing page with topic input, Stripe payment, generation flow
@@ -174,7 +174,9 @@ npm run lint
 | `STRIPE_SECRET_KEY` | Stripe server-side API key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook endpoint secret |
 
-| `OPENAI_API_KEY` | OpenAI API for content, audio, and image generation |
+| `OPENAI_API_KEY` | OpenAI API for content (GPT-4o via AI Gateway) and audio (TTS-1-HD) generation |
+| `CF_AI_GATEWAY_URL` | Cloudflare AI Gateway base URL for OpenAI text completions |
+| `CF_AI_GATEWAY_TOKEN` | Cloudflare AI Gateway authorization token |
 | `BETTER_AUTH_SECRET` | Encryption secret for Better Auth sessions/tokens |
 | `RESEND_API_KEY` | Resend API for transactional emails (configured but not actively used in main flow) |
 
@@ -216,7 +218,7 @@ npm run lint
    - `generatePPT()` → uploads `.pptx` to R2
    - `generateAudio()` → uploads `.mp3` to R2
    - `generateWorksheet()` → uploads `.docx` to R2
-   - `generateImages()` + `downloadImages()` → uploads `.png` files to R2
+   - `generateImages()` (Workers AI FLUX-1-schnell) + `downloadImages()` → uploads `.png` files to R2
 6. File metadata is saved to the `packages` table as a JSON string.
 7. User is redirected to `/dashboard` to download files.
 
@@ -262,8 +264,9 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 1. **D1 Database:** `wrangler d1 create teach-anything-db`
 2. **R2 Bucket:** `wrangler r2 bucket create teach-anything-assets`
-3. **Domain:** Add `teachanythingnow.com` (or your chosen domain) to your Cloudflare account and configure DNS to point to the Workers deployment.
-4. **Secrets:** Set all secrets listed in the Secrets table above via `wrangler secret put`.
+3. **Workers AI:** Ensure the `[[ai]]` binding in `wrangler.toml` is active (no separate provisioning needed; billed through Cloudflare unified billing).
+4. **Domain:** Add `teachanythingnow.com` (or your chosen domain) to your Cloudflare account and configure DNS to point to the Workers deployment.
+5. **Secrets:** Set all secrets listed in the Secrets table above via `wrangler secret put`.
 
 ---
 
@@ -341,4 +344,4 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 ---
 
-*Last updated: 2026-04-18*
+*Last updated: 2026-04-29*
