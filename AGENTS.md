@@ -178,7 +178,9 @@ npm run lint
 | `CF_AI_GATEWAY_URL` | Cloudflare AI Gateway base URL for OpenAI text completions |
 | `CF_AI_GATEWAY_TOKEN` | Cloudflare AI Gateway authorization token |
 | `BETTER_AUTH_SECRET` | Encryption secret for Better Auth sessions/tokens |
-| `RESEND_API_KEY` | Resend API for transactional emails (configured but not actively used in main flow) |
+| `RESEND_API_KEY` | Resend API for transactional emails (legacy — migrate to Cloudflare SEND_EMAIL) |
+
+**Email Policy:** All emails send from `hey@jamespares.me` via the Cloudflare `SEND_EMAIL` binding. No third-party email services.
 
 > **Security Warning:** `.dev.vars` contains live secrets for local development. It is listed in `.gitignore` and must **never** be committed.
 

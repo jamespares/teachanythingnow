@@ -10,7 +10,9 @@
     "db:migrate": "wrangler d1 migrations apply teach-anything-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply teach-anything-db --remote",
     "db:studio": "drizzle-kit studio",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@opentelemetry/api": "^1.9.0",
@@ -26,10 +28,12 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.15.1",
     "@cloudflare/workers-types": "^4.20241218.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^8.57.1",
     "typescript": "^5.7.2",
+    "vitest": "^4.1.5",
     "wrangler": "^4.83.0"
   }
 }
