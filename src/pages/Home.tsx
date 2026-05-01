@@ -23,14 +23,31 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
         <main class="flex-1">
           {/* Hero */}
           <section class="site-main--narrow pt-20 pb-12 text-center">
+            <style>{`
+              .hero-h1 { font-size: 4.5rem; }
+              .hero-line1 { font-size: 2.25rem; }
+              .hero-line2 { font-size: 1.875rem; }
+              .hero-desc { font-size: 1.125rem; }
+              @media (min-width: 768px) {
+                .hero-h1 { font-size: 6rem; }
+                .hero-line1 { font-size: 3rem; }
+                .hero-line2 { font-size: 2.25rem; }
+                .hero-desc { font-size: 1.25rem; }
+              }
+              @media (min-width: 1024px) {
+                .hero-h1 { font-size: 8rem; }
+                .hero-line1 { font-size: 3.75rem; }
+                .hero-line2 { font-size: 3rem; }
+              }
+            `}</style>
             <div class="animate-fade-in">
-              <h1 class="font-accent text-7xl md:text-9xl lg:text-[10rem] leading-tight mb-6" style="color: var(--base-text);">
+              <h1 class="font-accent hero-h1 leading-tight mb-6" style="color: var(--base-text);">
                 Covering a last-minute lesson?
               </h1>
-              <p class="font-accent text-4xl md:text-5xl lg:text-6xl mb-10" style="color: var(--base-text);">
+              <p class="font-accent hero-line1 mb-10" style="color: var(--base-text);">
                 Had a busy weekend and no time to plan?
               </p>
-              <p class="font-accent text-3xl md:text-4xl lg:text-5xl leading-tight mb-12" style="color: var(--accent);">
+              <p class="font-accent hero-line2 leading-tight mb-12" style="color: var(--accent);">
                 <span class="inline-flex items-center gap-4">
                   No problem.
                   <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 180px; height: 18px; flex-shrink: 0;">
@@ -38,7 +55,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                   </svg>
                 </span>
               </p>
-              <p class="font-body text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-secondary">
+              <p class="font-body hero-desc max-w-2xl mx-auto leading-relaxed text-secondary">
                 Type any topic. Get a complete, multi-media lesson package — presentation, podcast audio file, worksheet, and AI images — all aligned. Ready when you are!
               </p>
             </div>
