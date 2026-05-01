@@ -29,7 +29,7 @@ export const Footer: FC<FooterProps> = ({ showLegal = true }) => {
           </div>
         )}
 
-        <p class="text-sm text-secondary m-0">© 2026 Built by <span class="font-medium">James Pares</span></p>
+        <p class="text-sm text-secondary m-0">© 2026 Built by <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" class="font-medium hover:text-accent transition-colors">James Pares</a></p>
       </div>
     </footer>
   );
