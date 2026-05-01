@@ -9,7 +9,6 @@ export interface ImageGenerationResult {
     url: string;
     description: string;
   }>;
-  buffer?: Buffer; // For downloaded images
 }
 
 /**
@@ -26,13 +25,6 @@ export async function generateImages(
   gatewayUrl?: string,
   gatewayToken?: string
 ): Promise<ImageGenerationResult> {
-  if (!apiKey) {
-    console.warn("OpenAI API key not set, skipping image prompt generation");
-    return {
-      images: [],
-    };
-  }
-
   try {
     // Generate prompts for image generation based on the topic and ALL slides for consistency
     const imagePrompts = await generateImagePrompts(topic, slides, apiKey, gatewayUrl, gatewayToken);
@@ -150,7 +142,7 @@ async function generateImagePrompts(
   if (openai) {
     try {
       const identificationResponse = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4o-latest",
         messages: [
           {
             role: "system",

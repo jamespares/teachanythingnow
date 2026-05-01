@@ -34,6 +34,9 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
                       {files.presentation && <DownloadLink href={`/api/download?file=${files.presentation}`} label="PowerPoint Presentation" />}
                       {files.audio        && <DownloadLink href={`/api/download?file=${files.audio}`}        label="Podcast Audio" />}
                       {files.worksheet    && <DownloadLink href={`/api/download?file=${files.worksheet}`}    label="Student Worksheet" />}
+                      {files.images && Array.isArray(files.images) && files.images.map((img: string, i: number) => (
+                        <DownloadLink key={img} href={`/api/download?file=${img}`} label={`Educational Image ${i + 1}`} />
+                      ))}
                     </div>
                   </div>
                 );

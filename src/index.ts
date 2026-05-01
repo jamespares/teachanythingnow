@@ -214,70 +214,76 @@ app.post("/api/generate", async (c) => {
       .where(eq(payments.id, payment.id));
   }
 
-  // Mark as used
-  await db.update(payments).set({ usedAt: new Date() }).where(eq(payments.id, payment.id));
-
   const storage = new R2Storage(c.env.BUCKET);
-  const fileId = `${topic.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
+  const safeTopic = topic.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  const fileId = `${safeTopic}_${Date.now()}`;
 
-  // 1. Generate Content
-  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN, c.env.AI);
-  
-  // 2. Parallel Generation Tasks
-  const pptTask = async () => {
-    const pptBuffer = await generatePPT(content.slides, topic);
-    await storage.upload(pptBuffer, `${fileId}.pptx`, "application/vnd.openxmlformats-officedocument.presentationml.presentation");
-    return `${fileId}.pptx`;
-  };
+  try {
+    // 1. Generate Content
+    const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN, c.env.AI);
 
-  const audioTask = async () => {
-    const audioRes = await generateAudio(content.podcastScript, topic, c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
-    await storage.upload(audioRes.buffer, `${fileId}.mp3`, "audio/mpeg");
-    return `${fileId}.mp3`;
-  };
+    // 2. Parallel Generation Tasks
+    const pptTask = async () => {
+      const pptBuffer = await generatePPT(content.slides, topic);
+      await storage.upload(pptBuffer, `${fileId}.pptx`, "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+      return `${fileId}.pptx`;
+    };
 
-  const worksheetTask = async () => {
-    const worksheetBuffer = await generateWorksheet(topic, content.worksheet.questions);
-    await storage.upload(worksheetBuffer, `${fileId}_worksheet.docx`, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
-    return `${fileId}_worksheet.docx`;
-  };
+    const audioTask = async () => {
+      const audioRes = await generateAudio(content.podcastScript, topic, c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
+      await storage.upload(audioRes.buffer, `${fileId}.mp3`, "audio/mpeg");
+      return `${fileId}.mp3`;
+    };
 
-  const imageTask = async () => {
-    const imageResult = await generateImages(topic, content.slides, c.env.AI, c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
-    const downloadedImages = await downloadImages(imageResult.images);
-    const savedImages: string[] = [];
-    for (let i = 0; i < downloadedImages.length; i++) {
+    const worksheetTask = async () => {
+      const worksheetBuffer = await generateWorksheet(topic, content.worksheet.questions);
+      await storage.upload(worksheetBuffer, `${fileId}_worksheet.docx`, "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+      return `${fileId}_worksheet.docx`;
+    };
+
+    const imageTask = async () => {
+      const imageResult = await generateImages(topic, content.slides, c.env.AI, c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN);
+      const downloadedImages = await downloadImages(imageResult.images);
+      const savedImages: string[] = [];
+      for (let i = 0; i < downloadedImages.length; i++) {
         const name = `${fileId}_img_${i}.png`;
         await storage.upload(downloadedImages[i], name, "image/png");
         savedImages.push(name);
-    }
-    return savedImages;
-  };
+      }
+      return savedImages;
+    };
 
-  const [presentation, audio, worksheet, images] = await Promise.all([
-    pptTask(),
-    audioTask(),
-    worksheetTask(),
-    imageTask()
-  ]);
+    const [presentation, audio, worksheet, images] = await Promise.all([
+      pptTask(),
+      audioTask(),
+      worksheetTask(),
+      imageTask()
+    ]);
 
-  // Save Package
-  await db.insert(packages).values({
-    userId: session.user.id,
-    paymentId: payment.id,
-    topic,
-    curriculum,
-    yearLevel,
-    fileId,
-    files: JSON.stringify({
-      presentation,
-      audio,
-      worksheet,
-      images
-    }),
-  });
+    // Mark payment as used only after successful generation
+    await db.update(payments).set({ usedAt: new Date() }).where(eq(payments.id, payment.id));
 
-  return c.json({ packageId: fileId });
+    // Save Package
+    await db.insert(packages).values({
+      userId: session.user.id,
+      paymentId: payment.id,
+      topic,
+      curriculum,
+      yearLevel,
+      fileId,
+      files: JSON.stringify({
+        presentation,
+        audio,
+        worksheet,
+        images
+      }),
+    });
+
+    return c.json({ packageId: fileId });
+  } catch (error: any) {
+    console.error("Generation failed:", error?.message || error);
+    return c.json({ error: "Content generation failed. Your payment has not been used — please try again." }, 500);
+  }
 });
 
 app.get("/api/download", async (c) => {
