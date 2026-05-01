@@ -24,16 +24,16 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* Hero */}
           <section class="site-main--narrow pt-20 pb-12 text-center">
             <div class="animate-fade-in">
-              <h1 class="font-accent text-5xl md:text-7xl lg:text-8xl leading-tight mb-6" style="color: var(--base-text);">
+              <h1 class="font-accent text-6xl md:text-8xl lg:text-9xl leading-tight mb-6" style="color: var(--base-text);">
                 Covering a last-minute lesson?
               </h1>
-              <p class="font-accent text-2xl md:text-3xl lg:text-4xl mb-10" style="color: var(--base-text);">
+              <p class="font-accent text-3xl md:text-4xl lg:text-5xl mb-10" style="color: var(--base-text);">
                 Had a busy weekend and no time to plan?
               </p>
-              <p class="font-accent text-xl md:text-2xl lg:text-3xl leading-tight mb-12" style="color: var(--accent);">
+              <p class="font-accent text-2xl md:text-3xl lg:text-4xl leading-tight mb-12" style="color: var(--accent);">
                 <span class="inline-flex items-center gap-4">
                   No problem.
-                  <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 140px; height: 14px; flex-shrink: 0;">
+                  <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 160px; height: 16px; flex-shrink: 0;">
                     <path d="M0,15 Q60,2 120,12 T200,8" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" />
                   </svg>
                 </span>
