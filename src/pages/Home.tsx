@@ -24,22 +24,22 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* Hero */}
           <section class="site-main--narrow pt-20 pb-12 text-center">
             <div class="animate-fade-in">
-              <h1 class="font-accent text-6xl md:text-8xl lg:text-9xl leading-tight mb-6" style="color: var(--base-text);">
+              <h1 class="font-accent text-7xl md:text-9xl lg:text-[10rem] leading-tight mb-6" style="color: var(--base-text);">
                 Covering a last-minute lesson?
               </h1>
-              <p class="font-accent text-3xl md:text-4xl lg:text-5xl mb-10" style="color: var(--base-text);">
+              <p class="font-accent text-4xl md:text-5xl lg:text-6xl mb-10" style="color: var(--base-text);">
                 Had a busy weekend and no time to plan?
               </p>
-              <p class="font-accent text-2xl md:text-3xl lg:text-4xl leading-tight mb-12" style="color: var(--accent);">
+              <p class="font-accent text-3xl md:text-4xl lg:text-5xl leading-tight mb-12" style="color: var(--accent);">
                 <span class="inline-flex items-center gap-4">
                   No problem.
-                  <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 160px; height: 16px; flex-shrink: 0;">
+                  <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 180px; height: 18px; flex-shrink: 0;">
                     <path d="M0,15 Q60,2 120,12 T200,8" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" />
                   </svg>
                 </span>
               </p>
               <p class="font-body text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-secondary">
-                Type any topic. Get a complete, multi-media lesson package — presentation, podcast audio file, worksheet, and AI images — all aligned to your topic.
+                Type any topic. Get a complete, multi-media lesson package — presentation, podcast audio file, worksheet, and AI images — all aligned. Ready when you are!
               </p>
             </div>
           </section>
