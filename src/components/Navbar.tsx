@@ -10,7 +10,8 @@ export const Navbar: FC<NavbarProps> = ({ user, showDashboard = true }) => {
   return (
     <header class="site-header">
       <a href="/" class="brand">
-        <img src="/ll-logo.png" alt="Last Minute Lessons" />
+        <img src="/ll-logo.png" alt="" />
+        <span class="font-accent">Last Minute Lessons</span>
       </a>
       <nav class="site-nav">
         {user ? (

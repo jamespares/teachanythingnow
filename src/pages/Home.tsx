@@ -22,15 +22,25 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
 
         <main class="flex-1">
           {/* Hero */}
-          <section class="site-main--narrow pt-16 pb-8 text-center">
+          <section class="site-main--narrow pt-20 pb-12 text-center">
             <div class="animate-fade-in">
-              <p class="font-heading text-sm font-bold text-accent uppercase tracking-widest mb-4">Last Minute Lessons</p>
-              <p class="text-lg md:text-xl max-w-xl mx-auto leading-relaxed text-secondary mb-4">
-                Covering a last-minute lesson? Had a busy weekend and no time to plan? No problem.
-                <br /><br />
+              <h1 class="font-accent text-5xl md:text-7xl lg:text-8xl leading-tight mb-6" style="color: var(--base-text);">
+                Covering a last-minute lesson?
+              </h1>
+              <p class="font-accent text-2xl md:text-3xl lg:text-4xl mb-10" style="color: var(--accent-dark);">
+                Had a busy weekend and no time to plan?
+              </p>
+              <p class="font-accent text-5xl md:text-7xl lg:text-8xl leading-tight mb-12" style="color: var(--base-text);">
+                <span class="inline-flex items-center gap-4">
+                  No problem.
+                  <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 180px; height: 18px; flex-shrink: 0;">
+                    <path d="M0,15 Q60,2 120,12 T200,8" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" />
+                  </svg>
+                </span>
+              </p>
+              <p class="font-body text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-secondary">
                 Type any topic. Get a complete, multi-media lesson package — presentation, podcast audio file, worksheet, and AI images — all aligned to your topic.
               </p>
-
             </div>
           </section>
 
