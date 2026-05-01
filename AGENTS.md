@@ -1,4 +1,4 @@
-# AGENTS.md — Teach Anything Now
+# AGENTS.md — Last Minute Lessons
 
 > This file is intended for AI coding agents. It describes the project architecture, conventions, and workflows. The project is documented in English, and all code comments and documentation are written in English.
 
@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-**Teach Anything Now** is a **Cloudflare-first** educational content generation platform. The application runs entirely on Cloudflare's edge infrastructure — the domain (`teachanythingnow.com`), deployment, compute, database, and object storage are all hosted on Cloudflare. Users enter any topic, pay £1, and receive a complete teaching package generated in under 60 seconds. Each package includes:
+**Last Minute Lessons** is a **Cloudflare-first** educational content generation platform. The application runs entirely on Cloudflare's edge infrastructure — the domain (`www.lastminutelessons.com`), deployment, compute, database, and object storage are all hosted on Cloudflare. Users enter any topic, pay £1, and receive a complete teaching package generated in under 60 seconds. Each package includes:
 
 - A PowerPoint presentation (`.pptx`)
 - A podcast-style audio explanation (`.mp3`)
@@ -15,7 +15,7 @@
 
 The application is built as a single Hono application running on **Cloudflare Workers** (via Wrangler), using server-side rendered JSX for the UI. There is no client-side JavaScript framework — all interactivity is handled via vanilla JS embedded in inline `<script>` tags.
 
-The app is operated by EduConnect Asia Ltd and is deployed at `https://www.teachanythingnow.com` via **Cloudflare Workers**.
+The app is operated by EduConnect Asia Ltd and is deployed at `https://www.www.lastminutelessons.com` via **Cloudflare Workers**.
 
 ---
 
@@ -165,7 +165,7 @@ npm run lint
 | Variable | Purpose |
 |----------|---------|
 | `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key for frontend payment elements |
-| `BETTER_AUTH_URL` | Base URL for auth callbacks (`https://www.teachanythingnow.com`) |
+| `BETTER_AUTH_URL` | Base URL for auth callbacks (`https://www.www.lastminutelessons.com`) |
 
 ### Secrets (set via `wrangler secret put` or `.dev.vars` for local dev)
 
@@ -268,7 +268,7 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 1. **D1 Database:** `wrangler d1 create teach-anything-db`
 2. **R2 Bucket:** `wrangler r2 bucket create teach-anything-assets`
 3. **Workers AI:** Ensure the `[[ai]]` binding in `wrangler.toml` is active (no separate provisioning needed; billed through Cloudflare unified billing).
-4. **Domain:** Add `teachanythingnow.com` (or your chosen domain) to your Cloudflare account and configure DNS to point to the Workers deployment.
+4. **Domain:** Add `www.lastminutelessons.com` (or your chosen domain) to your Cloudflare account and configure DNS to point to the Workers deployment.
 5. **Secrets:** Set all secrets listed in the Secrets table above via `wrangler secret put`.
 
 ---

@@ -1,28 +1,21 @@
 /** @jsxImportSource hono/jsx */
 import { FC, PropsWithChildren } from "hono/jsx";
-import type { Lang, Dict } from "../lib/i18n";
 
-export const Layout: FC<PropsWithChildren<{ title?: string; lang: Lang; dict: Dict }>> = ({ children, title, lang, dict }) => {
+export const Layout: FC<PropsWithChildren<{ title?: string }>> = ({ children, title }) => {
   return (
-    <html lang={lang}>
+    <html lang="en">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{title ? `${title} | ${dict.siteName}` : dict.siteName}</title>
+        <title>{title ? `${title} | Last Minute Lessons` : "Last Minute Lessons"}</title>
         <meta name="description" content="Create a complete educational lesson package in 60 seconds. Includes slides, podcast audio, worksheets, and AI images." />
+        <link rel="icon" type="image/svg+xml" href="/ll-logo.svg" />
+        <link rel="icon" type="image/png" href="/ll-logo.png" />
         <link rel="stylesheet" href="/styles.css" />
         <style>{`.hidden { display: none !important; }`}</style>
       </head>
       <body>
         <script dangerouslySetInnerHTML={{ __html: `
-          document.querySelectorAll('.lang-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-              e.preventDefault();
-              const u = new URL(location.href);
-              u.searchParams.set('lang', btn.getAttribute('data-lang'));
-              location.href = u.toString();
-            });
-          });
           window.addEventListener('scroll', () => {
             const header = document.querySelector('.site-header');
             if (header) {

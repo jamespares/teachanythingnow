@@ -1,8 +1,6 @@
 import { Hono } from "hono";
 import { getAuth } from "./lib/auth";
 import { getDb } from "./lib/db";
-import { detectLang, getDict, t } from "./lib/i18n";
-import { setCookie } from "hono/cookie";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
@@ -39,25 +37,9 @@ const app = new Hono<{ Bindings: Bindings }>();
 // Redirect www → non-www (before auth sees mismatched origins)
 app.use("*", async (c, next) => {
   const url = new URL(c.req.url);
-  if (url.hostname === "www.teachanythingnow.com") {
-    url.hostname = "teachanythingnow.com";
+  if (url.hostname === "lastminutelessons.com") {
+    url.hostname = "www.lastminutelessons.com";
     return c.redirect(url.toString(), 301);
-  }
-  await next();
-});
-
-// Persist language preference when ?lang= is present (UI routes only)
-app.use("*", async (c, next) => {
-  const path = c.req.path;
-  if (path.startsWith("/api/")) return await next();
-
-  const queryLang = c.req.query("lang");
-  if (queryLang === "en" || queryLang === "fr" || queryLang === "zh") {
-    setCookie(c, "lang", queryLang, {
-      path: "/",
-      maxAge: 31536000,
-      sameSite: "Lax",
-    });
   }
   await next();
 });
@@ -68,27 +50,19 @@ app.get("/", async (c) => {
   const db = getDb(c.env.DB);
   const auth = getAuth(db, c.env);
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
-  const lang = detectLang(c);
-  const dict = getDict(lang);
-  return c.html(Home({ user: session?.user, stripeKey: c.env.STRIPE_PUBLISHABLE_KEY, lang, dict }) as any);
+  return c.html(Home({ user: session?.user, stripeKey: c.env.STRIPE_PUBLISHABLE_KEY }) as any);
 });
 
 app.get("/login", (c) => {
-  const lang = detectLang(c);
-  const dict = getDict(lang);
-  return c.html(Auth({ lang, dict }) as any);
+  return c.html(Auth() as any);
 });
 
 app.get("/reset-password", (c) => {
-  const lang = detectLang(c);
-  const dict = getDict(lang);
-  return c.html(ResetPassword({ lang, dict }) as any);
+  return c.html(ResetPassword() as any);
 });
 
 app.get("/terms", (c) => {
-  const lang = detectLang(c);
-  const dict = getDict(lang);
-  return c.html(Terms({ lang, dict }) as any);
+  return c.html(Terms() as any);
 });
 
 app.get("/privacy", (c) => {
@@ -108,9 +82,7 @@ app.get("/dashboard", async (c) => {
     .where(eq(packages.userId, session.user.id))
     .orderBy(desc(packages.createdAt));
 
-  const lang = detectLang(c);
-  const dict = getDict(lang);
-  return c.html(Dashboard({ user: session.user, packages: userPackages, lang, dict }) as any);
+  return c.html(Dashboard({ user: session.user, packages: userPackages }) as any);
 });
 
 // --- Auth Routes ---
@@ -128,7 +100,7 @@ app.post("/api/payment/create", async (c) => {
   const auth = getAuth(db, c.env);
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   
-  if (!session) return c.json({ error: t(c, "apiErrorUnauthorized") }, 401);
+  if (!session) return c.json({ error: "Unauthorized" }, 401);
   
   const { topic, curriculum, yearLevel } = await c.req.json();
   const stripeInstance = stripe(c.env.STRIPE_SECRET_KEY);
@@ -179,7 +151,7 @@ app.post("/api/webhooks/stripe", async (c) => {
     );
   } catch (err: any) {
     console.error("Webhook signature verification failed:", err.message);
-    return c.text(`${t(c, "apiErrorWebhookFailed")}: ${err.message}`, 400);
+    return c.text(`Webhook signature verification failed: ${err.message}`, 400);
   }
 
   const db = getDb(c.env.DB);
@@ -206,7 +178,7 @@ app.post("/api/generate", async (c) => {
   const auth = getAuth(db, c.env);
   const session = await auth.api.getSession({ headers: c.req.raw.headers });
   
-  if (!session) return c.json({ error: t(c, "apiErrorUnauthorized") }, 401);
+  if (!session) return c.json({ error: "Unauthorized" }, 401);
 
   const { topic, curriculum, yearLevel } = await c.req.json();
   
@@ -224,7 +196,7 @@ app.post("/api/generate", async (c) => {
     )
     .limit(1);
 
-  if (!payment) return c.json({ error: t(c, "apiErrorNoPayment") }, 400);
+  if (!payment) return c.json({ error: "No unused payment found for this topic" }, 400);
 
   // Verify payment succeeded (webhook or synchronous)
   if (payment.status !== "succeeded") {
@@ -232,7 +204,7 @@ app.post("/api/generate", async (c) => {
     const pi = await stripeInstance.paymentIntents.retrieve(payment.stripePaymentIntentId);
 
     if (pi.status !== "succeeded") {
-      return c.json({ error: t(c, "apiErrorPaymentNotCompleted") }, 400);
+      return c.json({ error: "Payment not completed" }, 400);
     }
 
     // Sync our DB since webhook may not have arrived yet
@@ -249,8 +221,7 @@ app.post("/api/generate", async (c) => {
   const fileId = `${topic.toLowerCase().replace(/\s+/g, "_")}_${Date.now()}`;
 
   // 1. Generate Content
-  const lang = detectLang(c);
-  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, lang, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN, c.env.AI);
+  const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN, c.env.AI);
   
   // 2. Parallel Generation Tasks
   const pptTask = async () => {
@@ -311,10 +282,10 @@ app.post("/api/generate", async (c) => {
 
 app.get("/api/download", async (c) => {
   const fileName = c.req.query("file");
-  if (!fileName) return c.text(t(c, "apiErrorMissingFile"), 400);
+  if (!fileName) return c.text("Missing file name", 400);
 
   const object = await c.env.BUCKET.get(fileName);
-  if (!object) return c.text(t(c, "apiErrorFileNotFound"), 404);
+  if (!object) return c.text("File not found", 404);
 
   const headers = new Headers();
   object.writeHttpMetadata(headers);

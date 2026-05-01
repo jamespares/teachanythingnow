@@ -24,8 +24,8 @@ export async function generatePPT(
   const pptx = new PptxGenJS();
 
   // Set presentation properties
-  pptx.author = "Teach Anything Now";
-  pptx.company = "Teach Anything Now";
+  pptx.author = "Last Minute Lessons";
+  pptx.company = "Last Minute Lessons";
   pptx.title = `${topic} - Educational Presentation`;
   pptx.subject = `Educational content about ${topic}`;
   pptx.layout = "LAYOUT_16x9"; // Modern widescreen format
@@ -78,7 +78,7 @@ export async function generatePPT(
   });
   
   // Footer with branding
-  titleSlide.addText("Created with Teach Anything Now", {
+  titleSlide.addText("Created with Last Minute Lessons", {
     x: 0.5,
     y: 5,
     w: 9,

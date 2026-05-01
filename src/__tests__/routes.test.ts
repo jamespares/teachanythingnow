@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-describe('Teach Anything Now — Design System Migration', () => {
+describe('Last Minute Lessons — Design System Migration', () => {
   it('should have the new styles.css file', async () => {
     const fs = await import('fs');
     const exists = fs.existsSync('./public/styles.css');
@@ -28,7 +28,7 @@ describe('Teach Anything Now — Design System Migration', () => {
   it('should use design system tokens in styles.css', async () => {
     const fs = await import('fs');
     const css = fs.readFileSync('./public/styles.css', 'utf-8');
-    expect(css).toContain('--accent: #006b54');
+    expect(css).toContain('--accent: #f59e0b');
     expect(css).toContain('--font-body');
     expect(css).toContain('--font-heading');
     expect(css).toContain('--radius-xl');

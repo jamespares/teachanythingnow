@@ -2,99 +2,102 @@
 import { FC } from "hono/jsx";
 import { Layout } from "../components/Layout";
 import { Footer } from "../components/Footer";
-import type { Lang, Dict } from "../lib/i18n";
 
-export const Auth: FC<{ lang: Lang; dict: Dict }> = ({ lang, dict }) => {
+export const Auth = () => {
   const scriptDict = JSON.stringify({
-    signIn: dict.authBtnSignIn,
-    createAccount: dict.authBtnCreateAccount,
-    sendResetLink: dict.authBtnSendResetLink,
-    welcomeBack: dict.authTitleWelcomeBack,
-    signInToAccount: dict.authSubtitleSignIn,
-    getStarted: dict.authTitleGetStarted,
-    createFreeAccount: dict.authSubtitleCreateAccount,
-    resetPassword: dict.authTitleResetPassword,
-    emailResetLink: dict.authSubtitleResetLink,
-    alreadyHaveAccount: dict.authToggleHasAccount,
-    signUp: dict.authToggleSignUp,
-    noAccount: dict.authToggleNoAccount,
-    signInLink: dict.authToggleSignIn,
-    rememberPassword: dict.authToggleRememberPassword,
-    signingIn: dict.authScriptSigningIn,
-    creatingAccount: dict.authScriptCreatingAccount,
-    errorInvalidCredentials: dict.authScriptErrorInvalidCredentials,
-    errorEnterName: dict.authScriptErrorEnterName,
-    errorCreateAccount: dict.authScriptErrorCreateAccount,
-    errorSendResetEmail: dict.authScriptErrorSendResetEmail,
-    successResetEmail: dict.authScriptSuccessResetEmail,
-    errorGeneric: dict.authScriptErrorGeneric,
+    signIn: "Sign In",
+    createAccount: "Create Account",
+    sendResetLink: "Send Reset Link",
+    welcomeBack: "Welcome Back",
+    signInToAccount: "Sign in to your account",
+    getStarted: "Get Started",
+    createFreeAccount: "Create your free account",
+    resetPassword: "Reset Password",
+    emailResetLink: "We will email you a reset link",
+    alreadyHaveAccount: "Already have an account?",
+    signUp: "Sign up",
+    noAccount: "Don't have an account?",
+    signInLink: "Sign in",
+    rememberPassword: "Remember your password?",
+    signingIn: "Signing in…",
+    creatingAccount: "Creating account…",
+    errorInvalidCredentials: "Invalid email or password.",
+    errorEnterName: "Please enter your name.",
+    errorCreateAccount: "Could not create account. Try a different email.",
+    errorSendResetEmail: "Failed to send reset email.",
+    successResetEmail: "Check your email for a password reset link!",
+    errorGeneric: "Something went wrong. Please try again.",
   });
 
   return (
-    <Layout title={dict.authTitle} lang={lang} dict={dict}>
+    <Layout title="Sign In">
       <div class="auth-wrapper">
         <div class="card auth-card">
           <div class="auth-header">
             <a href="/" class="text-sm text-muted inline-block mb-6 transition-colors hover:text-accent">
-              {dict.authBackToHome}
+              ← Back to home
             </a>
-            <h1 id="auth-title" class="font-accent text-3xl font-normal mb-2">{dict.authTitleWelcomeBack}</h1>
-            <p id="auth-subtitle" class="text-secondary m-0">{dict.authSubtitleSignIn}</p>
+            <h1 id="auth-title" class="font-accent text-3xl font-normal mb-2">Welcome Back</h1>
+            <p id="auth-subtitle" class="text-secondary m-0">Sign in to your account</p>
           </div>
 
           <form id="auth-form" class="flex flex-col gap-4">
             <div id="name-field" class="hidden">
-              <label class="form-label">{dict.authLabelFullName}</label>
-              <input id="name" type="text" placeholder={dict.authPlaceholderFullName} class="input" />
+              <label class="form-label">Full Name</label>
+              <input id="name" type="text" placeholder="Your name" class="input" />
             </div>
 
             <div>
-              <label class="form-label">{dict.authLabelEmail}</label>
-              <input id="email" type="email" placeholder={dict.authPlaceholderEmail} class="input" required />
+              <label class="form-label">Email</label>
+              <input id="email" type="email" placeholder="you@example.com" class="input" required />
             </div>
 
             <div id="password-field">
               <div class="flex justify-between items-center">
-                <label class="form-label">{dict.authLabelPassword}</label>
-                <a href="#" id="forgot-link" class="text-xs text-accent hover:opacity-80 transition-opacity">{dict.authLinkForgotPassword}</a>
+                <label class="form-label">Password</label>
+                <a href="#" id="forgot-link" class="text-xs text-accent hover:opacity-80 transition-opacity">Forgot password?</a>
               </div>
-              <input id="password" type="password" placeholder={dict.authPlaceholderPassword} class="input" required minlength={8} />
+              <input id="password" type="password" placeholder="••••••••" class="input" required minlength={8} />
             </div>
 
             <div id="error-message" class="hidden error-box"></div>
 
             <button type="submit" id="auth-submit" class="btn btn-primary btn-full btn-lg">
-              {dict.authBtnSignIn}
+              Sign In
             </button>
           </form>
 
           <div class="auth-footer">
             <p class="text-xs text-muted text-center mb-3">
-              {dict.authTermsAgreement} <a href="https://jamespares.me/terms/" target="_blank" rel="noopener noreferrer" class="underline">{dict.authTermsLink}</a> {dict.authAnd} <a href="https://jamespares.me/privacy/" target="_blank" rel="noopener noreferrer" class="underline">{dict.authPrivacyLink}</a>.
+              By signing in or creating an account, you agree to the <a href="https://jamespares.me/terms/" target="_blank" rel="noopener noreferrer" class="underline">Terms of Service</a> and <a href="https://jamespares.me/privacy/" target="_blank" rel="noopener noreferrer" class="underline">Privacy Policy</a>.
             </p>
             <p class="text-sm text-secondary text-center m-0">
-              <span id="toggle-text">{dict.authToggleNoAccount}</span>
-              <a href="#" id="toggle-link" class="text-accent ml-1">{dict.authToggleSignUp}</a>
+              <span id="toggle-text">Don't have an account?</span>
+              <a href="#" id="toggle-link" class="text-accent ml-1">Sign up</a>
             </p>
           </div>
         </div>
 
-        <div class="mt-8 text-center flex flex-col items-center gap-4">
-          <p class="font-heading text-lg font-semibold m-0">{dict.homeFooterBuiltBy}</p>
-          <div class="flex items-center gap-5">
+        <div class="mt-8 text-center flex flex-col items-center gap-5">
+          <div class="flex items-center gap-6">
             <a href="https://www.linkedin.com/in/james-p-ba7653207/" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-accent transition-colors" aria-label="LinkedIn">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
             </a>
             <a href="https://x.com/jamespareslfg" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-accent transition-colors" aria-label="X">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             </a>
             <a href="https://github.com/jamespares" target="_blank" rel="noopener noreferrer" class="text-secondary hover:text-accent transition-colors" aria-label="GitHub">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
             </a>
           </div>
-          <a href="https://jamespares.me" target="_blank" rel="noopener noreferrer" class="text-sm text-secondary font-medium">{dict.homeFooterWebsite}</a>
-          <span class="text-xs text-muted">·</span>
-          <a href="https://thedalfdojo.com" target="_blank" rel="noopener noreferrer" class="text-sm text-secondary font-medium">The DALF Dojo</a>
+
+          <div class="flex items-center gap-4 text-sm text-muted">
+            <a href="/terms" class="text-muted hover:text-accent transition-colors">Terms</a>
+            <span>·</span>
+            <a href="/privacy" class="text-muted hover:text-accent transition-colors">Privacy</a>
+          </div>
+
+          <p class="text-sm text-secondary m-0">© 2026 Built by <span class="font-medium">James Pares</span></p>
         </div>
       </div>
 

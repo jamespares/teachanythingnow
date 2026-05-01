@@ -3,13 +3,6 @@
 // Primary: GPT-4o via Cloudflare AI Gateway | Fallback: @cf/moonshotai/kimi-k2.6 via Workers AI
 
 import OpenAI from "openai";
-import type { Lang } from "./i18n";
-
-const langMap: Record<Lang, string> = {
-  en: "English",
-  fr: "French",
-  zh: "Simplified Chinese"
-};
 
 // Lazy initialization of OpenAI client to avoid errors when API key is missing
 function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: string): OpenAI | null {
@@ -84,16 +77,16 @@ export interface GeneratedContent {
   };
 }
 
-export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang = "en", gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<GeneratedContent> {
+export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<GeneratedContent> {
   try {
     // Generate slides using AI - this is the foundation for all other content
-    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, targetLang, gatewayUrl, gatewayToken, ai);
+    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, gatewayUrl, gatewayToken, ai);
     
     // Generate podcast script - uses slides for consistency
-    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken, ai);
+    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, gatewayUrl, gatewayToken, ai);
     
     // Generate worksheet questions - uses slides for consistency
-    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, targetLang, gatewayUrl, gatewayToken, ai);
+    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, gatewayUrl, gatewayToken, ai);
 
     return {
       slides,
@@ -115,10 +108,10 @@ export async function generateContent(topic: string, curriculum: string, yearLev
   }
 }
 
-async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<Array<{ title: string; content: string[] }>> {
+async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<Array<{ title: string; content: string[] }>> {
   const systemPrompt = `You are an expert educator who creates engaging, clear educational content. Create professional slides that are well-structured and easy to understand. 
           
-CRITICAL: You MUST generate all content (titles, bullet points, labels) EXCLUSIVELY in ${langMap[targetLang]}.
+CRITICAL: You MUST generate all content (titles, bullet points, labels) EXCLUSIVELY in English.
           
 Return ONLY valid JSON in this exact format: {"slides": [{"title": "...", "content": ["...", "..."]}]}.`;
 
@@ -192,12 +185,12 @@ Make it educational and suitable for teaching.`;
   return generateSlides(topic);
 }
 
-async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<string> {
+async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<string> {
   const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
 
   const systemPrompt = `You are an engaging podcast host who makes educational content interesting and accessible. Create conversational podcast scripts that sound natural when spoken. Write for the ear, not the eye - use natural spoken language.
           
-CRITICAL: You MUST write the script EXCLUSIVELY in ${langMap[targetLang]}.`;
+CRITICAL: You MUST write the script EXCLUSIVELY in English.`;
 
   const userPrompt = `Create a podcast script about "${topic}" for "${yearLevel}" students following the "${curriculum}" syllabus. The script MUST be under 3800 characters (approximately 600-800 words) to ensure it fits within technical limits.
           
@@ -269,12 +262,12 @@ ${slideContent}`;
   return generatePodcastScript(topic, slides);
 }
 
-async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, targetLang: Lang, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
+async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
   const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
 
   const systemPrompt = `You are an expert educator creating assessment questions. 
           
-CRITICAL: You MUST generate all questions and answers EXCLUSIVELY in ${langMap[targetLang]}.
+CRITICAL: You MUST generate all questions and answers EXCLUSIVELY in English.
           
 Return ONLY valid JSON in this exact format: {"questions": [{"question": "...", "type": "multiple-choice"|"short-answer"|"essay", "options": ["..."], "correctAnswer": "..."}]}. Create clear, educational questions that assess understanding.`;
 
@@ -398,7 +391,7 @@ function generateSlides(topic: string): Array<{ title: string; content: string[]
 
 function generatePodcastScript(topic: string, slides: Array<{ title: string; content: string[] }>): string {
   // Generate a podcast-style script
-  let script = `Welcome to Teach Anything Now. Today, we're diving deep into ${topic}.\n\n`;
+  let script = `Welcome to Last Minute Lessons. Today, we're diving deep into ${topic}.\n\n`;
   
   slides.forEach((slide, index) => {
     script += `${slide.title}.\n\n`;

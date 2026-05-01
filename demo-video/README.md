@@ -1,6 +1,6 @@
 # Demo Video — HyperFrames
 
-This folder contains a **HyperFrames** composition that renders a 15-second product demo video for Teach Anything Now.
+This folder contains a **HyperFrames** composition that renders a 15-second product demo video for Last Minute Lessons.
 
 ## What is HyperFrames?
 
@@ -44,7 +44,7 @@ npx hyperframes lint index.html
 
 | Time | Scene | Description |
 |------|-------|-------------|
-| 0.0s – 4.5s | Hero | Title "Teach Anything Now" + subtitle + CTA button fade in |
+| 0.0s – 4.5s | Hero | Title "Last Minute Lessons" + subtitle + CTA button fade in |
 | 4.5s – 8.5s | Input | Topic box with typewriter animation typing "The Solar System" |
 | 8.5s – 12.5s | Output | 4 cards slide up: PPTX, MP3, DOCX, AI Images |
 | 12.5s – 15.0s | CTA | "£1 per lesson. Instant results." + URL |

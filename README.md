@@ -1,4 +1,4 @@
-# Teach Anything Now
+# Last Minute Lessons
 
 A Cloudflare-native educational content generation platform. This application allows users to enter any topic and generate a complete teaching package including a PowerPoint presentation, a podcast-style audio explanation, an editable worksheet with answer keys, and high-quality educational images.
 

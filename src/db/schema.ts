@@ -86,7 +86,7 @@ export const blogPosts = sqliteTable("blog_posts", {
   title: text("title").notNull(),
   excerpt: text("excerpt").notNull(),
   content: text("content").notNull(),
-  author: text("author").notNull().default("Teach Anything Now Team"),
+  author: text("author").notNull().default("Last Minute Lessons Team"),
   tags: text("tags"), // Serialized JSON array
   published: integer("published", { mode: "boolean" }).default(false),
   featured: integer("featured", { mode: "boolean" }).default(false),

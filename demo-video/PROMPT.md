@@ -1,4 +1,4 @@
-# HyperFrames Demo Video Prompt — Teach Anything Now
+# HyperFrames Demo Video Prompt — Last Minute Lessons
 
 Use this prompt with Claude Code + the HyperFrames skill to generate a 15-second product demo MP4.
 
@@ -18,7 +18,7 @@ Then in Claude Code, run:
 
 ## Product Overview
 
-**Teach Anything Now** — an AI tool for teachers and educators. Type any topic, pay £1, and instantly receive a complete lesson package: PowerPoint presentation, podcast audio MP3, student worksheet, and AI-generated images. All generated images are aligned and follow a single source of truth. 
+**Last Minute Lessons** — an AI tool for teachers and educators. Type any topic, pay £1, and instantly receive a complete lesson package: PowerPoint presentation, podcast audio MP3, student worksheet, and AI-generated images. All generated images are aligned and follow a single source of truth. 
 
 **Brand colors:**
 - Primary green: `#00a884`
@@ -53,7 +53,7 @@ Then in Claude Code, run:
 ### Scene 1 — Hero (0.0s → 4.5s)
 
 **Content:**
-- Large title: **"Teach Anything Now"**
+- Large title: **"Last Minute Lessons"**
 - Subtitle: **"Create complete lesson materials in seconds with AI."**
 - CTA button: **"Get Started →"** (green `#00a884` background, white text)
 
@@ -121,7 +121,7 @@ Then in Claude Code, run:
 
 **Content:**
 - Main text: **"£1 per lesson. Instant results."**
-- URL: **"teachanythingnow.com"**
+- URL: **"www.lastminutelessons.com"**
 - Subtext: **"Sign up & generate in 60 seconds"**
 
 **Animation:**

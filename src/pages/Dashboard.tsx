@@ -3,39 +3,37 @@ import { FC } from "hono/jsx";
 import { Layout } from "../components/Layout";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
-import type { Lang, Dict } from "../lib/i18n";
 
-export const Dashboard: FC<{ user: any; packages: any[]; lang: Lang; dict: Dict }> = ({ user, packages, lang, dict }) => {
+export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }) => {
   return (
-    <Layout title={dict.dashTitle} lang={lang} dict={dict}>
+    <Layout title="My Dashboard">
       <div class="min-h-screen flex flex-col">
-        <Navbar dict={dict} user={user} showDashboard={false} />
+        <Navbar user={user} showDashboard={false} />
 
         <main class="site-main flex-1">
           <div class="dash-heading-row">
-            <h2 class="font-accent text-3xl font-normal tracking-tight">{dict.dashHeading}</h2>
+            <h2 class="font-accent text-3xl font-normal tracking-tight">My Lesson Packages</h2>
           </div>
 
           {packages.length === 0 ? (
             <div class="card p-10 text-center">
-              <p class="text-secondary mb-6">{dict.dashEmptyMsg}</p>
-              <a href="/" class="btn btn-primary">{dict.dashEmptyBtn}</a>
+              <p class="text-secondary mb-6">You haven't generated any lessons yet.</p>
+              <a href="/" class="btn btn-primary">Create your first lesson</a>
             </div>
           ) : (
             <div class="packages-grid">
               {packages.map((pkg) => {
                 const files = JSON.parse(pkg.files);
-                const locale = lang === "zh" ? "zh-CN" : lang === "fr" ? "fr-FR" : "en-GB";
                 return (
                   <div key={pkg.id} class="card card-hover package-card">
                     <h3 class="text-xl mb-2">{pkg.topic}</h3>
                     <p class="text-xs text-muted mb-6">
-                      {dict.dashGeneratedOn} {new Date(pkg.createdAt).toLocaleDateString(locale)}
+                      Generated on {new Date(pkg.createdAt).toLocaleDateString("en-GB")}
                     </p>
                     <div>
-                      {files.presentation && <DownloadLink href={`/api/download?file=${files.presentation}`} label={dict.dashDownloadPPT} />}
-                      {files.audio        && <DownloadLink href={`/api/download?file=${files.audio}`}        label={dict.dashDownloadPodcast} />}
-                      {files.worksheet    && <DownloadLink href={`/api/download?file=${files.worksheet}`}    label={dict.dashDownloadWorksheet} />}
+                      {files.presentation && <DownloadLink href={`/api/download?file=${files.presentation}`} label="PowerPoint Presentation" />}
+                      {files.audio        && <DownloadLink href={`/api/download?file=${files.audio}`}        label="Podcast Audio" />}
+                      {files.worksheet    && <DownloadLink href={`/api/download?file=${files.worksheet}`}    label="Student Worksheet" />}
                     </div>
                   </div>
                 );
@@ -44,7 +42,7 @@ export const Dashboard: FC<{ user: any; packages: any[]; lang: Lang; dict: Dict 
           )}
         </main>
 
-        <Footer dict={dict} showLegal={false} />
+        <Footer showLegal={false} />
       </div>
     </Layout>
   );

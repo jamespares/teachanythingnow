@@ -3,49 +3,40 @@ import { FC } from "hono/jsx";
 import { Layout } from "../components/Layout";
 import { Navbar } from "../components/Navbar";
 import { Footer } from "../components/Footer";
-import type { Lang, Dict } from "../lib/i18n";
 
-export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }> = ({ user, stripeKey, lang, dict }) => {
+export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey }) => {
   const scriptDict = JSON.stringify({
-    preparing: dict.homeScriptPreparing,
-    completePayment: dict.homeScriptCompletePayment,
-    initPaymentError: dict.homeScriptInitPaymentError,
-    alertEnterTopic: dict.homeScriptAlertEnterTopic,
-    processingPayment: dict.homeScriptProcessingPayment,
-    generationError: dict.homeScriptGenerationError,
-    generate: dict.homeBtnGenerate,
+    preparing: "Preparing...",
+    completePayment: "Complete Payment",
+    initPaymentError: "Failed to initialize payment",
+    alertEnterTopic: "Please enter a topic",
+    processingPayment: "Processing Payment...",
+    generationError: "Generation failed. Please contact support.",
+    generate: "Generate Package",
   });
 
   return (
-    <Layout title={dict.homeTitle} lang={lang} dict={dict}>
+    <Layout title="Create Lesson">
       <div class="min-h-screen flex flex-col">
-        <Navbar dict={dict} user={user} />
+        <Navbar user={user} />
 
         <main class="flex-1">
           {/* Hero */}
           <section class="site-main--narrow pt-16 pb-8 text-center">
             <div class="animate-fade-in">
+              <p class="font-heading text-sm font-bold text-accent uppercase tracking-widest mb-4">Last Minute Lessons</p>
               <h1
                 class="font-accent font-normal mb-6"
                 style="font-size: clamp(2.5rem, 6vw, 4.5rem); letter-spacing: -0.03em;"
-                dangerouslySetInnerHTML={{ __html: dict.homeHeroTitle }}
+                dangerouslySetInnerHTML={{ __html: 'Lesson materials,<br />generated <span class="text-accent">instantly.</span>' }}
               />
-              <p class="text-lg md:text-xl max-w-xl mx-auto leading-relaxed text-secondary">
-                {dict.homeHeroSubtitle}
+              <p class="text-lg md:text-xl max-w-xl mx-auto leading-relaxed text-secondary mb-4">
+                Covering a last-minute lesson? Had a busy weekend and no time to plan? No problem.
+              </p>
+              <p class="text-base max-w-xl mx-auto leading-relaxed text-muted">
+                Type any topic. Get a complete, multi-media lesson package — presentation, podcast audio file, worksheet, and AI images — all aligned to your topic.
               </p>
 
-              {/* AI Branding */}
-              <div class="mt-10 flex flex-col items-center gap-3">
-                <p class="text-xs font-semibold uppercase tracking-widest text-muted">{dict.homePoweredBy}</p>
-                <div
-                  class="flex items-center gap-10 transition-all duration-300"
-                  style="filter: grayscale(1); opacity: 0.6;"
-                  onmouseover="this.style.filter='none'; this.style.opacity='1'"
-                  onmouseout="this.style.filter='grayscale(1)'; this.style.opacity='0.6'"
-                >
-                  <img src="/claude.png" alt="Claude" class="h-7 w-auto" />
-                </div>
-              </div>
             </div>
           </section>
 
@@ -56,25 +47,25 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
               <div class="absolute -top-5 -left-5 -right-5 -bottom-5 bg-accent-bg-light rounded-[36px] -z-10" style="transform: rotate(-1deg);"></div>
 
               <div class="text-left mb-6">
-                <label for="topic" class="form-label text-base">{dict.homeFormLabelTopic}</label>
-                <input id="topic" type="text" placeholder={dict.homeFormPlaceholderTopic} class="input" required />
+                <label for="topic" class="form-label text-base">What do you want to teach?</label>
+                <input id="topic" type="text" placeholder="e.g., Photosynthesis, The French Revolution, Python" class="input" required />
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-left">
                 <div>
-                  <label for="curriculum" class="form-label text-sm">{dict.homeFormLabelCurriculum}</label>
-                  <input id="curriculum" type="text" placeholder={dict.homeFormPlaceholderCurriculum} class="input" style="padding: 10px 16px; font-size: 0.9rem;" />
+                  <label for="curriculum" class="form-label text-sm">Curriculum (Optional)</label>
+                  <input id="curriculum" type="text" placeholder="e.g., IB, IGCSE, US K-12" class="input" style="padding: 10px 16px; font-size: 0.9rem;" />
                 </div>
                 <div>
-                  <label for="yearLevel" class="form-label text-sm">{dict.homeFormLabelYearLevel}</label>
-                  <input id="yearLevel" type="text" placeholder={dict.homeFormPlaceholderYearLevel} class="input" style="padding: 10px 16px; font-size: 0.9rem;" />
+                  <label for="yearLevel" class="form-label text-sm">Year Level</label>
+                  <input id="yearLevel" type="text" placeholder="e.g., Year 9, Grade 5" class="input" style="padding: 10px 16px; font-size: 0.9rem;" />
                 </div>
               </div>
 
               <div id="payment-element" class="hidden animate-fade-in mb-6 text-left"></div>
 
               <button id="generate-btn" class="btn btn-primary btn-full btn-lg" data-state="generate">
-                {dict.homeBtnGenerate}
+                Generate Package
               </button>
 
               <p class="text-xs mt-4 font-medium text-muted">
@@ -82,15 +73,15 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
                   <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
                   <polyline points="22 4 12 14.01 9 11.01" />
                 </svg>
-                {dict.homeBadgeAligned}
+                Lesson materials aligned with research-backed learning standards
               </p>
 
               <div id="status-container" class="hidden animate-fade-in mt-4">
                 <div class="status-box">
                   <div class="spinner"></div>
                   <div class="text-left">
-                    <p id="status-text" class="text-base font-semibold m-0">{dict.homeStatusGenerating}</p>
-                    <p class="text-xs text-secondary m-0 mt-1">{dict.homeStatusTime}</p>
+                    <p id="status-text" class="text-base font-semibold m-0">Generating your content...</p>
+                    <p class="text-xs text-secondary m-0 mt-1">This usually takes about 60 seconds.</p>
                   </div>
                 </div>
               </div>
@@ -102,17 +93,17 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
           {/* What's Included */}
           <section class="py-20 px-6 text-center">
             <div class="max-w-6xl mx-auto">
-              <p class="font-heading text-sm font-bold text-accent uppercase tracking-widest mb-4">{dict.homeWhatsIncludedLabel}</p>
-              <h2 class="font-accent text-3xl md:text-5xl font-normal mb-16">{dict.homeWhatsIncludedTitle}</h2>
+              <p class="font-heading text-sm font-bold text-accent uppercase tracking-widest mb-4">What's Included</p>
+              <h2 class="font-accent text-3xl md:text-5xl font-normal mb-16">Everything you need to teach</h2>
 
               <div class="flex flex-wrap justify-center gap-8 max-w-5xl mx-auto">
                 {[
-                  { icon: "📊", title: dict.homeFeaturePresentationTitle, desc: dict.homeFeaturePresentationDesc },
-                  { icon: "🎙️", title: dict.homeFeaturePodcastTitle, desc: dict.homeFeaturePodcastDesc },
-                  { icon: "📝", title: dict.homeFeatureWorksheetTitle, desc: dict.homeFeatureWorksheetDesc },
-                  { icon: "🎨", title: dict.homeFeatureImagesTitle, desc: dict.homeFeatureImagesDesc },
+                  { icon: "📊", title: "Presentation", desc: "A complete slide deck with engaging visuals and speaker notes. Export as PPTX." },
+                  { icon: "🎙️", title: "Podcast Audio", desc: "A narrated lesson students can listen to anywhere. Export as MP3." },
+                  { icon: "📝", title: "Worksheet", desc: "Structured exercises that reinforce key concepts. Export as DOCX." },
+                  { icon: "🎨", title: "AI Images", desc: "Custom illustrations generated for your exact topic. Export as PNG." },
                 ].map(item => (
-                  <div key={item.title} class="card p-12 text-center flex-1 min-w-[240px] max-w-[300px]">
+                  <div key={item.title} class="card p-16 text-center flex-1 min-w-[300px] max-w-[380px]">
                     <div class="feature-icon">{item.icon}</div>
                     <h3 class="text-xl mb-3">{item.title}</h3>
                     <p class="text-secondary text-sm leading-relaxed">{item.desc}</p>
@@ -125,23 +116,23 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
           {/* Final CTA */}
           <section class="py-20 px-6 text-center" style="background: rgba(255,255,255,0.4);">
             <div class="max-w-xl mx-auto">
-              <p class="font-heading text-sm font-bold text-accent uppercase tracking-widest mb-4">{dict.homeFinalCtaLabel}</p>
-              <h2 class="font-accent text-3xl md:text-5xl font-normal mb-6">{dict.homeFinalCtaTitle}</h2>
+              <p class="font-heading text-sm font-bold text-accent uppercase tracking-widest mb-4">Get Started</p>
+              <h2 class="font-accent text-3xl md:text-5xl font-normal mb-6">Ready when you are.</h2>
               <p class="text-lg leading-relaxed mb-12 text-secondary">
-                {dict.homeFinalCtaSubtitle}
+                No subscriptions. No credits. Just enter a topic and get four professional teaching resources back in seconds.
               </p>
 
               <a href="#topic" class="btn btn-primary btn-lg" style="padding: 1rem 3rem; font-size: 1.25rem;" onclick="document.getElementById('topic').focus(); return false;">
-                {dict.homeFinalCtaBtn}
+                Generate your first lesson →
               </a>
               <p class="text-sm mt-6 text-muted">
-                {dict.homeFooterTerms} <a href="https://jamespares.me/terms/" target="_blank" rel="noopener noreferrer" class="underline">{dict.homeFooterTermsLink}</a> {dict.homeFooterAnd} <a href="https://jamespares.me/privacy/" target="_blank" rel="noopener noreferrer" class="underline">{dict.homeFooterPrivacyLink}</a>.
+                By using this service, you agree to the <a href="https://jamespares.me/terms/" target="_blank" rel="noopener noreferrer" class="underline">Terms of Service</a> and <a href="https://jamespares.me/privacy/" target="_blank" rel="noopener noreferrer" class="underline">Privacy Policy</a>.
               </p>
             </div>
           </section>
         </main>
 
-        <Footer dict={dict} />
+        <Footer />
       </div>
 
       <script src="https://js.stripe.com/v3/"></script>
@@ -221,8 +212,6 @@ export const Home: FC<{ user?: any; stripeKey: string; lang: Lang; dict: Dict }>
             errorMsg.classList.add('hidden');
 
             const returnUrl = new URL(window.location.origin + '?payment_success=true');
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('lang')) returnUrl.searchParams.set('lang', urlParams.get('lang'));
 
             const { error } = await stripe.confirmPayment({
               elements,
