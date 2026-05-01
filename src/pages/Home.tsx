@@ -25,15 +25,9 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           <section class="site-main--narrow pt-16 pb-8 text-center">
             <div class="animate-fade-in">
               <p class="font-heading text-sm font-bold text-accent uppercase tracking-widest mb-4">Last Minute Lessons</p>
-              <h1
-                class="font-accent font-normal mb-6"
-                style="font-size: clamp(2.5rem, 6vw, 4.5rem); letter-spacing: -0.03em;"
-                dangerouslySetInnerHTML={{ __html: 'Lesson materials,<br />generated <span class="text-accent">instantly.</span>' }}
-              />
               <p class="text-lg md:text-xl max-w-xl mx-auto leading-relaxed text-secondary mb-4">
                 Covering a last-minute lesson? Had a busy weekend and no time to plan? No problem.
-              </p>
-              <p class="text-base max-w-xl mx-auto leading-relaxed text-muted">
+                <br /><br />
                 Type any topic. Get a complete, multi-media lesson package — presentation, podcast audio file, worksheet, and AI images — all aligned to your topic.
               </p>
 
