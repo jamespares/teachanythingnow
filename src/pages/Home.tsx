@@ -42,7 +42,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             `}</style>
             <div class="animate-fade-in">
               <h1 class="font-accent hero-h1 leading-tight mb-6" style="color: var(--base-text);">
-                Covering a last-minute lesson?
+                Covering a lesson?
               </h1>
               <p class="font-accent hero-line1 mb-10" style="color: var(--base-text);">
                 Had a busy weekend and no time to plan?
