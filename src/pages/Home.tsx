@@ -83,6 +83,23 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                 </div>
               </div>
 
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 text-left">
+                <div>
+                  <label for="duration" class="form-label text-sm">Lesson Duration</label>
+                  <select id="duration" class="input" style="padding: 10px 16px; font-size: 0.9rem;">
+                    <option value="15 min">15 min</option>
+                    <option value="30 min">30 min</option>
+                    <option value="45 min">45 min</option>
+                    <option value="60 min" selected>60 min</option>
+                    <option value="90 min">90 min</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="objectives" class="form-label text-sm">Lesson Objectives</label>
+                  <textarea id="objectives" placeholder="e.g., Students will understand the causes of the French Revolution and be able to evaluate primary sources." class="input" style="padding: 10px 16px; font-size: 0.9rem; min-height: 80px; resize: vertical;"></textarea>
+                </div>
+              </div>
+
               <div id="payment-element" class="hidden animate-fade-in mb-6 text-left"></div>
 
               <button id="generate-btn" class="btn btn-primary btn-full btn-lg" data-state="generate">
@@ -119,10 +136,10 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
 
               <div class="flex flex-wrap justify-center gap-8 max-w-5xl mx-auto">
                 {[
-                  { icon: "📊", title: "Presentation", desc: "A complete slide deck with engaging visuals and speaker notes. Export as PPTX." },
-                  { icon: "🎙️", title: "Podcast Audio", desc: "A narrated lesson students can listen to anywhere. Export as MP3." },
-                  { icon: "📝", title: "Worksheet", desc: "Structured exercises that reinforce key concepts. Export as DOCX." },
-                  { icon: "🎨", title: "AI Images", desc: "Custom illustrations generated for your exact topic. Export as PNG." },
+                  { icon: "📊", title: "Presentation", desc: "A complete slide deck with engaging visuals and speaker notes. Export as PPTX. Use this to introduce concepts to the whole class — work through examples together and use speaker notes for guidance." },
+                  { icon: "🎙️", title: "Podcast Audio", desc: "A narrated lesson students can listen to anywhere. Export as MP3. Play at the start of the lesson to spark discussion, or let students listen independently to reinforce what they've learned." },
+                  { icon: "📝", title: "Worksheet", desc: "Structured exercises that reinforce key concepts. Export as DOCX. Distribute after the presentation to test understanding. Use as formative assessment, homework, or a peer-review activity." },
+                  { icon: "🎨", title: "AI Images", desc: "Custom illustrations generated for your exact topic. Export as PNG. Use these as a provocation to start the lesson, to spark curiosity, or as visual anchors on a classroom display." },
                 ].map(item => (
                   <div key={item.title} class="card p-16 text-center flex-1 min-w-[300px] max-w-[380px]">
                     <div class="feature-icon">{item.icon}</div>
@@ -167,18 +184,25 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
         const topicInput = document.getElementById('topic');
         const curriculumInput = document.getElementById('curriculum');
         const yearLevelInput = document.getElementById('yearLevel');
+        const durationInput = document.getElementById('duration');
+        const objectivesInput = document.getElementById('objectives');
         const errorMsg = document.getElementById('error-message');
         const user = ${JSON.stringify(user || null)};
 
         let elements;
+        let currentPaymentIntentId = '';
         let currentTopic = '';
         let currentCurriculum = '';
         let currentYearLevel = '';
+        let currentDuration = '';
+        let currentObjectives = '';
 
-        async function startPaymentFlow(topic, curriculum, yearLevel) {
+        async function startPaymentFlow(topic, curriculum, yearLevel, duration, objectives) {
           currentTopic = topic;
           currentCurriculum = curriculum;
           currentYearLevel = yearLevel;
+          currentDuration = duration;
+          currentObjectives = objectives;
           generateBtn.disabled = true;
           generateBtn.innerText = t.preparing;
           errorMsg.classList.add('hidden');
@@ -187,13 +211,15 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             const res = await fetch('/api/payment/create', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ topic, curriculum, yearLevel })
+              body: JSON.stringify({ topic, curriculum, yearLevel, duration, objectives })
             });
 
             if (res.status === 401) {
               sessionStorage.setItem('pendingTopic', topic);
               sessionStorage.setItem('pendingCurriculum', curriculum);
               sessionStorage.setItem('pendingYearLevel', yearLevel);
+              sessionStorage.setItem('pendingDuration', duration);
+              sessionStorage.setItem('pendingObjectives', objectives);
               window.location.href = '/login';
               return;
             }
@@ -201,6 +227,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
             const data = await res.json();
             if (data.error) throw new Error(data.error);
 
+            currentPaymentIntentId = data.paymentIntentId;
             elements = stripe.elements({ clientSecret: data.clientSecret, appearance: { theme: 'stripe' } });
             const paymentElement = elements.create('payment');
             paymentElement.mount('#payment-element');
@@ -222,11 +249,13 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           const topic = topicInput.value.trim();
           const curriculum = curriculumInput.value.trim();
           const yearLevel = yearLevelInput.value.trim();
+          const duration = durationInput.value;
+          const objectives = objectivesInput.value.trim();
 
           if (!topic) return alert(t.alertEnterTopic);
 
           if (generateBtn.dataset.state === 'generate') {
-            await startPaymentFlow(topic, curriculum, yearLevel);
+            await startPaymentFlow(topic, curriculum, yearLevel, duration, objectives);
           } else {
             generateBtn.disabled = true;
             generateBtn.innerText = t.processingPayment;
@@ -249,17 +278,17 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               paymentElementContainer.classList.add('hidden');
               generateBtn.classList.add('hidden');
               statusContainer.classList.remove('hidden');
-              startGeneration(currentTopic, currentCurriculum, currentYearLevel);
+              startGeneration(currentTopic, currentCurriculum, currentYearLevel, currentDuration, currentObjectives, currentPaymentIntentId);
             }
           }
         });
 
-        async function startGeneration(topic, curriculum, yearLevel) {
+        async function startGeneration(topic, curriculum, yearLevel, duration, objectives, paymentIntentId) {
           try {
             const res = await fetch('/api/generate', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ topic, curriculum, yearLevel })
+              body: JSON.stringify({ topic, curriculum, yearLevel, duration, objectives, paymentIntentId })
             });
             const data = await res.json();
             if (data.error) throw new Error(data.error);
@@ -278,15 +307,21 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
         const pendingTopic = sessionStorage.getItem('pendingTopic');
         const pendingCurriculum = sessionStorage.getItem('pendingCurriculum');
         const pendingYearLevel = sessionStorage.getItem('pendingYearLevel');
+        const pendingDuration = sessionStorage.getItem('pendingDuration');
+        const pendingObjectives = sessionStorage.getItem('pendingObjectives');
 
         if (pendingTopic && user) {
           sessionStorage.removeItem('pendingTopic');
           sessionStorage.removeItem('pendingCurriculum');
           sessionStorage.removeItem('pendingYearLevel');
+          sessionStorage.removeItem('pendingDuration');
+          sessionStorage.removeItem('pendingObjectives');
           topicInput.value = pendingTopic;
           curriculumInput.value = pendingCurriculum || '';
           yearLevelInput.value = pendingYearLevel || '';
-          startPaymentFlow(pendingTopic, pendingCurriculum, pendingYearLevel);
+          durationInput.value = pendingDuration || '60 min';
+          objectivesInput.value = pendingObjectives || '';
+          startPaymentFlow(pendingTopic, pendingCurriculum, pendingYearLevel, pendingDuration, pendingObjectives);
         }
       `}} />
     </Layout>
