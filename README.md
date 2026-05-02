@@ -37,7 +37,7 @@ A Cloudflare-native educational content generation platform. This application al
    ```
 
 3. **Configure Environment**:
-   Update `wrangler.toml` with your `database_id` and bucket bindings.
+   Update `wrangler.jsonc` with your `database_id` and bucket bindings.
 
 4. **Database Migrations**:
    ```bash

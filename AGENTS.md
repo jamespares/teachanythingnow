@@ -73,7 +73,7 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.www.l
 │   └── meta/
 ├── package.json
 ├── tsconfig.json
-├── wrangler.toml                # Cloudflare Workers deployment config
+├── wrangler.jsonc               # Cloudflare Workers deployment config
 ├── drizzle.config.ts            # Drizzle Kit configuration
 └── .dev.vars                    # Local development secrets (DO NOT COMMIT)
 ```
@@ -160,7 +160,7 @@ npm run lint
 
 ## Environment & Secrets
 
-### Public Vars (in `wrangler.toml`)
+### Public Vars (in `wrangler.jsonc`)
 
 | Variable | Purpose |
 |----------|---------|
@@ -259,7 +259,7 @@ If adding tests, the typical approach for this stack would be:
 - **Compatibility Flag:** `nodejs_compat` (required for some npm packages like `pptxgenjs`, `docx`, `pdf-lib`)
 - **Assets:** Static files served from `./public` via Wrangler's `[assets]` config
 - **Domain:** DNS and SSL managed through Cloudflare
-- **Observability:** Enabled in `wrangler.toml` for Cloudflare logging
+- **Observability:** Enabled in `wrangler.jsonc` for Cloudflare logging
 
 ### Resources to Provision
 
@@ -267,7 +267,7 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 1. **D1 Database:** `wrangler d1 create teach-anything-db`
 2. **R2 Bucket:** `wrangler r2 bucket create teach-anything-assets`
-3. **Workers AI:** Ensure the `[[ai]]` binding in `wrangler.toml` is active (no separate provisioning needed; billed through Cloudflare unified billing).
+3. **Workers AI:** Ensure the `ai` binding in `wrangler.jsonc` is active (no separate provisioning needed; billed through Cloudflare unified billing).
 4. **Domain:** Add `www.lastminutelessons.com` (or your chosen domain) to your Cloudflare account and configure DNS to point to the Workers deployment.
 5. **Secrets:** Set all secrets listed in the Secrets table above via `wrangler secret put`.
 

@@ -1,0 +1,40 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "last-minute-lessons",
+  "main": "src/index.ts",
+  "compatibility_date": "2024-11-01",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "vars": {
+    "STRIPE_PUBLISHABLE_KEY": "pk_live_51Sgg3aBYRA6cNlBJ0It49XIgT9m3sfasq999J2K0aLIPW3SuBy7IJ6l70bY9MUovpg1HE2uPV4xBAZotqdS3NTWV003zYv1lJo",
+    "BETTER_AUTH_URL": "https://www.lastminutelessons.com"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "teach-anything-db",
+      "database_id": "8628e8d5-92a7-43f5-96d9-f430f2b2dd2c"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BUCKET",
+      "bucket_name": "teach-anything-assets"
+    }
+  ],
+  "send_email": [
+    {
+      "name": "SEND_EMAIL"
+    }
+  ],
+  "assets": {
+    "directory": "./public"
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
