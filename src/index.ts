@@ -102,7 +102,7 @@ app.post("/api/payment/create", async (c) => {
   
   if (!session) return c.json({ error: "Unauthorized" }, 401);
   
-  const { topic, curriculum, yearLevel } = await c.req.json();
+  const { topic, curriculum, yearLevel, duration, objectives } = await c.req.json();
   const stripeInstance = stripe(c.env.STRIPE_SECRET_KEY);
 
   const paymentIntent = await stripeInstance.paymentIntents.create({
@@ -112,7 +112,9 @@ app.post("/api/payment/create", async (c) => {
       userId: session.user.id, 
       topic,
       curriculum,
-      yearLevel
+      yearLevel,
+      duration,
+      objectives
     }
   });
 
@@ -124,7 +126,9 @@ app.post("/api/payment/create", async (c) => {
     status: "pending",
     topic,
     curriculum,
-    yearLevel
+    yearLevel,
+    duration,
+    objectives
   });
 
   return c.json({
@@ -180,20 +184,30 @@ app.post("/api/generate", async (c) => {
   
   if (!session) return c.json({ error: "Unauthorized" }, 401);
 
-  const { topic, curriculum, yearLevel } = await c.req.json();
+  const { topic, curriculum, yearLevel, duration, objectives, paymentIntentId } = await c.req.json();
   
+  let paymentQuery;
+  if (paymentIntentId) {
+    paymentQuery = and(
+      eq(payments.stripePaymentIntentId, paymentIntentId),
+      eq(payments.userId, session.user.id),
+      isNull(payments.usedAt)
+    );
+  } else {
+    // Fallback to legacy lookup for backward compatibility
+    paymentQuery = and(
+      eq(payments.userId, session.user.id),
+      eq(payments.topic, topic),
+      eq(payments.curriculum, curriculum),
+      eq(payments.yearLevel, yearLevel),
+      isNull(payments.usedAt)
+    );
+  }
+
   const [payment] = await db
     .select()
     .from(payments)
-    .where(
-      and(
-        eq(payments.userId, session.user.id),
-        eq(payments.topic, topic),
-        eq(payments.curriculum, curriculum),
-        eq(payments.yearLevel, yearLevel),
-        isNull(payments.usedAt)
-      )
-    )
+    .where(paymentQuery)
     .limit(1);
 
   if (!payment) return c.json({ error: "No unused payment found for this topic" }, 400);
@@ -220,7 +234,7 @@ app.post("/api/generate", async (c) => {
 
   try {
     // 1. Generate Content
-    const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN, c.env.AI);
+    const content = await generateContent(topic, curriculum || "General", yearLevel || "All ages", c.env.OPENAI_API_KEY, c.env.CF_AI_GATEWAY_URL, c.env.CF_AI_GATEWAY_TOKEN, c.env.AI, duration, objectives);
 
     // 2. Parallel Generation Tasks
     const pptTask = async () => {
@@ -270,6 +284,8 @@ app.post("/api/generate", async (c) => {
       topic,
       curriculum,
       yearLevel,
+      duration,
+      objectives,
       fileId,
       files: JSON.stringify({
         presentation,

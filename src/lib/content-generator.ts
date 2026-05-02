@@ -77,16 +77,16 @@ export interface GeneratedContent {
   };
 }
 
-export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<GeneratedContent> {
+export async function generateContent(topic: string, curriculum: string, yearLevel: string, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai, duration?: string, objectives?: string): Promise<GeneratedContent> {
   try {
     // Generate slides using AI - this is the foundation for all other content
-    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, gatewayUrl, gatewayToken, ai);
+    const slides = await generateSlidesWithAI(topic, curriculum, yearLevel, apiKey, gatewayUrl, gatewayToken, ai, duration, objectives);
     
     // Generate podcast script - uses slides for consistency
-    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, gatewayUrl, gatewayToken, ai);
+    const podcastScript = await generatePodcastScriptWithAI(topic, curriculum, yearLevel, slides, apiKey, gatewayUrl, gatewayToken, ai, duration, objectives);
     
     // Generate worksheet questions - uses slides for consistency
-    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, gatewayUrl, gatewayToken, ai);
+    const worksheet = await generateWorksheetWithAI(topic, curriculum, yearLevel, slides, apiKey, gatewayUrl, gatewayToken, ai, duration, objectives);
 
     return {
       slides,
@@ -96,9 +96,9 @@ export async function generateContent(topic: string, curriculum: string, yearLev
   } catch (error) {
     console.error("Error generating content with AI, falling back to template:", error);
     // Fallback to template-based generation if AI fails
-    const slides = generateSlides(topic);
-    const podcastScript = generatePodcastScript(topic, slides);
-    const worksheet = generateWorksheet(topic, slides);
+    const slides = generateSlides(topic, duration, objectives);
+    const podcastScript = generatePodcastScript(topic, slides, duration, objectives);
+    const worksheet = generateWorksheet(topic, slides, duration, objectives);
 
     return {
       slides,
@@ -108,7 +108,10 @@ export async function generateContent(topic: string, curriculum: string, yearLev
   }
 }
 
-async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<Array<{ title: string; content: string[] }>> {
+async function generateSlidesWithAI(topic: string, curriculum: string, yearLevel: string, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai, duration?: string, objectives?: string): Promise<Array<{ title: string; content: string[] }>> {
+  const durationContext = duration ? `Design this for a ${duration} lesson.` : '';
+  const objectivesContext = objectives ? `Focus on achieving these objectives: ${objectives}` : '';
+
   const systemPrompt = `You are an expert educator who creates engaging, clear educational content. Create professional slides that are well-structured and easy to understand. 
           
 CRITICAL: You MUST generate all content (titles, bullet points, labels) EXCLUSIVELY in English.
@@ -121,6 +124,8 @@ Guidelines:
 - Align content specifically with "${curriculum}" learning standards.
 - Ensure vocabulary and concept complexity is appropriate for "${yearLevel}".
 - Use research-backed pedagogical standards (scaffolding, direct instruction).
+${durationContext}
+${objectivesContext}
           
 Create 6-8 slides with:
 - Clear, descriptive titles
@@ -185,8 +190,10 @@ Make it educational and suitable for teaching.`;
   return generateSlides(topic);
 }
 
-async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<string> {
+async function generatePodcastScriptWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai, duration?: string, objectives?: string): Promise<string> {
   const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
+  const durationContext = duration ? `The lesson duration is ${duration}.` : '';
+  const objectivesContext = objectives ? `Key objectives: ${objectives}` : '';
 
   const systemPrompt = `You are an engaging podcast host who makes educational content interesting and accessible. Create conversational podcast scripts that sound natural when spoken. Write for the ear, not the eye - use natural spoken language.
           
@@ -197,6 +204,8 @@ CRITICAL: You MUST write the script EXCLUSIVELY in English.`;
 Educational Context:
 - Target Audience: "${yearLevel}"
 - Curriculum: "${curriculum}"
+${durationContext}
+${objectivesContext}
 - Tone: Engaging, age-appropriate, and aligned with research-backed learning standards.
 
 Structure:
@@ -262,8 +271,10 @@ ${slideContent}`;
   return generatePodcastScript(topic, slides);
 }
 
-async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
+async function generateWorksheetWithAI(topic: string, curriculum: string, yearLevel: string, slides: Array<{ title: string; content: string[] }>, apiKey: string, gatewayUrl?: string, gatewayToken?: string, ai?: Ai, duration?: string, objectives?: string): Promise<{ questions: Array<{ question: string; type: "multiple-choice" | "short-answer" | "essay"; options?: string[]; correctAnswer: string; }> }> {
   const slideContent = slides.map(s => `${s.title}: ${s.content.join(" ")}`).join("\n\n");
+  const durationContext = duration ? `The lesson duration is ${duration}.` : '';
+  const objectivesContext = objectives ? `The objectives are: ${objectives}` : '';
 
   const systemPrompt = `You are an expert educator creating assessment questions. 
           
@@ -277,11 +288,15 @@ Standards:
 - Questions should map to "${curriculum}" assessment criteria.
 - Difficulty and wording must be suitable for "${yearLevel}".
 - Include clear, research-backed answer keys.
+${durationContext}
+${objectivesContext}
 
 Include:
 - 4-5 multiple-choice questions (with 4 options each)
 - 2-3 short-answer questions
 - 2 essay questions
+
+CRITICAL ALIGNMENT RULE: Every question MUST test content that is explicitly covered in the slides or podcast script provided above. Do NOT ask about concepts, facts, or vocabulary that do not appear in the provided slides or podcast. Students must be able to answer every question using only the information in the lesson materials.
 
 Make questions clear and directly related to "${topic}". Use concepts from these slides:
 ${slideContent}
@@ -342,16 +357,18 @@ Provide detailed correct answers. Return valid JSON.`;
   return generateWorksheet(topic, slides);
 }
 
-function generateSlides(topic: string): Array<{ title: string; content: string[] }> {
+function generateSlides(topic: string, duration?: string, objectives?: string): Array<{ title: string; content: string[] }> {
   // Generate slide content structure
   // In production, use AI to generate this
+  const durationText = duration ? ` (Duration: ${duration})` : '';
+  const objectivesText = objectives ? ` Objectives: ${objectives}` : '';
   return [
     {
       title: `Introduction to ${topic}`,
       content: [
-        `Welcome to our lesson on ${topic}`,
-        `Today we'll explore the key concepts and principles`,
-        `By the end, you'll have a solid understanding`
+        `Welcome to our lesson on ${topic}${durationText}`,
+        `${objectivesText}`,
+        `Today we'll explore the key concepts and principles`
       ]
     },
     {
@@ -389,9 +406,15 @@ function generateSlides(topic: string): Array<{ title: string; content: string[]
   ];
 }
 
-function generatePodcastScript(topic: string, slides: Array<{ title: string; content: string[] }>): string {
+function generatePodcastScript(topic: string, slides: Array<{ title: string; content: string[] }>, duration?: string, objectives?: string): string {
   // Generate a podcast-style script
   let script = `Welcome to Last Minute Lessons. Today, we're diving deep into ${topic}.\n\n`;
+  if (duration) {
+    script += `This lesson is designed to take about ${duration}. `;
+  }
+  if (objectives) {
+    script += `By the end, you should be able to: ${objectives}\n\n`;
+  }
   
   slides.forEach((slide, index) => {
     script += `${slide.title}.\n\n`;
@@ -406,7 +429,7 @@ function generatePodcastScript(topic: string, slides: Array<{ title: string; con
   return script;
 }
 
-function generateWorksheet(topic: string, slides: Array<{ title: string; content: string[] }>): {
+function generateWorksheet(topic: string, slides: Array<{ title: string; content: string[] }>, duration?: string, objectives?: string): {
   questions: Array<{
     question: string;
     type: "multiple-choice" | "short-answer" | "essay";
@@ -414,15 +437,16 @@ function generateWorksheet(topic: string, slides: Array<{ title: string; content
     correctAnswer: string;
   }>;
 } {
+  const contextPrefix = objectives ? `Based on the lesson objectives (${objectives}), ` : '';
   return {
     questions: [
       {
-        question: `What is ${topic}?`,
+        question: `${contextPrefix}What is ${topic}?`,
         type: "short-answer",
         correctAnswer: `${topic} is a fundamental concept that involves key principles and applications.`
       },
       {
-        question: `Which of the following best describes ${topic}?`,
+        question: `${contextPrefix}Which of the following best describes ${topic}?`,
         type: "multiple-choice",
         options: [
           "A fundamental concept",
@@ -433,17 +457,17 @@ function generateWorksheet(topic: string, slides: Array<{ title: string; content
         correctAnswer: "A fundamental concept"
       },
       {
-        question: `Explain the key concepts of ${topic} in your own words.`,
+        question: `${contextPrefix}Explain the key concepts of ${topic} in your own words.`,
         type: "essay",
         correctAnswer: "Answers should demonstrate understanding of the key concepts discussed in the lesson."
       },
       {
-        question: `What are some practical applications of ${topic}?`,
+        question: `${contextPrefix}What are some practical applications of ${topic}?`,
         type: "short-answer",
         correctAnswer: "Practical applications include real-world examples that illustrate the concepts."
       },
       {
-        question: `How would you apply your knowledge of ${topic}?`,
+        question: `${contextPrefix}How would you apply your knowledge of ${topic}?`,
         type: "essay",
         correctAnswer: "Answers should show practical understanding and application of the concepts."
       }

@@ -24,20 +24,20 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* Hero */}
           <section class="site-main--narrow pt-20 pb-12 text-center">
             <style>{`
-              .hero-h1 { font-size: 4.5rem; }
-              .hero-line1 { font-size: 2.25rem; }
-              .hero-line2 { font-size: 1.875rem; }
+              .hero-h1 { font-size: 3.5rem; }
+              .hero-line1 { font-size: 1.875rem; }
+              .hero-line2 { font-size: 1.5rem; }
               .hero-desc { font-size: 1.125rem; }
               @media (min-width: 768px) {
-                .hero-h1 { font-size: 6rem; }
-                .hero-line1 { font-size: 3rem; }
-                .hero-line2 { font-size: 2.25rem; }
+                .hero-h1 { font-size: 5rem; }
+                .hero-line1 { font-size: 2.5rem; }
+                .hero-line2 { font-size: 1.875rem; }
                 .hero-desc { font-size: 1.25rem; }
               }
               @media (min-width: 1024px) {
-                .hero-h1 { font-size: 8rem; }
-                .hero-line1 { font-size: 3.75rem; }
-                .hero-line2 { font-size: 3rem; }
+                .hero-h1 { font-size: 6.5rem; }
+                .hero-line1 { font-size: 3.25rem; }
+                .hero-line2 { font-size: 2.25rem; }
               }
             `}</style>
             <div class="animate-fade-in">

@@ -27,6 +27,18 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
                 return (
                   <div key={pkg.id} class="card card-hover package-card">
                     <h3 class="text-xl mb-2">{pkg.topic}</h3>
+                    {(pkg.duration || pkg.objectives) && (
+                      <div class="mb-3">
+                        {pkg.duration && (
+                          <span class="inline-block px-2 py-1 text-xs font-medium rounded" style="background: rgba(0,107,84,0.1); color: #006b54;">
+                            {pkg.duration}
+                          </span>
+                        )}
+                        {pkg.objectives && (
+                          <p class="text-xs text-secondary mt-1 leading-relaxed">{pkg.objectives}</p>
+                        )}
+                      </div>
+                    )}
                     <p class="text-xs text-muted mb-6">
                       Generated on {new Date(pkg.createdAt).toLocaleDateString("en-GB")}
                     </p>

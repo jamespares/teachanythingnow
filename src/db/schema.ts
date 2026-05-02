@@ -62,6 +62,8 @@ export const payments = sqliteTable("payments", {
   topic: text("topic"),
   curriculum: text("curriculum"),
   yearLevel: text("year_level"),
+  duration: text("duration"),
+  objectives: text("objectives"),
   usedAt: integer("used_at", { mode: "timestamp" }),
   createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
   updatedAt: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
@@ -74,6 +76,8 @@ export const packages = sqliteTable("packages", {
   topic: text("topic").notNull(),
   curriculum: text("curriculum"),
   yearLevel: text("year_level"),
+  duration: text("duration"),
+  objectives: text("objectives"),
   fileId: text("file_id").notNull(),
   files: text("files").notNull(), // JSON string: {presentation, audio, worksheet, answerSheet, images[]}
   createdAt: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`),
