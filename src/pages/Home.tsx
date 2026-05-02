@@ -141,7 +141,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
                   { icon: "📝", title: "Worksheet", desc: "Structured exercises that reinforce key concepts. Export as DOCX. Distribute after the presentation to test understanding. Use as formative assessment, homework, or a peer-review activity." },
                   { icon: "🎨", title: "AI Images", desc: "Custom illustrations generated for your exact topic. Export as PNG. Use these as a provocation to start the lesson, to spark curiosity, or as visual anchors on a classroom display." },
                 ].map(item => (
-                  <div key={item.title} class="card p-16 text-center flex-1 min-w-[300px] max-w-[380px]">
+                  <div key={item.title} class="card p-10 text-center flex-1 min-w-[340px] max-w-[460px]">
                     <div class="feature-icon">{item.icon}</div>
                     <h3 class="text-xl mb-3">{item.title}</h3>
                     <p class="text-secondary text-sm leading-relaxed">{item.desc}</p>
