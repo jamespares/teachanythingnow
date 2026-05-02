@@ -30,7 +30,7 @@ export function getAuth(db: ReturnType<typeof getDb>, env: { BETTER_AUTH_SECRET:
         const boundary = "boundary-" + crypto.randomUUID();
         const mimeMessage = [
           `To: ${user.email}`,
-          `From: James Pares <hey@jamespares.me>`,
+          `From: noreply@lastminutelessons.com`,
           `Subject: Reset your password`,
           `MIME-Version: 1.0`,
           `Content-Type: multipart/alternative; boundary="${boundary}"`,
@@ -46,10 +46,10 @@ export function getAuth(db: ReturnType<typeof getDb>, env: { BETTER_AUTH_SECRET:
           `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
           ``,
           `--${boundary}--`,
-        ].join("\\r\\n");
+        ].join("\r\n");
 
         const msg = new EmailMessage(
-          "hey@jamespares.me",
+          "noreply@lastminutelessons.com",
           user.email,
           mimeMessage
         );
