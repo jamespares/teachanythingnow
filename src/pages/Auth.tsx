@@ -201,8 +201,7 @@ export const Auth = () => {
               }
             } else if (mode === 'forgot') {
               const { data, error } = await client.forgetPassword({
-                email,
-                redirectTo: window.location.origin + '/reset-password'
+                email
               });
               if (error) {
                 showError(error.message || t.errorSendResetEmail);

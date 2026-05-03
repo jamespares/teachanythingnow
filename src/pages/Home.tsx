@@ -24,20 +24,20 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
           {/* Hero */}
           <section class="site-main--narrow pt-20 pb-12 text-center">
             <style>{`
-              .hero-h1 { font-size: 3.5rem; }
-              .hero-line1 { font-size: 1.875rem; }
-              .hero-line2 { font-size: 1.5rem; }
-              .hero-desc { font-size: 1.125rem; }
+              .hero-h1 { font-size: 2.5rem; }
+              .hero-line1 { font-size: 1.5rem; }
+              .hero-line2 { font-size: 1.25rem; }
+              .hero-desc { font-size: 1rem; }
               @media (min-width: 768px) {
-                .hero-h1 { font-size: 5rem; }
-                .hero-line1 { font-size: 2.5rem; }
-                .hero-line2 { font-size: 1.875rem; }
-                .hero-desc { font-size: 1.25rem; }
+                .hero-h1 { font-size: 3.5rem; }
+                .hero-line1 { font-size: 2rem; }
+                .hero-line2 { font-size: 1.5rem; }
+                .hero-desc { font-size: 1.125rem; }
               }
               @media (min-width: 1024px) {
-                .hero-h1 { font-size: 6.5rem; }
-                .hero-line1 { font-size: 3.25rem; }
-                .hero-line2 { font-size: 2.25rem; }
+                .hero-h1 { font-size: 4.5rem; }
+                .hero-line1 { font-size: 2.5rem; }
+                .hero-line2 { font-size: 1.75rem; }
               }
             `}</style>
             <div class="animate-fade-in">
@@ -50,7 +50,7 @@ export const Home: FC<{ user?: any; stripeKey: string }> = ({ user, stripeKey })
               <p class="font-accent hero-line2 leading-tight mb-12" style="color: var(--accent);">
                 <span class="inline-flex items-center gap-4">
                   No problem.
-                  <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 180px; height: 18px; flex-shrink: 0;">
+                  <svg viewBox="0 0 200 20" preserveAspectRatio="none" style="width: 140px; height: 14px; flex-shrink: 0;">
                     <path d="M0,15 Q60,2 120,12 T200,8" fill="none" stroke="var(--accent)" stroke-width="5" stroke-linecap="round" />
                   </svg>
                 </span>

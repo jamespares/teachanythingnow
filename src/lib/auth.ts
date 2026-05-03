@@ -10,7 +10,7 @@ export function getAuth(db: ReturnType<typeof getDb>, env: { BETTER_AUTH_SECRET:
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
-      sendResetPassword: async ({ user, url }, request) => {
+      sendResetPassword: async ({ user, url, token }, request) => {
         if (!env.SEND_EMAIL) {
           console.warn("SEND_EMAIL binding is missing. Cannot send reset password email.");
           return;
@@ -25,12 +25,14 @@ export function getAuth(db: ReturnType<typeof getDb>, env: { BETTER_AUTH_SECRET:
           return;
         }
 
+        const resetUrl = `${env.BETTER_AUTH_URL}/reset-password?token=${token}`;
+
         // To comply with raw MIME generation without complex node dependencies
         // we can piece together a simple plain-text compliant MIME format
         const boundary = "boundary-" + crypto.randomUUID();
         const mimeMessage = [
           `To: ${user.email}`,
-          `From: noreply@lastminutelessons.com`,
+          `From: hey@jamespares.me`,
           `Subject: Reset your password`,
           `MIME-Version: 1.0`,
           `Content-Type: multipart/alternative; boundary="${boundary}"`,
@@ -38,18 +40,18 @@ export function getAuth(db: ReturnType<typeof getDb>, env: { BETTER_AUTH_SECRET:
           `--${boundary}`,
           `Content-Type: text/plain; charset="utf-8"`,
           ``,
-          `Click the following link to reset your password: ${url}`,
+          `Click the following link to reset your password: ${resetUrl}`,
           ``,
           `--${boundary}`,
           `Content-Type: text/html; charset="utf-8"`,
           ``,
-          `<p>Click <a href="${url}">here</a> to reset your password.</p>`,
+          `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p>`,
           ``,
           `--${boundary}--`,
         ].join("\r\n");
 
         const msg = new EmailMessage(
-          "noreply@lastminutelessons.com",
+          "hey@jamespares.me",
           user.email,
           mimeMessage
         );
