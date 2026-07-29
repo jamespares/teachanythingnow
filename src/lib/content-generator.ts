@@ -357,7 +357,7 @@ function generateWorksheet(topic: string, slides: Array<{ title: string; content
       {
         question: `${contextPrefix}What are some practical applications of ${topic}?`,
         type: "short-answer",
-        correctAnswer: "Practical applications include real-world examples that illustrate the concepts.`"
+        correctAnswer: "Practical applications include real-world examples that illustrate the concepts."
       },
       {
         question: `${contextPrefix}How would you apply your knowledge of ${topic}?`,
