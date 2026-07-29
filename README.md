@@ -10,8 +10,8 @@ A Cloudflare-native educational content generation platform. This application al
 - **ORM**: [Drizzle ORM](https://orm.drizzle.team/)
 - **Authentication**: [Better Auth](https://better-auth.com/)
 - **Storage**: [Cloudflare R2](https://developers.cloudflare.com/r2/)
-- **AI Stack**: OpenAI (GPT-4o, TTS-1-HD, DALL-E 3)
-- **Payments**: Stripe
+- **AI Stack**: [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/) — Kimi K2.6 (text, primary) with Llama 3.3 70B fallback, FLUX.1 schnell (images), Deepgram Aura-1 (audio narration)
+- **Pricing**: Free — 5 lesson packages per account per day
 
 ## 🛠️ Getting Started
 
@@ -49,10 +49,8 @@ A Cloudflare-native educational content generation platform. This application al
    ```
 
 5. **Secrets**:
-   Add your API keys to Cloudflare:
+   Only the auth secret is required — all AI runs on the Workers AI binding, no AI provider keys needed:
    ```bash
-   npx wrangler secret put STRIPE_SECRET_KEY
-   npx wrangler secret put OPENAI_API_KEY
    npx wrangler secret put BETTER_AUTH_SECRET
    ```
 
