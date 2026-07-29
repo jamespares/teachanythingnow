@@ -30,12 +30,12 @@ export const Dashboard: FC<{ user: any; packages: any[] }> = ({ user, packages }
                     {(pkg.duration || pkg.objectives) && (
                       <div class="mb-3">
                         {pkg.duration && (
-                          <span class="inline-block px-2 py-1 text-xs font-medium rounded" style="background: rgba(0,107,84,0.1); color: #006b54;">
+                          <span class="badge">
                             {pkg.duration}
                           </span>
                         )}
                         {pkg.objectives && (
-                          <p class="text-xs text-secondary mt-1 leading-relaxed">{pkg.objectives}</p>
+                          <p class="text-xs text-secondary mt-2 leading-relaxed">{pkg.objectives}</p>
                         )}
                       </div>
                     )}

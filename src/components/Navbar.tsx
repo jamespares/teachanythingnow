@@ -17,7 +17,7 @@ export const Navbar: FC<NavbarProps> = ({ user, showDashboard = true }) => {
         {user ? (
           <>
             {showDashboard && (
-              <a href="/dashboard" class="text-sm font-semibold transition-colors" style="color:var(--base-text);" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--base-text)'">
+              <a href="/dashboard" class="nav-link">
                 My Packages
               </a>
             )}
