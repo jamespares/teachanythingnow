@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-**Last Minute Lessons** is a **Cloudflare-first** educational content generation platform. The application runs entirely on Cloudflare's edge infrastructure — the domain (`www.lastminutelessons.com`), deployment, compute, database, and object storage are all hosted on Cloudflare. Users enter any topic, pay £1, and receive a complete teaching package generated in under 60 seconds. Each package includes:
+**Last Minute Lessons** is a **Cloudflare-first** educational content generation platform. The application runs entirely on Cloudflare's edge infrastructure — the domain (`www.lastminutelessons.com`), deployment, compute, database, and object storage are all hosted on Cloudflare. Users enter any topic and receive a complete teaching package generated in under 60 seconds — free of charge (5 packages per account per day). Each package includes:
 
 - A PowerPoint presentation (`.pptx`)
 - A podcast-style audio explanation (`.mp3`)
@@ -15,7 +15,7 @@
 
 The application is built as a single Hono application running on **Cloudflare Workers** (via Wrangler), using server-side rendered JSX for the UI. There is no client-side JavaScript framework — all interactivity is handled via vanilla JS embedded in inline `<script>` tags.
 
-The app is operated by EduConnect Asia Ltd and is deployed at `https://www.www.lastminutelessons.com` via **Cloudflare Workers**.
+The app is operated by EduConnect Asia Ltd and is deployed at `https://www.lastminutelessons.com` via **Cloudflare Workers**.
 
 ---
 
@@ -31,9 +31,9 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.www.l
 | ORM | Drizzle ORM v0.45+ |
 | Auth | Better Auth v1.1+ (email/password, Drizzle adapter) |
 | Object Storage | Cloudflare R2 — edge object storage |
-| AI / Content | OpenAI GPT-4o (primary via AI Gateway), Workers AI `kimi-k2.6` (fallback), OpenAI TTS-1-HD |
+| AI / Content | Workers AI `@cf/moonshotai/kimi-k2.6` (primary), `@cf/meta/llama-3.3-70b-instruct-fp8-fast` (fallback), Workers AI `@cf/deepgram/aura-1` (TTS) |
 | Image Generation | Cloudflare Workers AI — `@cf/black-forest-labs/flux-1-schnell` |
-| Payments | Stripe (Payment Intents + webhooks) |
+| Pricing | Free — 5 generations per account per day (enforced in `/api/generate`) |
 | Email | Resend |
 | Language | TypeScript (ES modules, strict mode) |
 
@@ -50,20 +50,18 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.www.l
 │   │   ├── auth.ts              # Better Auth factory (getAuth)
 │   │   ├── db.ts                # Drizzle client factory (getDb)
 │   │   ├── storage.ts           # R2Storage wrapper for R2 uploads/downloads
-│   │   ├── stripe.ts            # Stripe SDK initializer
-│   │   ├── content-generator.ts # GPT-4o content generation with Workers AI kimi-k2.6 fallback
+│   │   ├── content-generator.ts # Content generation via Workers AI (Kimi K2.6 → Llama 3.3 70B)
 │   │   ├── ppt-generator.ts     # PPTX generation via PptxGenJS
-│   │   ├── audio-generator.ts   # MP3 generation via OpenAI TTS
+│   │   ├── audio-generator.ts   # MP3 generation via Workers AI (Deepgram Aura-1, chunked)
 │   │   ├── worksheet-generator.ts # DOCX worksheet + PDF answer key generation
 │   │   └── image-generator.ts   # Image generation via Cloudflare Workers AI (FLUX-1-schnell)
 │   └── pages/
-│       ├── Layout.tsx           # Root layout component (HTML shell, CSS, global styles)
-│       ├── Home.tsx             # Landing page with topic input, Stripe payment, generation flow
+│       ├── Home.tsx             # Landing page with topic input and free generation flow
 │       ├── Dashboard.tsx        # User's generated lesson packages with download links
 │       ├── Auth.tsx             # Sign-in / sign-up toggle page (Better Auth client)
 │       └── Terms.tsx            # Terms of Service page
 ├── public/
-│   ├── globals.css              # Plain CSS design system (no build step)
+│   ├── styles.css               # Plain CSS design system (no build step)
 │   ├── logo.png                 # Brand logo
 │   ├── chalk-board-bg.png       # Background texture
 │   ├── robots.txt               # SEO robots file
@@ -89,7 +87,7 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.www.l
 - **`src/lib/`** contains pure business logic with no JSX. Each file is responsible for one domain:
   - Content/audio/image/worksheet/PPT generation
   - Auth and DB factories
-  - External service clients (Stripe, R2)
+  - External service clients (R2)
 - **`src/pages/`** contains Hono JSX components. They are responsible **only** for rendering HTML and embedding minimal client-side JavaScript.
 
 ### Naming Conventions
@@ -103,15 +101,15 @@ The app is operated by EduConnect Asia Ltd and is deployed at `https://www.www.l
 
 - JSX is rendered server-side using `hono/jsx`. There is **no client-side hydration**.
 - The `/** @jsxImportSource hono/jsx */` pragma is used at the top of `.tsx` files.
-- Styles are applied via inline `style` attributes and global CSS classes defined inside `Layout.tsx` (in a `<style>` block) and `public/globals.css`.
-- The design system uses CSS custom properties (variables) for colors, fonts, and spacing. Primary brand color is a deep teal (`#006b54`).
-- Fonts are loaded from Google Fonts: **Lexend** (headings) and **Inter** (body).
+- Styles are applied via utility classes defined in `public/styles.css` (plain CSS design system, no build step), with occasional inline `style` attributes.
+- The design system uses CSS custom properties (variables) for colors, fonts, and spacing. Primary accent color is sun yellow (`#f59e0b`) on warm neutrals.
+- Fonts are loaded from Google Fonts: **Lexend** (headings), **Inter** (body), and **Patrick Hand** (hero/brand accents).
+- The site is English-only; there is no i18n system.
 
 ### Client-Side JavaScript
 
 - Client scripts are embedded directly in page components using `<script dangerouslySetInnerHTML={{ __html: '...' }}>` or `<script type="module" dangerouslySetInnerHTML={{ __html: '...' }}>`.
 - The Better Auth client is loaded from `https://esm.sh/better-auth/client` as an ES module.
-- Stripe.js is loaded from `https://js.stripe.com/v3/`.
 - There is no bundler for client assets; all client code is hand-written inline.
 
 ### Database & Migrations
@@ -154,7 +152,7 @@ npm run db:studio
 npm run lint
 ```
 
-> **Note:** There is no build step for the application. Wrangler bundles `src/index.ts` automatically using its internal esbuild pipeline. There is also no test runner configured.
+> **Note:** There is no build step for the application. Wrangler bundles `src/index.ts` automatically using its internal esbuild pipeline. Tests run via `npm test` (Vitest).
 
 ---
 
@@ -164,19 +162,12 @@ npm run lint
 
 | Variable | Purpose |
 |----------|---------|
-| `STRIPE_PUBLISHABLE_KEY` | Stripe publishable key for frontend payment elements |
-| `BETTER_AUTH_URL` | Base URL for auth callbacks (`https://www.www.lastminutelessons.com`) |
+| `BETTER_AUTH_URL` | Base URL for auth callbacks (`https://www.lastminutelessons.com`) |
 
 ### Secrets (set via `wrangler secret put` or `.dev.vars` for local dev)
 
 | Secret | Purpose |
 |--------|---------|
-| `STRIPE_SECRET_KEY` | Stripe server-side API key |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook endpoint secret |
-
-| `OPENAI_API_KEY` | OpenAI API for content (GPT-4o via AI Gateway) and audio (TTS-1-HD) generation. If missing, Workers AI fallback handles content. |
-| `CF_AI_GATEWAY_URL` | Cloudflare AI Gateway base URL for OpenAI text completions |
-| `CF_AI_GATEWAY_TOKEN` | Cloudflare AI Gateway authorization token |
 | `BETTER_AUTH_SECRET` | Encryption secret for Better Auth sessions/tokens |
 | `RESEND_API_KEY` | Resend API for transactional emails (legacy — migrate to Cloudflare SEND_EMAIL) |
 
@@ -200,41 +191,37 @@ npm run lint
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/` | Landing page (topic input + payment) |
+| `GET` | `/` | Landing page (topic input + free generation) |
 | `GET` | `/login` | Auth page (sign in / sign up) |
 | `GET` | `/dashboard` | User's lesson packages |
 | `GET` | `/terms` | Terms of Service |
 | `POST/GET` | `/api/auth/*` | Better Auth endpoints |
-| `POST` | `/api/payment/create` | Creates Stripe PaymentIntent (£1.00 GBP) |
-| `POST` | `/api/webhooks/stripe` | Stripe webhook handler (payment succeeded/failed) |
-| `POST` | `/api/generate` | Triggers content generation after payment verification |
+| `POST` | `/api/generate` | Triggers content generation (free; max 5 per account per day, resets midnight UTC) |
 | `GET` | `/api/download?file=...` | Downloads a file from R2 |
 
 ### Generation Flow
 
-1. User enters topic on `/` and clicks "Generate".
-2. Frontend creates a Stripe PaymentIntent via `/api/payment/create`.
-3. User completes card payment via Stripe Elements.
-4. On success, frontend calls `/api/generate` with the topic.
-5. Backend verifies payment, marks it as `used`, then runs four parallel generation tasks:
+1. User enters topic on `/` and clicks "Generate Package — Free".
+2. Unauthenticated users are redirected to `/login` (the pending form state is restored afterwards).
+3. Backend checks the daily free limit (5 packages per account per UTC day, counted from the `packages` table), then runs four parallel generation tasks:
    - `generatePPT()` → uploads `.pptx` to R2
-   - `generateAudio()` → uploads `.mp3` to R2
+   - `generateAudio()` (Workers AI Deepgram Aura-1, sentence-chunked) → uploads `.mp3` to R2
    - `generateWorksheet()` → uploads `.docx` to R2
-   - `generateContent()` → tries GPT-4o first, falls back to Workers AI `kimi-k2.6` if OpenAI fails
-   - `generateImages()` (Workers AI FLUX-1-schnell) + `downloadImages()` → uploads `.png` files to R2
-6. File metadata is saved to the `packages` table as a JSON string.
-7. User is redirected to `/dashboard` to download files.
+   - `generateContent()` → Workers AI Kimi K2.6 first, falls back to Llama 3.3 70B, then static templates
+   - `generateImages()` (Workers AI FLUX-1-schnell, prompts via Workers AI text models) + `downloadImages()` → uploads `.png` files to R2
+4. File metadata is saved to the `packages` table as a JSON string.
+5. User is redirected to `/dashboard` to download files.
+
+> **Legacy note:** The `payments` table still exists in D1 with historical Stripe records but is no longer referenced by any code. It can be dropped in a future migration if desired.
 
 ---
 
 ## Testing Strategy
 
-> **Current State:** The project has **no automated tests** and **no test runner** configured. There are no `*.test.*` or `*.spec.*` files.
-
-Testing is currently manual:
+Testing is a mix of automated and manual:
+- `npm test` runs the Vitest suite (`src/__tests__/`), which checks design-system files, removed legacy files, and that payment code stays removed.
 - Run `npm run dev` and test the full user flow locally.
 - Use Wrangler's local D1/R2 emulation for database and storage testing.
-- Verify Stripe webhooks using the Stripe CLI or by inspecting the Stripe Dashboard.
 
 If adding tests, the typical approach for this stack would be:
 - **Unit tests:** Use Vitest for testing pure logic in `src/lib/`.
@@ -275,13 +262,11 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 ## Security Considerations
 
-1. **Secrets Management:** Live API keys (Stripe, OpenAI, Better Auth) are stored in `.dev.vars` for local dev and as Wrangler secrets for production. Never commit `.dev.vars`.
-2. **Stripe Webhooks:** The webhook endpoint (`/api/webhooks/stripe`) validates the Stripe signature using `STRIPE_WEBHOOK_SECRET`. Always verify signatures in production.
-3. **Auth Sessions:** Better Auth sessions are cookie-based and encrypted with `BETTER_AUTH_SECRET`. The `baseURL` must match the deployed domain.
+1. **Secrets Management:** Live secrets (Better Auth) are stored in `.dev.vars` for local dev and as Wrangler secrets for production. Never commit `.dev.vars`.
+2. **Auth Sessions:** Better Auth sessions are cookie-based and encrypted with `BETTER_AUTH_SECRET`. The `baseURL` must match the deployed domain.
+3. **Free-tier abuse:** `/api/generate` enforces authentication plus a per-account daily limit (5/day). Workers AI usage is billed through Cloudflare unified billing — monitor usage in the Cloudflare dashboard.
 4. **File Downloads:** The `/api/download` endpoint does not enforce authentication — anyone with the filename can download. Files in R2 should ideally be non-listable, and filenames contain random IDs for obscurity.
-5. **Payment Verification:** Before generating content, the `/api/generate` endpoint verifies that the user has an unused, successful payment for the topic. It also syncs payment status from Stripe as a fallback if the webhook has not yet arrived.
-6. **No Rate Limiting:** There is no rate limiting implemented on API endpoints. Consider adding Cloudflare Rate Limiting or in-app throttling for the generation endpoint.
-7. **Input Sanitization:** Topic input is not strictly sanitized beyond basic JSON parsing. Since content is passed to OpenAI prompts, prompt injection by users is a theoretical risk.
+5. **Input Sanitization:** Topic input is not strictly sanitized beyond basic JSON parsing. Since content is passed to Workers AI prompts, prompt injection by users is a theoretical risk.
 
 ---
 
@@ -297,7 +282,7 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 ### Adding a New Page
 
 1. Create a new `.tsx` file in `src/pages/` with the `/** @jsxImportSource hono/jsx */` pragma.
-2. Wrap the page in the `Layout` component from `./Layout`.
+2. Wrap the page in the `Layout` component from `../components/Layout`.
 3. Add the route in `src/index.ts` using `app.get("/new-path", (c) => c.html(<NewPage />))`.
 4. For auth-protected pages, validate the session and redirect to `/login` if missing.
 
@@ -317,9 +302,9 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 - `src/lib/content-generator.ts` is the orchestrator. It generates slides first, then derives the podcast script and worksheet questions from those slides for consistency.
 - Each generator (`ppt-generator.ts`, `audio-generator.ts`, etc.) is independent and can be modified without affecting others, as long as the input/output interfaces remain compatible.
-- `content-generator.ts` has a two-tier fallback: OpenAI GPT-4o → Workers AI `kimi-k2.6` → template-based generation.
+- `content-generator.ts` has a two-tier fallback: Workers AI `kimi-k2.6` → Workers AI `llama-3.3-70b-instruct-fp8-fast` → template-based generation.
 - `image-generator.ts` falls back to empty images if Workers AI fails.
-- `audio-generator.ts` throws an error if OpenAI TTS fails (no fallback yet).
+- `audio-generator.ts` (Workers AI Deepgram Aura-1) throws an error if TTS fails (no fallback yet).
 
 ---
 
@@ -331,8 +316,6 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 - **`pptxgenjs`** — Generates PowerPoint files in Node/Worker environments.
 - **`docx`** — Generates Word documents.
 - **`pdf-lib`** — Generates PDF documents (used for answer keys).
-- **`openai`** — Official OpenAI SDK for chat completions and TTS.
-- **`stripe`** — Official Stripe SDK for payments.
 - **`zod`** — Installed but not actively used in the current codebase.
 
 ---
@@ -341,12 +324,9 @@ Before first deploy, the following Cloudflare resources must exist in your Cloud
 
 - **D1 migration fails locally:** Ensure `.dev.vars` has `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` set, or pass them as environment variables.
 - **`npm run lint` fails with config error:** There is no ESLint config file. Either create one (`.eslintrc.cjs` or `eslint.config.js`) or run `npx eslint src --ext .ts,.tsx` directly.
-- **Stripe webhook not working locally:** Use Stripe CLI to forward webhooks to your local dev server:
-  ```bash
-  stripe listen --forward-to localhost:8787/api/webhooks/stripe
-  ```
-- **OpenAI timeouts:** The OpenAI client is configured with a 60s–120s timeout. In Wrangler dev, Workers have a 50ms CPU limit in the free tier but longer wall-clock time for I/O. For long generations, monitor for 524/1101 errors.
+- **Workers AI timeouts:** In Wrangler dev, Workers have a 50ms CPU limit in the free tier but longer wall-clock time for I/O. For long generations (especially audio chunking), monitor for 524/1101 errors.
+- **Audio is silent or truncated:** Check the Aura-1 chunking logs (`Generating audio with Aura-1: ... chunk(s)`) — each chunk is synthesised sequentially and concatenated.
 
 ---
 
-*Last updated: 2026-04-29*
+*Last updated: 2026-07-29*
