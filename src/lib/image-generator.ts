@@ -1,8 +1,9 @@
 // Image generation utility using Cloudflare Workers AI
 // Generates high-quality educational images via FLUX.1 [schnell]
-// Prompts are still crafted using GPT-4o through Cloudflare AI Gateway for relevance
+// Prompts are crafted with Workers AI text models (Kimi K2.6 primary, Llama 3.3 70B fallback)
 
-import OpenAI from "openai";
+const PROMPT_PRIMARY_MODEL = "@cf/moonshotai/kimi-k2.6";
+const PROMPT_FALLBACK_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 
 export interface ImageGenerationResult {
   images: Array<{
@@ -15,25 +16,21 @@ export interface ImageGenerationResult {
  * Generates high-quality educational images related to the topic
  * Uses Cloudflare Workers AI (FLUX.1 schnell) for fast, cost-effective image generation
  * billed through Cloudflare's unified billing.
- * Prompts are generated via GPT-4o for educational relevance and consistency.
  */
 export async function generateImages(
   topic: string,
   slides: Array<{ title: string; content: string[] }>,
-  ai: Ai,
-  apiKey: string,
-  gatewayUrl?: string,
-  gatewayToken?: string
+  ai: Ai
 ): Promise<ImageGenerationResult> {
   try {
     // Generate prompts for image generation based on the topic and ALL slides for consistency
-    const imagePrompts = await generateImagePrompts(topic, slides, apiKey, gatewayUrl, gatewayToken);
-    
+    const imagePrompts = await generateImagePrompts(topic, slides, ai);
+
     // Generate up to 3 high-quality images in parallel using Cloudflare Workers AI
     const imagePromises = imagePrompts.slice(0, 3).map(async (prompt, i) => {
       try {
         console.log(`Generating image ${i + 1} with Workers AI FLUX: ${prompt.prompt.substring(0, 100)}...`);
-        
+
         const response = await ai.run("@cf/black-forest-labs/flux-1-schnell", {
           prompt: prompt.prompt,
         }) as { image: string };
@@ -54,10 +51,10 @@ export async function generateImages(
         return null;
       }
     });
-    
+
     const results = await Promise.all(imagePromises);
     const images = results.filter((img): img is { url: string; description: string } => img !== null);
-    
+
     console.log(`Total images generated: ${images.length}`);
 
     return {
@@ -78,7 +75,7 @@ export async function downloadImages(
   images: Array<{ url: string; description: string }>
 ): Promise<Buffer[]> {
   const buffers: Buffer[] = [];
-  
+
   for (let i = 0; i < images.length; i++) {
     const image = images[i];
     try {
@@ -119,38 +116,54 @@ export async function downloadImages(
       // Continue with other images
     }
   }
-  
+
   console.log(`Downloaded ${buffers.length} out of ${images.length} images`);
   return buffers;
 }
 
 /**
- * Generates appropriate image prompts using GPT-4o
+ * Calls a Workers AI text model, falling back to a secondary model on failure.
+ */
+async function runPromptModel(
+  ai: Ai,
+  messages: Array<{ role: string; content: string }>
+): Promise<string | null> {
+  for (const model of [PROMPT_PRIMARY_MODEL, PROMPT_FALLBACK_MODEL]) {
+    try {
+      const response = await ai.run(model as any, {
+        messages,
+        max_tokens: 500,
+      }) as { response?: string };
+
+      if (response?.response) {
+        return response.response;
+      }
+      console.warn(`Workers AI (${model}) returned empty response for image prompts.`);
+    } catch (error: any) {
+      console.error(`Workers AI (${model}) failed for image prompts:`, error?.message || error);
+    }
+  }
+  return null;
+}
+
+/**
+ * Generates appropriate image prompts using Workers AI
  * Identifies 3 specific key events, people, or places related to the topic
  * Creates prompts for hyper-realistic, photorealistic images
  */
 async function generateImagePrompts(
   topic: string,
   slides: Array<{ title: string; content: string[] }>,
-  openaiApiKey: string,
-  gatewayUrl?: string,
-  gatewayToken?: string
+  ai: Ai
 ): Promise<Array<{ prompt: string; description: string }>> {
-  // Use OpenAI to identify 3 specific key subjects (events, people, or places)
-  const openai = getOpenAIClient(openaiApiKey, gatewayUrl, gatewayToken);
-  
-  if (openai) {
-    try {
-      const identificationResponse = await openai.chat.completions.create({
-        model: "gpt-4o-latest",
-        messages: [
-          {
-            role: "system",
-            content: "You are an expert educator who identifies the most important and visually interesting subjects for educational images. Identify exactly 3 specific key events, historical figures, or important places related to the topic. Each should be a single, specific subject (not combinations). Return ONLY valid JSON in this exact format: {\"subjects\": [{\"type\": \"event\" | \"person\" | \"place\", \"name\": \"specific name\", \"description\": \"brief description\"}]}}.",
-          },
-          {
-            role: "user",
-            content: `For the topic "${topic}", identify exactly 3 specific key subjects that would make excellent educational images. Focus on:
+  const identificationContent = await runPromptModel(ai, [
+    {
+      role: "system",
+      content: "You are an expert educator who identifies the most important and visually interesting subjects for educational images. Identify exactly 3 specific key events, historical figures, or important places related to the topic. Each should be a single, specific subject (not combinations). Return ONLY valid JSON in this exact format: {\"subjects\": [{\"type\": \"event\" | \"person\" | \"place\", \"name\": \"specific name\", \"description\": \"brief description\"}]}.",
+    },
+    {
+      role: "user",
+      content: `For the topic "${topic}", identify exactly 3 specific key subjects that would make excellent educational images. Focus on:
 - Important historical events (be specific: e.g., "The signing of the Declaration of Independence" not just "American Revolution")
 - Key historical figures (be specific: e.g., "Albert Einstein in his laboratory" not just "scientists")
 - Significant places or locations (be specific: e.g., "The Great Wall of China" not just "China")
@@ -159,51 +172,47 @@ Each subject should be ONE specific thing, not a combination. Prioritize subject
 
 Topic: "${topic}"
 Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
-      });
+    },
+  ]);
 
-      const identificationContent = identificationResponse.choices[0]?.message?.content;
-      if (identificationContent) {
-        const jsonMatch = identificationContent.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          if (parsed.subjects && Array.isArray(parsed.subjects) && parsed.subjects.length > 0) {
-            // Generate hyper-realistic image prompts for each subject
-            return parsed.subjects.slice(0, 3).map((subject: { type: string; name: string; description: string }) => {
-              const subjectName = subject.name;
-              const subjectType = subject.type;
-              
-              // Create hyper-realistic, photorealistic prompts optimized for FLUX
-              let prompt = `A highly detailed, photorealistic photograph of ${subjectName}`;
-              
-              if (subjectType === "event") {
-                prompt = `A highly detailed, photorealistic photograph capturing the historical moment of ${subjectName}, documentary photography style, high detail, sharp focus, natural lighting, professional photojournalism quality`;
-              } else if (subjectType === "person") {
-                prompt = `A highly detailed, photorealistic portrait photograph of ${subjectName}, professional portrait photography, high detail, sharp focus, natural lighting, authentic and realistic`;
-              } else if (subjectType === "place") {
-                prompt = `A highly detailed, photorealistic landscape photograph of ${subjectName}, professional landscape photography, high detail, sharp focus, natural lighting, wide angle view, authentic and realistic`;
-              }
-              
-              // Add style requirements and text exclusion
-              prompt += `. Style: photorealistic, documentary photography, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only with perfect, realistic detail.`;
-              
-              return {
-                prompt,
-                description: `${subjectType === "event" ? "Historical event" : subjectType === "person" ? "Historical figure" : "Historical place"}: ${subjectName}`,
-              };
-            });
-          }
+  if (identificationContent) {
+    try {
+      const jsonMatch = identificationContent.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.subjects && Array.isArray(parsed.subjects) && parsed.subjects.length > 0) {
+          // Generate hyper-realistic image prompts for each subject
+          return parsed.subjects.slice(0, 3).map((subject: { type: string; name: string; description: string }) => {
+            const subjectName = subject.name;
+            const subjectType = subject.type;
+
+            // Create hyper-realistic, photorealistic prompts optimized for FLUX
+            let prompt = `A highly detailed, photorealistic photograph of ${subjectName}`;
+
+            if (subjectType === "event") {
+              prompt = `A highly detailed, photorealistic photograph capturing the historical moment of ${subjectName}, documentary photography style, high detail, sharp focus, natural lighting, professional photojournalism quality`;
+            } else if (subjectType === "person") {
+              prompt = `A highly detailed, photorealistic portrait photograph of ${subjectName}, professional portrait photography, high detail, sharp focus, natural lighting, authentic and realistic`;
+            } else if (subjectType === "place") {
+              prompt = `A highly detailed, photorealistic landscape photograph of ${subjectName}, professional landscape photography, high detail, sharp focus, natural lighting, wide angle view, authentic and realistic`;
+            }
+
+            // Add style requirements and text exclusion
+            prompt += `. Style: photorealistic, documentary photography, high resolution, professional quality, natural colors, realistic lighting, no artistic filters, no cartoon style, no animation, no illustration. CRITICAL: This image must contain ABSOLUTELY NO text, NO words, NO letters, NO numbers, NO labels, NO captions, NO signs, NO written content of any kind whatsoever. Pure visual photograph only with perfect, realistic detail.`;
+
+            return {
+              prompt,
+              description: `${subjectType === "event" ? "Historical event" : subjectType === "person" ? "Historical figure" : "Historical place"}: ${subjectName}`,
+            };
+          });
         }
       }
     } catch (error) {
-      console.error("Error identifying key subjects with AI:", error);
+      console.error("Error parsing key subjects from Workers AI:", error);
       // Fall through to fallback
     }
   }
-  
+
   // Fallback: Create prompts based on topic if AI fails
   // Still focus on hyper-realistic, single subjects
   return [
@@ -220,31 +229,4 @@ Slides context: ${JSON.stringify(slides.map(s => s.title).slice(0, 5))}`,
       description: `Significant location for ${topic}`,
     },
   ];
-}
-
-// Helper function to get OpenAI client
-function getOpenAIClient(apiKey: string, gatewayUrl?: string, gatewayToken?: string): OpenAI | null {
-  if (!apiKey) {
-    return null;
-  }
-  
-  const headers: Record<string, string> = {};
-  if (gatewayToken) {
-    headers["cf-aig-authorization"] = `Bearer ${gatewayToken}`;
-  }
-
-  let baseURL = 'https://api.openai.com/v1';
-  
-  if (gatewayUrl) {
-    const cleanGatewayUrl = gatewayUrl.replace(/\/+$/, "");
-    baseURL = `${cleanGatewayUrl}/openai`;
-  }
-
-  return new OpenAI({
-    baseURL,
-    apiKey: apiKey,
-    timeout: 60000,
-    maxRetries: 2,
-    defaultHeaders: Object.keys(headers).length > 0 ? headers : undefined,
-  });
 }
